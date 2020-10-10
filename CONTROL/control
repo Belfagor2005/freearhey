@@ -1,0 +1,6 @@
+Package: enigma2-plugin-extensions-freearhey
+Version: 1.6
+Section: misc
+Priority: optional
+Architecture: all
+Description: freearhey free link stream (no pay)
