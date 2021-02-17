@@ -411,11 +411,12 @@ class freearhey(Screen):
                                                 desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
                                         else:
                                                 desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-                        outfile.close()
+                        # outfile.close()
             if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
                 remove_line('/etc/enigma2/bouquets.tv', bqtname)
                 with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                    outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
+                    outfile.write(bouquetTvString)
+                    # outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)                    
                     outfile.close()
             self.mbox = self.session.open(openMessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), openMessageBox.TYPE_INFO, timeout=5)
             ReloadBouquet()
