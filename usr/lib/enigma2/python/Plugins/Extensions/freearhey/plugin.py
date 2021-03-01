@@ -35,14 +35,16 @@ import sys
 from Components.Console import Console as iConsole
 
 try:
-        from enigma import eDVBDB
+    from enigma import eDVBDB
 except ImportError:
-        eDVBDB = None
+    eDVBDB = None
 '''
 BRAND = '/usr/lib/enigma2/python/boxbranding.so'
 BRANDP = '/usr/lib/enigma2/python/Plugins/PLi/__init__.pyo'
 BRANDPLI ='/usr/lib/enigma2/python/Tools/StbHardware.pyo'
 '''
+
+currversion = '1.8'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
@@ -50,10 +52,14 @@ host1= base64.b64decode(m31)
 m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
 host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
+desc_plugin = '..:: Freearhey Free V. %s ::.. ' % currversion)
+name_plugin = 'Freearhey International Channel List'
 
 from sys import version_info
 global isDreamOS, skin_path
+
 isDreamOS = False
+
 try:
     from enigma import eMediaDatabase
     isDreamOS = True
@@ -112,25 +118,25 @@ except Exception as ex:
     print('addfont', ex)
 
 def checkInternet():
-        try:
-            response = urlopen("http://google.com", None, 5)
-            response.close()
-        except HTTPError:
-            return False
-        except URLError:
-            return False
-        except socket.timeout:
-            return False
+    try:
+        response = urlopen("http://google.com", None, 5)
+        response.close()
+    except HTTPError:
+        return False
+    except URLError:
+        return False
+    except socket.timeout:
+        return False
 
 def getUrl(url):
     try:
-            req = Request(url)
-            req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
-            response = urlopen(req)
-            link = response.read()
-            response.close()
-            print("link =", link)
-            return link
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
+        response = urlopen(req)
+        link = response.read()
+        response.close()
+        print("link =", link)
+        return link
     except:
         e = URLError
         print('We failed to open "%s".' % url)
@@ -157,7 +163,6 @@ def remove_line(filename, what):
         file_write.close()
 
 class m2list(MenuList):
-
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
         self.l.setFont(0, gFont('Regular', 14))
@@ -482,4 +487,4 @@ def main(session, **kwargs):
 def Plugins(path, **kwargs):
     global plugin_path
     plugin_path = path
-    return [PluginDescriptor(name='freearhey', description='freearhey international channel', where=[PluginDescriptor.WHERE_EXTENSIONSMENU], fnc=main), PluginDescriptor(name='freearhey', description='freearhey plugin', where=[PluginDescriptor.WHERE_PLUGINMENU], fnc=main, icon='plugin.png')]
+    return [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], fnc=main), PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], fnc=main, icon='plugin.png')]
