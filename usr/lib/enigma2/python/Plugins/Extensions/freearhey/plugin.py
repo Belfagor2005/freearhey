@@ -1,10 +1,14 @@
+#04/04/2021
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-# import zlib, base64
-# exec zlib.decompress(base64.b64decode(''))
-# http://www.unit-conversion.info/texttools/compress/
-#08.01.2021
-# from __future__ import print_function
+ ######################################################################
+#                                                                     #
+#   Enigma2 plugin Freearhey is coded by Lululla,                     #
+#   version  originally by Lambda (https://forums.tvaddons.ag/).      #
+#   This is free software; you can redistribute it and/or modify it.  #
+#   But no delete this message to the forum linuxsat-support          #
+#######################################################################                    
+from __future__ import print_function
 import base64
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
@@ -15,7 +19,7 @@ from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import ePicLoad, loadPNG, getDesktop
-from enigma import eTimer, gFont, eTimer, eListbox
+from enigma import eTimer, gFont, eTimer, eListbox    
 from Plugins.Plugin import PluginDescriptor
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
@@ -25,10 +29,10 @@ from twisted.web.client import downloadPage, getPage, error
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
 from Tools.LoadPixmap import LoadPixmap
 import os, time, socket
-import sha
 import hashlib
 import ssl
 import re
+import six
 from time import strptime, mktime
 from Components.ActionMap import *
 import sys
@@ -44,7 +48,7 @@ BRANDP = '/usr/lib/enigma2/python/Plugins/PLi/__init__.pyo'
 BRANDPLI ='/usr/lib/enigma2/python/Tools/StbHardware.pyo'
 '''
 
-currversion = '1.8'
+currversion = '1.8'                   
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
@@ -52,7 +56,7 @@ host1= base64.b64decode(m31)
 m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
 host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
-desc_plugin = '..:: Freearhey Free V. %s ::.. ' % currversion)
+desc_plugin = '..:: Freearhey Free V. %s ::.. ' % currversion
 name_plugin = 'Freearhey International Channel List'
 
 from sys import version_info
@@ -66,7 +70,8 @@ try:
 except:
     isDreamOS = False
 
-PY3 = sys.version_info[0] == 3
+PY3 = sys.version_info.major >= 3
+
 if PY3:
     from urllib.request import  Request, urlopen
     from urllib.error import URLError, HTTPError
@@ -129,6 +134,7 @@ def checkInternet():
         return False
 
 def getUrl(url):
+                         
     try:
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
@@ -138,7 +144,7 @@ def getUrl(url):
         print("link =", link)
         return link
     except:
-        e = URLError
+        e = URLError 
         print('We failed to open "%s".' % url)
         if hasattr(e, 'code'):
             print('We failed with error code - %s.' % e.code)
@@ -163,6 +169,7 @@ def remove_line(filename, what):
         file_write.close()
 
 class m2list(MenuList):
+
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
         self.l.setFont(0, gFont('Regular', 14))
@@ -183,6 +190,8 @@ def show_(name, link):
     else:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
+
+
 
 def cat_(letter, link):
     res = [(letter, link)]
@@ -265,11 +274,13 @@ class freearhey(Screen):
             self.timer.callback.append(self.load)
 
     def load(self):
-        url = str(host1)
+        url = six.ensure_str(host1)
         self.index = 'group'
         self.cat_list = []
         content = getUrl(url)
+        content = six.ensure_str(content)
         print("content 3 =", content)
+        
         if not 'None' in content:
             if '#EXTINF' in content:
                 regexcat = '#EXTINF.*?,(.*?)\\n(.*?)\\n'
@@ -290,17 +301,19 @@ class freearhey(Screen):
                 self['text'].setText('')
             else:
                 return
+                
         else:
             return
 
     def cat(self,url):
         self.index = 'cat'
         self.cat_list = []
-        url = host + url
+        url = six.ensure_str(host) + url
         print('read url: ',  url)
         # content = checkStr(getUrl(url))
         req = Request(url, None, headers=headers)
         content = urlopen(req, timeout=30).read()
+        content = six.ensure_str(content)
         print("content 3 =", content)
 
         if '#EXTINF' in content:
@@ -386,11 +399,13 @@ class freearhey(Screen):
             url = host + str(url) #fix 17122020
             name = str(name)
             print('name content: ', name)
+
             req = Request(url)
             req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
             content = checkStr(urlopen(req))
             content = content.read()
             print("content =", content)
+
             with open(xxxname, 'w') as f:
                 f.write(content)
             bqtname = 'userbouquet.%s.tv' % name
@@ -416,12 +431,11 @@ class freearhey(Screen):
                                                 desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
                                         else:
                                                 desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-                        # outfile.close()
             if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
                 remove_line('/etc/enigma2/bouquets.tv', bqtname)
                 with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                    outfile.write(bouquetTvString)
-                    # outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)                    
+                    outfile.write(bouquetTvString)                                                  
+                    # outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
                     outfile.close()
             self.mbox = self.session.open(openMessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), openMessageBox.TYPE_INFO, timeout=5)
             ReloadBouquet()
@@ -483,6 +497,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
 def main(session, **kwargs):
     session.open(freearhey)
+
 
 def Plugins(path, **kwargs):
     global plugin_path
