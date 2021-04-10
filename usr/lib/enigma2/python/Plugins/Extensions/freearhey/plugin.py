@@ -3,23 +3,24 @@
 #!/usr/bin/env python
  ######################################################################
 #                                                                     #
-#   Enigma2 plugin Freearhey is coded by Lululla,                     #
-#   version  originally by Lambda (https://forums.tvaddons.ag/).      #
+#   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
 #   But no delete this message to the forum linuxsat-support          #
-#######################################################################                    
-from __future__ import print_function
+#######################################################################
+# from __future__ import print_function
 import base64
 from Components.Label import Label
 from Components.Sources.StaticText import StaticText
 from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap, MovingPixmap
 from Components.MultiContent import MultiContentEntryText
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
+from enigma import eSize, iServiceInformation 
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import ePicLoad, loadPNG, getDesktop
-from enigma import eTimer, gFont, eTimer, eListbox    
+from enigma import eTimer, gFont, eTimer, eListbox
 from Plugins.Plugin import PluginDescriptor
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
@@ -29,6 +30,7 @@ from twisted.web.client import downloadPage, getPage, error
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
 from Tools.LoadPixmap import LoadPixmap
 import os, time, socket
+from Components.AVSwitch import AVSwitch          
 import hashlib
 import ssl
 import re
@@ -37,18 +39,17 @@ from time import strptime, mktime
 from Components.ActionMap import *
 import sys
 from Components.Console import Console as iConsole
+from sys import version_info
+
+global isDreamOS, skin_path
+isDreamOS = False
 
 try:
     from enigma import eDVBDB
 except ImportError:
     eDVBDB = None
-'''
-BRAND = '/usr/lib/enigma2/python/boxbranding.so'
-BRANDP = '/usr/lib/enigma2/python/Plugins/PLi/__init__.pyo'
-BRANDPLI ='/usr/lib/enigma2/python/Tools/StbHardware.pyo'
-'''
 
-currversion = '1.8'                   
+currversion = '1.8'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
@@ -56,13 +57,8 @@ host1= base64.b64decode(m31)
 m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
 host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
-desc_plugin = '..:: Freearhey Free V. %s ::.. ' % currversion
+desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey International Channel List'
-
-from sys import version_info
-global isDreamOS, skin_path
-
-isDreamOS = False
 
 try:
     from enigma import eMediaDatabase
@@ -80,7 +76,6 @@ if PY3:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
     from urllib.request import urlretrieve
-
 else:
     import cookielib
     from urllib2 import Request, urlopen
@@ -134,7 +129,7 @@ def checkInternet():
         return False
 
 def getUrl(url):
-                         
+
     try:
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
@@ -144,7 +139,7 @@ def getUrl(url):
         print("link =", link)
         return link
     except:
-        e = URLError 
+        e = URLError
         print('We failed to open "%s".' % url)
         if hasattr(e, 'code'):
             print('We failed with error code - %s.' % e.code)
@@ -192,7 +187,6 @@ def show_(name, link):
     return res
 
 
-
 def cat_(letter, link):
     res = [(letter, link)]
     if sz_w.width() > 1280:
@@ -205,9 +199,9 @@ class freearhey(Screen):
 
     def __init__(self, session):
         if sz_w.width() > 1280:
-                path = skin_path + 'defaultListScreen_new.xml'
+            path = skin_path + 'defaultListScreen_new.xml'
         else:
-                path =  skin_path + 'defaultListScreen.xml'
+            path =  skin_path + 'defaultListScreen.xml'
         with open(path, 'r') as f:
             self.skin = f.read()
             f.close()
@@ -280,7 +274,7 @@ class freearhey(Screen):
         content = getUrl(url)
         content = six.ensure_str(content)
         print("content 3 =", content)
-        
+
         if not 'None' in content:
             if '#EXTINF' in content:
                 regexcat = '#EXTINF.*?,(.*?)\\n(.*?)\\n'
@@ -301,7 +295,6 @@ class freearhey(Screen):
                 self['text'].setText('')
             else:
                 return
-                
         else:
             return
 
@@ -336,7 +329,7 @@ class freearhey(Screen):
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
-                
+
                 self.cat_list.append(show_(name, url))
             self['menulist'].l.setList(self.cat_list)
             self['menulist'].l.setItemHeight(40)
@@ -350,7 +343,7 @@ class freearhey(Screen):
     def ok(self):
         id = self['menulist'].getCurrent()[0][1]
         url = str(id)
-        print('url: ', url)    
+        print('url: ', url)
         if self.index == 'cat':
             self.play_that_shit(url)
         else:
@@ -434,7 +427,7 @@ class freearhey(Screen):
             if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
                 remove_line('/etc/enigma2/bouquets.tv', bqtname)
                 with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                    outfile.write(bouquetTvString)                                                  
+                    outfile.write(bouquetTvString)
                     # outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
                     outfile.close()
             self.mbox = self.session.open(openMessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), openMessageBox.TYPE_INFO, timeout=5)
@@ -442,49 +435,289 @@ class freearhey(Screen):
         except:
             return
 
+class TvInfoBarShowHide():
+    """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
+    fancy animations. """
+    STATE_HIDDEN = 0
+    STATE_HIDING = 1
+    STATE_SHOWING = 2
+    STATE_SHOWN = 3
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+    def __init__(self):
+        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.toggleShow,
+         "hide": self.hide}, 0)
+        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
+        self.__state = self.STATE_SHOWN
+        self.__locked = 0
+        self.hideTimer = eTimer()
+        self.hideTimer.start(5000, True)
+        try:
+            self.hideTimer_conn = self.hideTimer.timeout.connect(self.doTimerHide)
+        except:
+            self.hideTimer.callback.append(self.doTimerHide)
+        self.onShow.append(self.__onShow)
+        self.onHide.append(self.__onHide)
+
+    def serviceStarted(self):
+        if self.execing:
+            if config.usage.show_infobar_on_zap.value:
+                self.doShow()
+
+    def __onShow(self):
+        self.__state = self.STATE_SHOWN
+        self.startHideTimer()
+
+    def startHideTimer(self):
+        if self.__state == self.STATE_SHOWN and not self.__locked:
+            idx = config.usage.infobar_timeout.index
+            if idx:
+                self.hideTimer.start(idx * 1500, True)
+
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
+
+    def doShow(self):
+        self.show()
+        self.startHideTimer()
+
+    def doTimerHide(self):
+        self.hideTimer.stop()
+        if self.__state == self.STATE_SHOWN:
+            self.hide()
+
+    def toggleShow(self):
+        if self.__state == self.STATE_SHOWN:
+            self.hide()
+            self.hideTimer.stop()
+        elif self.__state == self.STATE_HIDDEN:
+            self.show()
+
+    def lockShow(self):
+        self.__locked = self.__locked + 1
+        if self.execing:
+            self.show()
+            self.hideTimer.stop()
+
+    def unlockShow(self):
+        self.__locked = self.__locked - 1
+        if self.execing:
+            self.startHideTimer()
+
+    def debug(obj, text = ""):
+        print(text + " %s\n" % obj)
+
+
+#work very fine
+class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
+    STATE_IDLE = 0
+    STATE_PLAYING = 1
+    STATE_PAUSED = 2
+    ENABLE_RESUME_SUPPORT = True
+    ALLOW_SUSPEND = True
+    screen_timeout = 5000
 
     def __init__(self, session, name, url):
+        global SREF
         Screen.__init__(self, session)
+        self.session = session #edit
         self.skinName = 'MoviePlayer'
-        title = 'Play'
-        self['list'] = MenuList([])
+        title = 'Play Stream'
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self)
-        InfoBarShowHide.__init__(self)
+        InfoBarBase.__init__(self, steal_current_service=True)
+        TvInfoBarShowHide.__init__(self)
+        InfoBarAudioSelection.__init__(self)
+        # InfoBarSubtitleSupport.__init__(self)
+        try:
+            self.init_aspect = int(self.getAspect())
+        except:
+            self.init_aspect = 0
+
+        self.new_aspect = self.init_aspect
         self['actions'] = ActionMap(['WizardActions',
          'MoviePlayerActions',
+         'MovieSelectionActions',
+         'MediaPlayerActions',
          'EPGSelectActions',
          'MediaPlayerSeekActions',
+         'SetupActions',
          'ColorActions',
          'InfobarShowHideActions',
-         'InfobarActions'], {'leavePlayer': self.cancel,
+         'InfobarActions',
+         'InfobarSeekActions'], {'leavePlayer': self.cancel,
+         'epg': self.showIMDB,
+         'info': self.showinfo,
+         # 'info': self.cicleStreamType,
+         'tv': self.cicleStreamType,
+         'stop': self.leavePlayer,
+         'cancel': self.cancel,
          'back': self.cancel}, -1)
         self.allowPiP = False
-        InfoBarSeek.__init__(self, actionmap='MediaPlayerSeekActions')
+        self.service = None
+        service = None
+        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         url = url.replace(':', '%3a')
+        self.icount = 0
+        # self.desc = desc
+        self.pcip = 'None'
         self.url = url
         self.name = name
+        self.state = self.STATE_PLAYING
+        self.hideTimer = eTimer()
+        self.hideTimer.start(5000, True)
+        try:
+            self.hideTimer_conn = self.hideTimer.timeout.connect(self.ok)
+        except:
+            self.hideTimer.callback.append(self.ok)
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.openTest)
+        SREF = self.srefOld
+        self.onLayoutFinish.append(self.cicleStreamType)
+        self.onClose.append(self.cancel)
+        return
 
-    def openTest(self):
-        url = self.url
-        pass
-        ref = '4097:0:1:0:0:0:0:0:0:0:' + url
+    def getAspect(self):
+        return AVSwitch().getAspectRatioSetting()
+
+    def getAspectString(self, aspectnum):
+        return {0: _('4:3 Letterbox'),
+         1: _('4:3 PanScan'),
+         2: _('16:9'),
+         3: _('16:9 always'),
+         4: _('16:10 Letterbox'),
+         5: _('16:10 PanScan'),
+         6: _('16:9 Letterbox')}[aspectnum]
+
+    def setAspect(self, aspect):
+        map = {0: '4_3_letterbox',
+         1: '4_3_panscan',
+         2: '16_9',
+         3: '16_9_always',
+         4: '16_10_letterbox',
+         5: '16_10_panscan',
+         6: '16_9_letterbox'}
+        config.av.aspectratio.setValue(map[aspect])
+        try:
+            AVSwitch().setAspectRatio(aspect)
+        except:
+            pass
+
+    def av(self):
+        temp = int(self.getAspect())
+        temp = temp + 1
+        if temp > 6:
+            temp = 0
+        self.new_aspect = temp
+        self.setAspect(temp)
+
+    def showinfo(self):
+        debug = True
+        sTitle = ''
+        sServiceref = ''
+        try:
+            servicename, serviceurl = getserviceinfo(sref)
+            if servicename is not None:
+                sTitle = servicename
+            else:
+                sTitle = ''
+            if serviceurl is not None:
+                sServiceref = serviceurl
+            else:
+                sServiceref = ''
+            currPlay = self.session.nav.getCurrentService()
+            sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
+            sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
+            sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
+            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec :' + str(sTagAudioCodec)
+            self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+        except:
+            pass
+        return
+
+    def showIMDB(self):
+        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text_clear = self.name
+            text = charRemove(text_clear)
+            self.session.open(TMBD, text, False)
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+            from Plugins.Extensions.IMDb.plugin import IMDB
+            text_clear = self.name
+            text = charRemove(text_clear)
+            HHHHH = text
+            self.session.open(IMDB, HHHHH)
+        else:
+            text_clear = self.name
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+
+    def openPlay(self,servicetype, url):
+        url = url
+        ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
+        print('final reference :   ', ref)
         sref = eServiceReference(ref)
         sref.setName(self.name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
+    def cicleStreamType(self):
+        from itertools import cycle, islice
+        self.servicetype = str(config.plugins.exodus.services.value)# '4097'
+        print('servicetype1: ', self.servicetype)
+        url = str(self.url)
+        currentindex = 0
+        streamtypelist = ["1", "4097"]
+        if os.path.exists("/usr/bin/gstplayer"):
+            streamtypelist.append("5001")
+        if os.path.exists("/usr/bin/exteplayer3"):
+            streamtypelist.append("5002")
+        if os.path.exists("/usr/bin/apt-get"):
+            streamtypelist.append("8193")
+        for index, item in enumerate(streamtypelist, start=0):
+            if str(item) == str(self.servicetype):
+                currentindex = index
+                break
+        nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
+        self.servicetype = int(next(nextStreamType))
+        print('servicetype2: ', self.servicetype)
+        self.openPlay(self.servicetype, url)
+
+    def keyNumberGlobal(self, number):
+        self['text'].number(number)
+
     def cancel(self):
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(self.srefOld)
+        self.session.nav.playService(SREF)
+        if self.pcip != 'None':
+            url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
+            resp = urlopen(url2)
+        if not self.new_aspect == self.init_aspect:
+            try:
+                self.setAspect(self.init_aspect)
+            except:
+                pass
         self.close()
+
+    def __setHideTimer(self):
+              self.hidetimer.start(self.screen_timeout)
+
+    def showInfobar(self):
+        self.vlcservice.refresh()
+        self.show()
+        if self.state == self.STATE_PLAYING:
+            self.__setHideTimer()
+        else:
+            pass
+
+    def hideInfobar(self):
+        self.hide()
+        # self.hidetimer.stop()
+
+    def ok(self):
+        if self.shown:
+            self.hideInfobar()
+        else:
+            self.showInfobar()
 
     def keyLeft(self):
         self['text'].left()
@@ -492,12 +725,84 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def keyRight(self):
         self['text'].right()
 
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
+    def showVideoInfo(self):
+        if self.shown:
+            self.hideInfobar()
+        if self.infoCallback is not None:
+            self.infoCallback()
+        return
+
+    def showAfterSeek(self):
+        if isinstance(self, TvInfoBarShowHide):
+            self.doShow()
+
+    def leavePlayer(self):
+        self.close()
+
+def charRemove(text):
+    char = ["1080p",
+     "2018",
+     "2019",
+     "2020",
+     "2021",
+     "480p",
+     "4K",
+     "720p",
+     "ANIMAZIONE",
+     "APR",
+     "AVVENTURA",
+     "BIOGRAFICO",
+     "BDRip",
+     "BluRay",
+     "CINEMA",
+     "COMMEDIA",
+     "DOCUMENTARIO",
+     "DRAMMATICO",
+     "FANTASCIENZA",
+     "FANTASY",
+     "FEB",
+     "GEN",
+     "GIU",
+     "HDCAM",
+     "HDTC",
+     "HDTS",
+     "LD",
+     "MAFIA",
+     "MAG",
+     "MARVEL",
+     "MD",
+     "ORROR",
+     "NEW_AUDIO",
+     "POLIZ",
+     "R3",
+     "R6",
+     "SD",
+     "SENTIMENTALE",
+     "TC",
+     "TEEN",
+     "TELECINE",
+     "TELESYNC",
+     "THRILLER",
+     "Uncensored",
+     "V2",
+     "WEBDL",
+     "WEBRip",
+     "WEB",
+     "WESTERN",
+     "-",
+     "_",
+     ".",
+     "+",
+     "[",
+     "]"]
+
+    myreplace = text
+    for ch in char:
+        myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("       ", " ").strip()
+    return myreplace
 
 def main(session, **kwargs):
     session.open(freearhey)
-
 
 def Plugins(path, **kwargs):
     global plugin_path
