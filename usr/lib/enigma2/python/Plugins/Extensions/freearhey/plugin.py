@@ -563,12 +563,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-        self.hideTimer = eTimer()
-        self.hideTimer.start(5000, True)
-        try:
-            self.hideTimer_conn = self.hideTimer.timeout.connect(self.ok)
-        except:
-            self.hideTimer.callback.append(self.ok)
+        # self.hideTimer = eTimer()
+        # self.hideTimer.start(5000, True)
+        # try:
+            # self.hideTimer_conn = self.hideTimer.timeout.connect(self.ok)
+        # except:
+            # self.hideTimer.callback.append(self.ok)
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
         self.onLayoutFinish.append(self.cicleStreamType)
@@ -660,7 +660,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def cicleStreamType(self):
         from itertools import cycle, islice
-        self.servicetype = str(config.plugins.exodus.services.value)# '4097'
+        self.servicetype = '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -698,26 +698,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 pass
         self.close()
 
-    def __setHideTimer(self):
-              self.hidetimer.start(self.screen_timeout)
-
-    def showInfobar(self):
-        self.vlcservice.refresh()
-        self.show()
-        if self.state == self.STATE_PLAYING:
-            self.__setHideTimer()
-        else:
-            pass
-
-    def hideInfobar(self):
-        self.hide()
-        # self.hidetimer.stop()
-
-    def ok(self):
-        if self.shown:
-            self.hideInfobar()
-        else:
-            self.showInfobar()
 
     def keyLeft(self):
         self['text'].left()
