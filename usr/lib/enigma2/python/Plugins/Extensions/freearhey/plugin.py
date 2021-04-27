@@ -1,45 +1,49 @@
-#04/04/2021
+#24/04/2021
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
  ######################################################################
-#                                                                     #
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
-#   But no delete this message to the forum linuxsat-support          #
+#   But no delete this message support on forum linuxsat-support      #
 #######################################################################
-# from __future__ import print_function
-import base64
+from __future__ import print_function
+                                                                             
+from Components.AVSwitch import AVSwitch  
+from Components.ActionMap import *
+from Components.Console import Console as iConsole
 from Components.Label import Label
-from Components.Sources.StaticText import StaticText
 from Components.MenuList import MenuList
-from Components.Pixmap import Pixmap, MovingPixmap
 from Components.MultiContent import MultiContentEntryText
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
-from enigma import eSize, iServiceInformation 
+from Components.Pixmap import Pixmap, MovingPixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
-from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
-from enigma import ePicLoad, loadPNG, getDesktop
-from enigma import eTimer, gFont, eTimer, eListbox
+from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
-from Screens.Screen import Screen
-from Screens.MessageBox import MessageBox
-from Screens.InfoBarGenerics import *
 from Screens.InfoBar import MoviePlayer, InfoBar
-from twisted.web.client import downloadPage, getPage, error
+from Screens.InfoBarGenerics import *
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
+from Screens.MessageBox import MessageBox
+from Screens.Screen import Screen
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
 from Tools.LoadPixmap import LoadPixmap
-import os, time, socket
-from Components.AVSwitch import AVSwitch          
+from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
+from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
+from enigma import ePicLoad
+from enigma import eSize, iServiceInformation 
+from enigma import eTimer, gFont, eListbox
+from enigma import getDesktop
+from enigma import loadPNG
+from sys import version_info
+from time import strptime, mktime
+from twisted.web.client import downloadPage, getPage, error
+import base64
 import hashlib
-import ssl
+import os
 import re
 import six
-from time import strptime, mktime
-from Components.ActionMap import *
+import socket
+import ssl
 import sys
-from Components.Console import Console as iConsole
-from sys import version_info
+import time
 
 global isDreamOS, skin_path
 isDreamOS = False
@@ -48,25 +52,13 @@ try:
     from enigma import eDVBDB
 except ImportError:
     eDVBDB = None
-
-currversion = '1.8'
-estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
-m3uest = base64.b64decode(estm3u)
-m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
-host1= base64.b64decode(m31)
-m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
-host= base64.b64decode(m3)
-PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
-desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
-name_plugin = 'Freearhey International Channel List'
-
 try:
     from enigma import eMediaDatabase
     isDreamOS = True
 except:
     isDreamOS = False
-
-PY3 = sys.version_info.major >= 3
+    
+PY3 = sys.version_info[0] == 3
 
 if PY3:
     from urllib.request import  Request, urlopen
@@ -84,6 +76,21 @@ else:
     from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
     from urllib import urlretrieve
+
+currversion = '1.8'
+estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
+m3uest = base64.b64decode(estm3u)
+m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
+host1= base64.b64decode(m31)
+m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
+host= base64.b64decode(m3)
+PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
+desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
+name_plugin = 'Freearhey International Channel List'
+
+
+
+
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
@@ -784,7 +791,16 @@ def charRemove(text):
 def main(session, **kwargs):
     session.open(freearhey)
 
-def Plugins(path, **kwargs):
-    global plugin_path
-    plugin_path = path
-    return [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], fnc=main), PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], fnc=main, icon='plugin.png')]
+# def Plugins(path, **kwargs):
+    # global plugin_path
+    # plugin_path = path
+    # return [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], fnc=main), PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], fnc=main, icon='plugin.png')]
+
+def Plugins(**kwargs):
+    icona = 'plugin.png'
+    extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)
+    result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=icona, fnc=main)]
+    result.append(extDescriptor)
+    return result
+
+
