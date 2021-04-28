@@ -7,7 +7,6 @@
 #   But no delete this message support on forum linuxsat-support      #
 #######################################################################
 from __future__ import print_function
-                                                                             
 from Components.AVSwitch import AVSwitch  
 from Components.ActionMap import *
 from Components.Console import Console as iConsole
@@ -44,7 +43,7 @@ import socket
 import ssl
 import sys
 import time
-
+PY3 = sys.version_info[0] == 3
 global isDreamOS, skin_path
 isDreamOS = False
 
@@ -57,8 +56,6 @@ try:
     isDreamOS = True
 except:
     isDreamOS = False
-    
-PY3 = sys.version_info[0] == 3
 
 if PY3:
     from urllib.request import  Request, urlopen
@@ -67,7 +64,7 @@ if PY3:
     from urllib.parse import quote, unquote_plus, unquote, urlencode
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib.request import urlretrieve
+    # from urllib.request import urlretrieve
 else:
     import cookielib
     from urllib2 import Request, urlopen
@@ -75,7 +72,7 @@ else:
     from urlparse import urlparse
     from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    from urllib import urlretrieve
+    # from urllib import urlretrieve
 
 currversion = '1.8'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
@@ -87,11 +84,6 @@ host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey International Channel List'
-
-
-
-
-
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
 
@@ -400,19 +392,21 @@ class freearhey(Screen):
             name = str(name)
             print('name content: ', name)
 
-            req = Request(url)
-            req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
-            content = checkStr(urlopen(req))
+            # req = Request(url)
+            # req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
+            # content = checkStr(urlopen(req))
+            # content = content.read()
+            # print("content =", content)
+            content = getUrl(url)
+            content = six.ensure_str(content)
             content = content.read()
-            print("content =", content)
-
             with open(xxxname, 'w') as f:
                 f.write(content)
             bqtname = 'userbouquet.%s.tv' % name
             bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + bqtname + '" ORDER BY bouquet\n'
             bouquet = 'bouquets.tv'
             self.iConsole = iConsole()
-            desk_tmp = hls_opt = ''
+            desk_tmp = ''
             if os.path.isfile('/etc/enigma2/%s' % bqtname):
                         os.remove('/etc/enigma2/%s' % bqtname)
             with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
