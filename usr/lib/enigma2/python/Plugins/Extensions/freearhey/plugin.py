@@ -74,7 +74,7 @@ else:
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
     # from urllib import urlretrieve
 
-currversion = '1.8'
+currversion = '1.9'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
