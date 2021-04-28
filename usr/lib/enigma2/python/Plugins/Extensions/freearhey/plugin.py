@@ -79,7 +79,10 @@ estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
 host1= base64.b64decode(m31)
-m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci8='
+# m3 = 'https://raw.githubusercontent.com/freearhey/iptv/master/channels/it.m3u'
+
+m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lwdHYtb3JnL2lwdHYvbWFzdGVyLw==' #channels/it.m3u
+
 host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
@@ -146,6 +149,15 @@ def getUrl(url):
             print('We failed to reach a server.')
             print('Reason: ', e.reason)
 
+def getUrlresp(url):
+       print("Here in getUrlresp url =", url)
+       req = Request(url)
+       req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+       response = urlopen(req)
+#      link=response.read()
+#      response.close()
+       return response
+       
 def ReloadBouquet():
     try:
         eDVBDB.getInstance().reloadServicelist()
@@ -328,7 +340,6 @@ class freearhey(Screen):
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
-
                 self.cat_list.append(show_(name, url))
             self['menulist'].l.setList(self.cat_list)
             self['menulist'].l.setItemHeight(40)
@@ -388,49 +399,49 @@ class freearhey(Screen):
             print('permantly remove file ', file)
             os.remove(xxxname)
         try:
-            url = host + str(url) #fix 17122020
-            name = str(name)
-            print('name content: ', name)
-
-            # req = Request(url)
-            # req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
-            # content = checkStr(urlopen(req))
-            # content = content.read()
-            # print("content =", content)
-            content = getUrl(url)
+            url = six.ensure_str(host) + url
+            print('read url: ',  url)
+            req = Request(url, None, headers=headers)
+            content = urlopen(req, timeout=30).read()
             content = six.ensure_str(content)
-            content = content.read()
-            with open(xxxname, 'w') as f:
+            print("content =", content)
+            with open('/tmp/temporary.m3u', 'w') as f:
                 f.write(content)
             bqtname = 'userbouquet.%s.tv' % name
             bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + bqtname + '" ORDER BY bouquet\n'
             bouquet = 'bouquets.tv'
-            self.iConsole = iConsole()
             desk_tmp = ''
+            in_bouquets = 0
             if os.path.isfile('/etc/enigma2/%s' % bqtname):
-                        os.remove('/etc/enigma2/%s' % bqtname)
+                    os.remove('/etc/enigma2/%s' % bqtname)
             with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
-                        outfile.write('#NAME %s\r\n' % name.capitalize())
-                        for line in open(xxxname):
-                                if line.startswith('http://') or line.startswith('https'):
-                                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
-                                        outfile.write('#DESCRIPTION %s' % desk_tmp)
-                                elif line.startswith('#EXTINF'):
-                                        desk_tmp = '%s' % line.split(',')[-1]
-                                elif '<stream_url><![CDATA' in line:
-                                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
-                                        outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
-                                elif '<title>' in line:
-                                        if '<![CDATA[' in line:
-                                                desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
-                                        else:
-                                                desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-            if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
-                remove_line('/etc/enigma2/bouquets.tv', bqtname)
-                with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                    outfile.write(bouquetTvString)
-                    # outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
-                    outfile.close()
+                outfile.write('#NAME %s\r\n' % name.capitalize())
+                for line in open(xxxname ):
+                    if line.startswith('http://') or line.startswith('https'):
+                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
+                        outfile.write('#DESCRIPTION %s' % desk_tmp)
+                    elif line.startswith('#EXTINF'):
+                        desk_tmp = '%s' % line.split(',')[-1]
+                    elif '<stream_url><![CDATA' in line:
+                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
+                        outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
+                    elif '<title>' in line:
+                        if '<![CDATA[' in line:
+                            desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
+                        else:
+                            desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
+                outfile.close()
+            if os.path.isfile('/etc/enigma2/bouquets.tv'):
+                for line in open('/etc/enigma2/bouquets.tv'):
+                    if bqtname in line:
+                        in_bouquets = 1
+
+                if in_bouquets == 0:
+                    if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
+                        remove_line('/etc/enigma2/bouquets.tv', bqtname)
+                        with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
+                            outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
+                            outfile.close()                   
             self.mbox = self.session.open(openMessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), openMessageBox.TYPE_INFO, timeout=5)
             ReloadBouquet()
         except:
