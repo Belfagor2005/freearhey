@@ -674,7 +674,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
-        streamtypelist = ["1", "4097"]
+        streamtypelist = ["4097"]
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
