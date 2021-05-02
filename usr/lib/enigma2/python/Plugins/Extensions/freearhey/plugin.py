@@ -64,7 +64,6 @@ if PY3:
     from urllib.parse import quote, unquote_plus, unquote, urlencode
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    # from urllib.request import urlretrieve
 else:
     import cookielib
     from urllib2 import Request, urlopen
@@ -72,7 +71,6 @@ else:
     from urlparse import urlparse
     from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-    # from urllib import urlretrieve
 
 currversion = '1.9'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
@@ -129,7 +127,6 @@ def checkInternet():
         return False
 
 def getUrl(url):
-
     try:
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
@@ -148,13 +145,13 @@ def getUrl(url):
             print('Reason: ', e.reason)
 
 def getUrlresp(url):
-       print("Here in getUrlresp url =", url)
-       req = Request(url)
-       req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-       response = urlopen(req)
-#      link=response.read()
-#      response.close()
-       return response
+        print("Here in getUrlresp url =", url)
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        response = urlopen(req)
+        link=response.read()
+        response.close()
+        return link
        
 def ReloadBouquet():
     try:
@@ -387,7 +384,6 @@ class freearhey(Screen):
         name = self['menulist'].l.getCurrentSelection()[0][0]
         if result:
             self.convert_bouquet(url, name)
-            # return
         else:
             return
 
@@ -542,7 +538,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             self.init_aspect = int(self.getAspect())
         except:
             self.init_aspect = 0
-
         self.new_aspect = self.init_aspect
         self['actions'] = ActionMap(['WizardActions',
          'MoviePlayerActions',
@@ -573,12 +568,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.url = url
         self.name = name
         self.state = self.STATE_PLAYING
-        # self.hideTimer = eTimer()
-        # self.hideTimer.start(5000, True)
-        # try:
-            # self.hideTimer_conn = self.hideTimer.timeout.connect(self.ok)
-        # except:
-            # self.hideTimer.callback.append(self.ok)
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
         self.onLayoutFinish.append(self.cicleStreamType)
@@ -708,7 +697,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 pass
         self.close()
 
-
     def keyLeft(self):
         self['text'].left()
 
@@ -793,11 +781,6 @@ def charRemove(text):
 
 def main(session, **kwargs):
     session.open(freearhey)
-
-# def Plugins(path, **kwargs):
-    # global plugin_path
-    # plugin_path = path
-    # return [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], fnc=main), PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], fnc=main, icon='plugin.png')]
 
 def Plugins(**kwargs):
     icona = 'plugin.png'
