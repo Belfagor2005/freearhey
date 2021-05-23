@@ -60,14 +60,12 @@ except:
 if PY3:
     from urllib.request import  Request, urlopen
     from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import quote, unquote_plus, unquote, urlencode
+    from urllib.parse import quote, unquote_plus, unquote, urlencode, urlparse
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 else:
     import cookielib
-    from urllib2 import Request, urlopen
-    from urllib2 import URLError, HTTPError
+    from urllib2 import URLError, HTTPError, Request, urlopen
     from urlparse import urlparse
     from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
