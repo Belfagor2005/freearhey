@@ -60,12 +60,14 @@ except:
 if PY3:
     from urllib.request import  Request, urlopen
     from urllib.error import URLError, HTTPError
-    from urllib.parse import quote, unquote_plus, unquote, urlencode, urlparse
+    from urllib.parse import urlparse
+    from urllib.parse import quote, unquote_plus, unquote, urlencode
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 else:
     import cookielib
-    from urllib2 import URLError, HTTPError, Request, urlopen
+    from urllib2 import Request, urlopen
+    from urllib2 import URLError, HTTPError
     from urlparse import urlparse
     from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
@@ -293,7 +295,7 @@ class freearhey(Screen):
                     self.cat_list.append(show_(name, url))
                 self['menulist'].l.setList(self.cat_list)
                 self['menulist'].l.setItemHeight(40)
-                self['menulist'].moveToIndex(0)
+                # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(auswahl)
                 self['text'].setText('')
@@ -336,7 +338,7 @@ class freearhey(Screen):
                 self.cat_list.append(show_(name, url))
             self['menulist'].l.setList(self.cat_list)
             self['menulist'].l.setItemHeight(40)
-            self['menulist'].moveToIndex(0)
+            # self['menulist'].moveToIndex(0)
             auswahl = self['menulist'].getCurrent()[0][0]
             self['name'].setText(auswahl)
         else:
