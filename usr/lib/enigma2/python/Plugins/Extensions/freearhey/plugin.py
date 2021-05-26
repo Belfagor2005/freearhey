@@ -1,7 +1,7 @@
-#24/04/2021
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
- ######################################################################
+#24/04/2021
+#######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
 #   But no delete this message support on forum linuxsat-support      #
@@ -552,7 +552,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'InfobarSeekActions'], {'leavePlayer': self.cancel,
          'epg': self.showIMDB,
          'info': self.showinfo,
-         # 'info': self.cicleStreamType,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
          'cancel': self.cancel,
