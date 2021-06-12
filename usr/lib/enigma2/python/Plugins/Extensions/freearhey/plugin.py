@@ -7,7 +7,7 @@
 #   But no delete this message support on forum linuxsat-support      #
 #######################################################################
 from __future__ import print_function
-from Components.AVSwitch import AVSwitch  
+from Components.AVSwitch import AVSwitch
 from Components.ActionMap import *
 from Components.Console import Console as iConsole
 from Components.Label import Label
@@ -27,7 +27,7 @@ from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
 from enigma import ePicLoad
-from enigma import eSize, iServiceInformation 
+from enigma import eSize, iServiceInformation
 from enigma import eTimer, gFont, eListbox
 from enigma import getDesktop
 from enigma import loadPNG
@@ -152,7 +152,7 @@ def getUrlresp(url):
         link=response.read()
         response.close()
         return link
-       
+
 def ReloadBouquet():
     try:
         eDVBDB.getInstance().reloadServicelist()
@@ -238,6 +238,7 @@ class freearhey(Screen):
         self.loading_ok = False
         self.count = 0
         self.loading = 0
+        self.index = 'group'
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.downmasterpage)
 
@@ -274,11 +275,16 @@ class freearhey(Screen):
             self.timer.callback.append(self.load)
 
     def load(self):
-        url = six.ensure_str(host1)
+        # url = six.ensure_str(host1)
+        url = host1
+        if PY3:
+            url = six.ensure_str(host1)
+
         self.index = 'group'
         self.cat_list = []
         content = getUrl(url)
-        content = six.ensure_str(content)
+        if PY3:
+            content = six.ensure_str(content)
         print("content 3 =", content)
 
         if not 'None' in content:
@@ -317,24 +323,29 @@ class freearhey(Screen):
 
         if '#EXTINF' in content:
             print("#EXTINF in content =========")
-            regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            regexcat = 'EXTINF.*?tvg-logo="(.*?)".*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
             items = []
             self.names = []
             self.urls = []
-            for name, url in match:
+            self.logos = []
+            for logo, name, url in match:
                 url = url.replace(" ", "%20")
                 url = url.replace("\\n", "")
                 url = url.replace('\r','')
                 name = name.replace('\r','')
+                logo = logo
                 print('name:', name)
                 print('url final:', url)
-                item = name + "###" + url
+                print('logo final:', logo)
+                item = name + "###" + url 
+                # item = name + "###" + url + "###" + logo 
                 items.append(item)
             items.sort()
             for item in items:
                 name = item.split("###")[0]
                 url = item.split("###")[1]
+                # logo = item.split("###")[2]
                 self.cat_list.append(show_(name, url))
             self['menulist'].l.setList(self.cat_list)
             self['menulist'].l.setItemHeight(40)
@@ -435,7 +446,7 @@ class freearhey(Screen):
                         remove_line('/etc/enigma2/bouquets.tv', bqtname)
                         with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
                             outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
-                            outfile.close()                   
+                            outfile.close()
             self.mbox = self.session.open(openMessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), openMessageBox.TYPE_INFO, timeout=5)
             ReloadBouquet()
         except:
@@ -533,6 +544,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         InfoBarBase.__init__(self, steal_current_service=True)
         TvInfoBarShowHide.__init__(self)
         InfoBarAudioSelection.__init__(self)
+        InfoBarSeek.__init__(self)
         # InfoBarSubtitleSupport.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
@@ -557,9 +569,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'cancel': self.cancel,
          'back': self.cancel}, -1)
         self.allowPiP = False
+        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
         self.service = None
         service = None
-        InfoBarSeek.__init__(self, actionmap='InfobarSeekActions')
         url = url.replace(':', '%3a')
         self.icount = 0
         # self.desc = desc
