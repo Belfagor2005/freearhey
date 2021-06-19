@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#24/04/2021
+#18/06/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -43,9 +43,27 @@ import socket
 import ssl
 import sys
 import time
-PY3 = sys.version_info[0] == 3
+
 global isDreamOS, skin_path
 isDreamOS = False
+
+PY3 = sys.version_info.major >= 3
+print('Py3: ',PY3)
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import Request
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.request import urlretrieve    
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.request import build_opener
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import urlencode
+import six.moves.urllib.request
+import six.moves.urllib.parse
+import six.moves.urllib.error
 
 try:
     from enigma import eDVBDB
@@ -57,19 +75,11 @@ try:
 except:
     isDreamOS = False
 
-if PY3:
-    from urllib.request import  Request, urlopen
-    from urllib.error import URLError, HTTPError
-    from urllib.parse import urlparse
-    from urllib.parse import quote, unquote_plus, unquote, urlencode
+try:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-else:
+except:
     import cookielib
-    from urllib2 import Request, urlopen
-    from urllib2 import URLError, HTTPError
-    from urlparse import urlparse
-    from urllib import quote, unquote_plus, unquote, urlencode
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
 currversion = '1.9'
@@ -101,7 +111,6 @@ def checkStr(txt):
         if type(txt) == type(unicode()):
             txt = txt.encode('utf-8')
     return txt
-
 
 skin_path= PLUGIN_PATH +'/skin'
 if isDreamOS:
