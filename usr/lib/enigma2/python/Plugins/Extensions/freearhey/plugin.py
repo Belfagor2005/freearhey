@@ -410,7 +410,7 @@ class freearhey(Screen):
     def convert_bouquet(self, url, name):
         xxxname = '/tmp/temporary.m3u'
         if os.path.exists(xxxname):
-            print('permantly remove file ', file)
+            print('permantly remove file ', xxxname)
             os.remove(xxxname)
         try:
             url = six.ensure_str(host) + url
