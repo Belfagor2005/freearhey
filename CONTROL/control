@@ -1,9 +1,8 @@
 Package: enigma2-plugin-extensions-freearhey
-Version: 1.9
+Version: 2.0
 Section: misc
 Priority: optional
 Architecture: all
-Maintainer: *
-Description: freearhey 
-Source: *
-Homepage: *
+Maintainer: Lululla
+Description: freearhey free link stream (no pay)
+

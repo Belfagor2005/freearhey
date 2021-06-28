@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#18/06/2021
+#28/06/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -12,7 +12,7 @@ from Components.ActionMap import *
 from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText
+from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap, MovingPixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
@@ -32,8 +32,8 @@ from enigma import eTimer, gFont, eListbox
 from enigma import getDesktop
 from enigma import loadPNG
 from sys import version_info
-from time import strptime, mktime
-from twisted.web.client import downloadPage, getPage, error
+# from time import strptime, mktime
+# from twisted.web.client import downloadPage, getPage, error
 import base64
 import hashlib
 import os
@@ -42,17 +42,18 @@ import six
 import socket
 import ssl
 import sys
-import time
+# import time
+from . import xfree
 
-global isDreamOS, skin_path
-isDreamOS = False
+global faDreamOS, skin_path
+faDreamOS = False
 
 PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import Request
 from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.request import urlretrieve    
+from six.moves.urllib.request import urlretrieve
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.parse import parse_qs
 from six.moves.urllib.request import build_opener
@@ -71,9 +72,9 @@ except ImportError:
     eDVBDB = None
 try:
     from enigma import eMediaDatabase
-    isDreamOS = True
+    faDreamOS = True
 except:
-    isDreamOS = False
+    faDreamOS = False
 
 try:
     import http.cookiejar
@@ -82,21 +83,16 @@ except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
-currversion = '1.9'
-estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
-m3uest = base64.b64decode(estm3u)
-m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
-host1= base64.b64decode(m31)
-m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lwdHYtb3JnL2lwdHYvbWFzdGVyLw=='
+currversion = '2.0'
+host0="https://iptv-org.github.io/iptv/categories/xxx.m3u"
+host1="https://github.com/iptv-org/iptv"
 
-host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey International Channel List'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
 
-cj = {}
 sz_w = getDesktop(0).size()
 if sz_w.width() > 1280:
     Height = 60
@@ -113,7 +109,7 @@ def checkStr(txt):
     return txt
 
 skin_path= PLUGIN_PATH +'/skin'
-if isDreamOS:
+if faDreamOS:
     skin_path= skin_path + '/skin_cvs/'
 else:
     skin_path= skin_path + '/skin_pli/'
@@ -123,6 +119,15 @@ try:
     addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
 except Exception as ex:
     print('addfont', ex)
+
+global downloadfree
+downloadfree = None
+try:
+    from Components.UsageConfig import defaultMoviePath
+    downloadfree = defaultMoviePath()
+except:
+    if os.path.exists("/usr/bin/apt-get"):
+        downloadfree = ('/media/hdd/movie/')
 
 def checkInternet():
     try:
@@ -135,32 +140,34 @@ def checkInternet():
     except socket.timeout:
         return False
 
-def getUrl(url):
+def check(url):
     try:
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0')
-        response = urlopen(req)
-        link = response.read()
+        response = urlopen(url, None, 5)
         response.close()
-        print("link =", link)
-        return link
-    except:
-        e = URLError
-        print('We failed to open "%s".' % url)
-        if hasattr(e, 'code'):
-            print('We failed with error code - %s.' % e.code)
-        if hasattr(e, 'reason'):
-            print('We failed to reach a server.')
-            print('Reason: ', e.reason)
+        return True
+    except HTTPError:
+        return False
+    except URLError:
+        return False
+    except socket.timeout:
+        return False
 
-def getUrlresp(url):
-        print("Here in getUrlresp url =", url)
+def getUrl(url):
+        print(  "Here in getUrl url =", url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        response = urlopen(req)
-        link=response.read()
-        response.close()
-        return link
+        try:
+               response = urlopen(req)
+               link=response.read()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read()
+               response.close()
+               return link
 
 def ReloadBouquet():
     try:
@@ -178,7 +185,7 @@ def remove_line(filename, what):
                 file_write.write(line)
         file_write.close()
 
-class m2list(MenuList):
+class free2list(MenuList):
 
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
@@ -192,6 +199,10 @@ class m2list(MenuList):
         self.l.setFont(7, gFont('Regular', 28))
         self.l.setFont(8, gFont('Regular', 32))
         self.l.setFont(9, gFont('Regular', 38))
+        if sz_w.width() > 1280:
+            self.l.setItemHeight(50)
+        else:
+            self.l.setItemHeight(40)
 
 def show_(name, link):
     res = [(name,link)]
@@ -201,14 +212,23 @@ def show_(name, link):
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
 
-
-def cat_(letter, link):
-    res = [(letter, link)]
+def FreeListEntry(name,png):
+    res = [name]
+    png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/setting.png'
     if sz_w.width() > 1280:
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=letter, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
+            res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=letter, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 4), size=(34, 25), png=loadPNG(png)))
+            res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
     return res
+
+Panel_list = [
+ ('PLAYLISTS DIRECT'),
+ ('PLAYLISTS BY CATEGORY'),
+ ('PLAYLISTS BY LANGUAGE'),
+ ('PLAYLISTS BY COUNTRY'),
+ ('MOVIE XXX')]
 
 class freearhey(Screen):
 
@@ -230,13 +250,13 @@ class freearhey(Screen):
          'left': self.left,
          'right': self.right,
          'ok': self.ok,
-		 'green': self.message2,
-         'cancel': self.exit,
-         'red': self.exit}, -1)
-        self['menulist'] = m2list([])
+		 # 'green': self.message2,
+         'cancel': self.close,
+         'red': self.close}, -1)
+        self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
-        self['green'] = Label(_('Export'))
-        self['title'] = Label('free')
+        self['green'] = Label('')
+        self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
@@ -247,173 +267,220 @@ class freearhey(Screen):
         self.loading_ok = False
         self.count = 0
         self.loading = 0
-        self.index = 'group'
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.downmasterpage)
+        self.onLayoutFinish.append(self.updateMenuList)
+
+    def updateMenuList(self):
+        self.menu_list = []
+        for x in self.menu_list:
+            del self.menu_list[0]
+        list = []
+        idx = 0
+        png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/res/pics/setting.png'
+        for x in Panel_list:
+            list.append(FreeListEntry(x, png))
+            self.menu_list.append(x)
+            idx += 1
+        self['menulist'].setList(list)
+        auswahl = self['menulist'].getCurrent()[0]#[0]
+        print('auswahl: ', auswahl)
+        self['name'].setText(str(auswahl))
+
+    def ok(self):
+        self.keyNumberGlobalCB(self['menulist'].getSelectedIndex())
+
+    def keyNumberGlobalCB(self, idx):
+        global namex, lnk
+        namex = ''
+        lnk = host1
+        sel = self.menu_list[idx]
+        if sel == ("PLAYLISTS DIRECT"):
+                namex = "Directy"
+                self.session.open(xfree.xfreearhey)
+        elif sel == ("PLAYLISTS BY CATEGORY"):
+                namex = "Category"
+                self.session.open(select, namex, lnk)
+        elif sel == ("PLAYLISTS BY LANGUAGE"):
+                namex = "Language"
+                self.session.open(select, namex, lnk)
+        elif sel == ("PLAYLISTS BY COUNTRY"):
+                namex = "Country"
+                self.session.open(select, namex, lnk)
+        else:
+            if sel == ("MOVIE XXX"):
+                namex = "moviexxx"
+                lnk = host0
+                # self.session.open(adultonly, namex, lnk)
+                self.adultonly(namex, lnk)
+
+    def adultonly(self, namex, lnk):
+        self.session.openWithCallback(self.cancelConfirm, MessageBox, _('These streams may contain audio-only content\n\nare you sure you want to continue??'))
+
+    def cancelConfirm(self, result):
+        if not result:
+            return
+        else:
+            self.session.open(selectplay, namex, lnk)
+
+    def up(self):
+        self[self.currentList].up()
+        auswahl = self['menulist'].getCurrent()[0]#[0]
+        print('auswahl: ', auswahl)
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def down(self):
+        self[self.currentList].down()
+        auswahl = self['menulist'].getCurrent()[0]#[0]
+        print('auswahl: ', auswahl)
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def left(self):
+        self[self.currentList].pageUp()
+        auswahl = self['menulist'].getCurrent()[0]#[0]
+        print('auswahl: ', auswahl)
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def right(self):
+        self[self.currentList].pageDown()
+        auswahl = self['menulist'].getCurrent()[0]#[0]
+        print('auswahl: ', auswahl)
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+class select(Screen):
+
+    def __init__(self, session, namex, lnk):
+        if sz_w.width() > 1280:
+            path = skin_path + 'defaultListScreen_new.xml'
+        else:
+            path =  skin_path + 'defaultListScreen.xml'
+        with open(path, 'r') as f:
+            self.skin = f.read()
+            f.close()
+        self.session = session
+        Screen.__init__(self, session)
+        self['actions'] = ActionMap(['OkCancelActions',
+         'ColorActions',
+         'DirectionActions',
+         'MovieSelectionActions'], {'up': self.up,
+         'down': self.down,
+         'left': self.left,
+         'right': self.right,
+         'ok': self.ok,
+		 'green': self.message2,
+         'cancel': self.close,
+         'red': self.close}, -1)
+        self['menulist'] = free2list([])
+        self['red'] = Label(_('Exit'))
+        self['green'] = Label(_('Export'))
+        self['title'] = Label("Thank's Freearhey")
+        self['name'] = Label('')
+        self['text'] = Label('')
+        # self['poster'] = Pixmap()
+        self.picload = ePicLoad()
+        self.picfile = ''
+        self.currentList = 'menulist'
+        self.menulist = []
+        self.loading_ok = False
+        self.count = 0
+        self.loading = 0
+        self.name =namex
+        self.url = lnk
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.onLayoutFinish.append(self.updateMenuList)
+
+    def updateMenuList(self):
+        self.menu_list = []
+        if check(self.url):
+
+            content = getUrl(self.url)
+            n1 = content.find(b"user-content-playlists-by-category", 0)
+            n2 = content.find(b"user-content-playlists-by-language", n1)
+            n3 = content.find(b"user-content-playlists-by-country", n2)
+            n4 = content.find(b"</table>", n3)
+            if "Category" in self.name:
+                   content2 = content[n1:n2]
+                   regexcat = b'td align="left">(.*?)<.*?<code>(.*?)<'
+            elif "Language" in self.name:
+                   content2 = content[n2:n3]
+                   regexcat = b'td align="left">(.*?)<.*?<code>(.*?)<'
+            elif "Country" in self.name:
+                   content2 = content[n3:n4]
+                   regexcat = b'alias="(.*?)".*?<code>(.*?)<'
+            match = re.compile(regexcat,re.DOTALL).findall(content2)
+            pic = " "
+            for name, url in match:
+                if b"xxx" in name.lower():
+                    continue
+                self.menu_list.append(show_(name, url))
+                self['menulist'].l.setList(self.menu_list)
+                # self['menulist'].l.setItemHeight(40)
+                # self['menulist'].moveToIndex(0)
+            auswahl = self['menulist'].getCurrent()[0][0]
+            print('auswahl: ', auswahl)
+            self['name'].setText(str(auswahl))
+            self['text'].setText('')
+        else:
+            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+            return
+
+
+    def ok(self):
+        name = self['menulist'].getCurrent()[0][0]
+        url = self['menulist'].getCurrent()[0][1]
+        print('name: ', name)
+        print('url: ', url)
+        self.session.open(selectplay, namex, url)
 
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(auswahl)
+        self['name'].setText(str(auswahl))
         # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(auswahl)
+        self['name'].setText(str(auswahl))
         # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(auswahl)
+        self['name'].setText(str(auswahl))
         # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(auswahl)
+        self['name'].setText(str(auswahl))
         # self.load_poster()
 
-    def downmasterpage(self):
-        self.timer = eTimer()
-        self.timer.start(100, 1)
-        try:
-            self.timer_conn = self.timer.timeout.connect(self.load)
-        except:
-            self.timer.callback.append(self.load)
-
-    def load(self):
-        # url = six.ensure_str(host1)
-        url = host1
-        if PY3:
-            url = six.ensure_str(host1)
-
-        self.index = 'group'
-        self.cat_list = []
-        content = getUrl(url)
-        if PY3:
-            content = six.ensure_str(content)
-        print("content 3 =", content)
-
-        if not 'None' in content:
-            if '#EXTINF' in content:
-                regexcat = '#EXTINF.*?,(.*?)\\n(.*?)\\n'
-                match = re.compile(regexcat,re.DOTALL).findall(content)
-                for name, url in match:
-                    # img = ('')
-                    url = url.replace(" ", "%20")
-                    url = url.replace("\\n", "")
-                    url = url.replace('\r','')
-                    url = url.replace('https','http')
-                    name = name.replace('\r','')
-                    self.cat_list.append(show_(name, url))
-                self['menulist'].l.setList(self.cat_list)
-                self['menulist'].l.setItemHeight(40)
-                # self['menulist'].moveToIndex(0)
-                auswahl = self['menulist'].getCurrent()[0][0]
-                self['name'].setText(auswahl)
-                self['text'].setText('')
-            else:
-                return
-        else:
-            return
-
-    def cat(self,url):
-        self.index = 'cat'
-        self.cat_list = []
-        url = six.ensure_str(host) + url
-        print('read url: ',  url)
-        # content = checkStr(getUrl(url))
-        req = Request(url, None, headers=headers)
-        content = urlopen(req, timeout=30).read()
-        content = six.ensure_str(content)
-        print("content 3 =", content)
-
-        if '#EXTINF' in content:
-            print("#EXTINF in content =========")
-            regexcat = 'EXTINF.*?tvg-logo="(.*?)".*?,(.*?)\\n(.*?)\\n'
-            match = re.compile(regexcat,re.DOTALL).findall(content)
-            items = []
-            self.names = []
-            self.urls = []
-            self.logos = []
-            for logo, name, url in match:
-                url = url.replace(" ", "%20")
-                url = url.replace("\\n", "")
-                url = url.replace('\r','')
-                name = name.replace('\r','')
-                logo = logo
-                print('name:', name)
-                print('url final:', url)
-                print('logo final:', logo)
-                item = name + "###" + url 
-                # item = name + "###" + url + "###" + logo 
-                items.append(item)
-            items.sort()
-            for item in items:
-                name = item.split("###")[0]
-                url = item.split("###")[1]
-                # logo = item.split("###")[2]
-                self.cat_list.append(show_(name, url))
-            self['menulist'].l.setList(self.cat_list)
-            self['menulist'].l.setItemHeight(40)
-            # self['menulist'].moveToIndex(0)
-            auswahl = self['menulist'].getCurrent()[0][0]
-            self['name'].setText(auswahl)
-        else:
-            self.index = 'group'
-            return
-
-    def ok(self):
-        id = self['menulist'].getCurrent()[0][1]
-        url = str(id)
-        print('url: ', url)
-        if self.index == 'cat':
-            self.play_that_shit(url)
-        else:
-            auswahl = self['menulist'].getCurrent()[0][0]
-            self['text'].setText(auswahl)
-            self.cat(url)
-
-
-    def play_that_shit(self, data):
-        desc = self['menulist'].l.getCurrentSelection()[0][0]
-        url = data
-        name = desc
-        self.session.open(Playstream2, name, url)
-
-    def exit(self):
-        if self.index == 'group':
-            ReloadBouquet()
-            self.close()
-        elif self.index == 'cat':
-            self.load()
-
     def message2(self):
-        if self.index == 'group':
-            name = self['menulist'].l.getCurrentSelection()[0][0]
-            self.session.openWithCallback(self.convert,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
-        else:
-            return
+        name = self['menulist'].l.getCurrentSelection()[0][0]
+        self.session.openWithCallback(self.convert,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
 
     def convert(self, result):
-        url = self['menulist'].getCurrent()[0][1]
-        url = str(url)
-        print('url convert: ', url)
-        name = self['menulist'].l.getCurrentSelection()[0][0]
-        if result:
-            self.convert_bouquet(url, name)
-        else:
+        if not result:
             return
+        else:
+            name = self['menulist'].l.getCurrentSelection()[0][0]
+            url = self['menulist'].getCurrent()[0][1]
+            url = str(url)
+            print('url convert: ', url)
+            self.convert_bouquet(url, name)
 
     def convert_bouquet(self, url, name):
+        # xxxname = downloadfree + 'temporary.m3u'
         xxxname = '/tmp/temporary.m3u'
         if os.path.exists(xxxname):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)
         try:
-            url = six.ensure_str(host) + url
+            url = six.ensure_str(url)
             print('read url: ',  url)
             req = Request(url, None, headers=headers)
             content = urlopen(req, timeout=30).read()
@@ -460,6 +527,162 @@ class freearhey(Screen):
             ReloadBouquet()
         except:
             return
+
+class selectplay(Screen):
+
+    def __init__(self, session, namex, lnk):
+        if sz_w.width() > 1280:
+            path = skin_path + 'defaultListScreen_new.xml'
+        else:
+            path =  skin_path + 'defaultListScreen.xml'
+        with open(path, 'r') as f:
+            self.skin = f.read()
+            f.close()
+        self.session = session
+        Screen.__init__(self, session)
+        self['actions'] = ActionMap(['OkCancelActions',
+         'ColorActions',
+         'DirectionActions',
+         'MovieSelectionActions'], {'up': self.up,
+         'down': self.down,
+         'left': self.left,
+         'right': self.right,
+         'ok': self.ok,
+		 # 'green': self.message2,
+         'cancel': self.close,
+         'red': self.close}, -1)
+        self['menulist'] = free2list([])
+        self['red'] = Label(_('Exit'))
+        self['green'] = Label('')
+        self['title'] = Label("Thank's Freearhey")
+        self['name'] = Label('')
+        self['text'] = Label('')
+        # self['poster'] = Pixmap()
+        self.picload = ePicLoad()
+        self.picfile = ''
+        self.currentList = 'menulist'
+        self.menulist = []
+        self.loading_ok = False
+        self.count = 0
+        self.loading = 0
+        self.name =namex
+        self.url = lnk
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        if self.name == 'moviexxx':
+            self.onLayoutFinish.append(self.updateMenuListx)
+        else:
+            self.onLayoutFinish.append(self.updateMenuList)
+
+    def updateMenuList(self):
+        self.menu_list = []
+        if check(self.url):
+
+            content = getUrl(self.url)
+            # print( "content A =", content)
+            regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            match = re.compile(regexcat,re.DOTALL).findall(content)
+            print( "In showContent match =", match)
+            n1 = 0
+            for name, url in match:
+                if not b".m3u8" in url:
+                       continue
+                n1 = n1+1
+                if n1 > 50:
+                       break
+                url = url.replace(b" ", b"")
+                url = url.replace(b"\\n", b"")
+                url = url.replace(b'\r',b'')
+                name = name.replace(b'\r',b'')
+                print( "In showContent name =", name)
+                print( "In showContent url =", url)
+                pic = " "
+                self.menu_list.append(show_(name, url))
+                self['menulist'].l.setList(self.menu_list)
+                self['menulist'].l.setItemHeight(40)
+                # self['menulist'].moveToIndex(0)
+            auswahl = self['menulist'].getCurrent()[0][0]
+            self['name'].setText(str(auswahl))
+            self['text'].setText('')
+        else:
+            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+            return
+
+
+    def updateMenuListx(self):
+        self.menu_list = []
+        if check(self.url):
+
+            content = getUrl(self.url)
+            print( "content A =", content)
+            regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            match = re.compile(regexcat,re.DOTALL).findall(content)
+            print( "In showContent match =", match)
+            n1 = 0
+            for name, url in match:
+                if not b".m3u8" in url:
+                       continue
+                n1 = n1+1
+                if n1 > 50:
+                       break
+                url = url.replace(b" ", b"")
+                url = url.replace(b"\\n", b"")
+                url = url.replace(b'\r',b'')
+                name = name.replace(b'\r',b'')
+                print( "In showContent name =", name)
+                print( "In showContent url =", url)
+                pic = " "
+                self.menu_list.append(show_(name, url))
+                self['menulist'].l.setList(self.menu_list)
+                self['menulist'].l.setItemHeight(40)
+                # self['menulist'].moveToIndex(0)
+            if n1 == 0: return
+            auswahl = self['menulist'].getCurrent()[0][0]
+            self['name'].setText(str(auswahl))
+            self['text'].setText('')
+        else:
+            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+            return
+
+    def ok(self):
+        name = self['menulist'].getCurrent()[0][0]
+        url = self['menulist'].getCurrent()[0][1]
+        print('name: ', name)
+        print('url: ', url)
+        if check(url):
+            self.play_that_shit(name, url)
+        else:
+            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+            return
+
+
+    def play_that_shit(self, name, url):
+        url = url
+        name = name
+        self.session.open(Playstream2, name, url)
+
+    def up(self):
+        self[self.currentList].up()
+        auswahl = self['menulist'].getCurrent()[0][0]
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def down(self):
+        self[self.currentList].down()
+        auswahl = self['menulist'].getCurrent()[0][0]
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def left(self):
+        self[self.currentList].pageUp()
+        auswahl = self['menulist'].getCurrent()[0][0]
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
+
+    def right(self):
+        self[self.currentList].pageDown()
+        auswahl = self['menulist'].getCurrent()[0][0]
+        self['name'].setText(str(auswahl))
+        # self.load_poster()
 
 class TvInfoBarShowHide():
     """ InfoBar show/hide control, accepts toggleShow and hide actions, might start
@@ -532,8 +755,6 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-
-#work very fine
 class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
     STATE_IDLE = 0
     STATE_PLAYING = 1
@@ -545,7 +766,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def __init__(self, session, name, url):
         global SREF
         Screen.__init__(self, session)
-        self.session = session #edit
+        self.session = session
         self.skinName = 'MoviePlayer'
         title = 'Play Stream'
         InfoBarMenu.__init__(self)
