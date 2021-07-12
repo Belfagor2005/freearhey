@@ -293,6 +293,8 @@ class freearhey(Screen):
         global namex, lnk
         namex = ''
         lnk = host1
+        if PY3:
+            url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
         if sel == ("PLAYLISTS DIRECT"):
                 namex = "Directy"
@@ -310,11 +312,13 @@ class freearhey(Screen):
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
                 lnk = host0
+                if PY3:
+                    url = six.ensure_str(lnk)
                 # self.session.open(adultonly, namex, lnk)
                 self.adultonly(namex, lnk)
 
     def adultonly(self, namex, lnk):
-        self.session.openWithCallback(self.cancelConfirm, MessageBox, _('These streams may contain audio-only content\n\nare you sure you want to continue??'))
+        self.session.openWithCallback(self.cancelConfirm, MessageBox, _('These streams may contain Adult content\n\nare you sure you want to continue??'))
 
     def cancelConfirm(self, result):
         if not result:
@@ -397,8 +401,11 @@ class select(Screen):
         if check(self.url):
 
             content = getUrl(self.url)
-            if PY3:
-                content = six.ensure_str(content)
+            # if PY3:
+                # content = content.decode("utf-8")
+            # if PY3:
+                # content = six.ensure_str(content)
+                # content = six.ensure_str(content.decode("utf8"))
                 
             n1 = content.find(b"user-content-playlists-by-category", 0)
             n2 = content.find(b"user-content-playlists-by-language", n1)
@@ -582,7 +589,9 @@ class selectplay(Screen):
 
             content = getUrl(self.url)
             if PY3:
-                content = six.ensure_str(content)            
+                content = content.decode("utf-8")
+            # if PY3:
+                # content = six.ensure_str(content.decode("utf8"))           
             # print( "content A =", content)
             regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
@@ -619,7 +628,8 @@ class selectplay(Screen):
 
             content = getUrl(self.url)
             if PY3:
-                content = six.ensure_str(content)            
+                content = content.decode("utf-8")
+               
             print( "content A =", content)
             regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
