@@ -397,6 +397,9 @@ class select(Screen):
         if check(self.url):
 
             content = getUrl(self.url)
+            if PY3:
+                content = six.ensure_str(content)
+                
             n1 = content.find(b"user-content-playlists-by-category", 0)
             n2 = content.find(b"user-content-playlists-by-language", n1)
             n3 = content.find(b"user-content-playlists-by-country", n2)
@@ -578,6 +581,8 @@ class selectplay(Screen):
         if check(self.url):
 
             content = getUrl(self.url)
+            if PY3:
+                content = six.ensure_str(content)            
             # print( "content A =", content)
             regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
@@ -613,6 +618,8 @@ class selectplay(Screen):
         if check(self.url):
 
             content = getUrl(self.url)
+            if PY3:
+                content = six.ensure_str(content)            
             print( "content A =", content)
             regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
