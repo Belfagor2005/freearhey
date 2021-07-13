@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#28/06/2021
+#13/07/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -399,31 +399,26 @@ class select(Screen):
     def updateMenuList(self):
         self.menu_list = []
         if check(self.url):
-
             content = getUrl(self.url)
-            # if PY3:
-                # content = content.decode("utf-8")
-            # if PY3:
-                # content = six.ensure_str(content)
-                # content = six.ensure_str(content.decode("utf8"))
-                
-            n1 = content.find(b"user-content-playlists-by-category", 0)
-            n2 = content.find(b"user-content-playlists-by-language", n1)
-            n3 = content.find(b"user-content-playlists-by-country", n2)
-            n4 = content.find(b"</table>", n3)
+            if PY3:
+                content = six.ensure_str(content)
+            n1 = content.find("user-content-playlists-by-category", 0)
+            n2 = content.find("user-content-playlists-by-language", n1)
+            n3 = content.find("user-content-playlists-by-country", n2)
+            n4 = content.find("</table>", n3)
             if "Category" in self.name:
-                   content2 = content[n1:n2]
-                   regexcat = b'td align="left">(.*?)<.*?<code>(.*?)<'
+                    content2 = content[n1:n2]
+                    regexcat = 'td align="left">(.*?)<.*?<code>(.*?)<'
             elif "Language" in self.name:
-                   content2 = content[n2:n3]
-                   regexcat = b'td align="left">(.*?)<.*?<code>(.*?)<'
+                    content2 = content[n2:n3]
+                    regexcat = 'td align="left">(.*?)<.*?<code>(.*?)<'
             elif "Country" in self.name:
-                   content2 = content[n3:n4]
-                   regexcat = b'alias="(.*?)".*?<code>(.*?)<'
+                    content2 = content[n3:n4]
+                    regexcat = 'alias="(.*?)".*?<code>(.*?)<'
             match = re.compile(regexcat,re.DOTALL).findall(content2)
             pic = " "
             for name, url in match:
-                if b"xxx" in name.lower():
+                if "xxx" in name.lower():
                     continue
                 self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
@@ -490,7 +485,8 @@ class select(Screen):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)
         try:
-            url = six.ensure_str(url)
+            if PY3:
+                url = six.ensure_str(url)        
             print('read url: ',  url)
             req = Request(url, None, headers=headers)
             content = urlopen(req, timeout=30).read()
@@ -586,27 +582,26 @@ class selectplay(Screen):
     def updateMenuList(self):
         self.menu_list = []
         if check(self.url):
-
             content = getUrl(self.url)
             if PY3:
-                content = content.decode("utf-8")
+                content = content.decode("utf-8")            
             # if PY3:
-                # content = six.ensure_str(content.decode("utf8"))           
+                # content = six.ensure_str(self.url)           
             # print( "content A =", content)
-            regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
             print( "In showContent match =", match)
             n1 = 0
             for name, url in match:
-                if not b".m3u8" in url:
+                if not ".m3u8" in url:
                        continue
                 n1 = n1+1
                 if n1 > 50:
                        break
-                url = url.replace(b" ", b"")
-                url = url.replace(b"\\n", b"")
-                url = url.replace(b'\r',b'')
-                name = name.replace(b'\r',b'')
+                url = url.replace(" ", "")
+                url = url.replace("\\n", "")
+                url = url.replace('\r','')
+                name = name.replace('\r','')
                 print( "In showContent name =", name)
                 print( "In showContent url =", url)
                 pic = " "
@@ -625,26 +620,26 @@ class selectplay(Screen):
     def updateMenuListx(self):
         self.menu_list = []
         if check(self.url):
-
             content = getUrl(self.url)
+            # if PY3:
+                # content = six.ensure_str(content) 
             if PY3:
-                content = content.decode("utf-8")
-               
+                content = content.decode("utf-8")                  
             print( "content A =", content)
-            regexcat = b'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
             print( "In showContent match =", match)
             n1 = 0
             for name, url in match:
-                if not b".m3u8" in url:
-                       continue
+                if not ".m3u8" in url:
+                    continue
                 n1 = n1+1
                 if n1 > 50:
-                       break
-                url = url.replace(b" ", b"")
-                url = url.replace(b"\\n", b"")
-                url = url.replace(b'\r',b'')
-                name = name.replace(b'\r',b'')
+                    break
+                url = url.replace(" ", "")
+                url = url.replace("\\n", "")
+                url = url.replace('\r','')
+                name = name.replace('\r','')
                 print( "In showContent name =", name)
                 print( "In showContent url =", url)
                 pic = " "
@@ -670,7 +665,6 @@ class selectplay(Screen):
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
-
 
     def play_that_shit(self, name, url):
         url = url

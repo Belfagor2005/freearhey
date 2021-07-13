@@ -335,9 +335,7 @@ class xfreearhey(Screen):
     def cat(self,url):
         self.index = 'cat'
         self.cat_list = []
-        url = hst + url
-        if PY3:
-            url = six.ensure_str(host) + url
+        url = six.ensure_str(host) + url
         print('read url: ',  url)
         # content = checkStr(getUrl(url))
         # if check(url):
