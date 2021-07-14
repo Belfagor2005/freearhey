@@ -83,7 +83,7 @@ except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
-currversion = '2.0'
+currversion = '2.1'
 host0="https://iptv-org.github.io/iptv/categories/xxx.m3u"
 host1="https://github.com/iptv-org/iptv"
 
@@ -219,8 +219,8 @@ def FreeListEntry(name,png):
             res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
             res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 4), size=(34, 25), png=loadPNG(png)))
-            res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
+            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
+            res.append(MultiContentEntryText(pos=(60, 7), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
     return res
 
 Panel_list = [
