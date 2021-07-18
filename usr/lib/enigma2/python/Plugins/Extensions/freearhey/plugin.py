@@ -132,6 +132,7 @@ def checkInternet():
     try:
         response = checkStr(urlopen("http://google.com", None, 5))
         response.close()
+        return True
     except HTTPError:
         return False
     except URLError:
