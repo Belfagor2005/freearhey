@@ -8,12 +8,12 @@
 #######################################################################
 from __future__ import print_function
 from Components.AVSwitch import AVSwitch
-from Components.ActionMap import *
+from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
-from Components.Pixmap import Pixmap, MovingPixmap
+from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
@@ -65,7 +65,6 @@ from six.moves.urllib.parse import urlencode
 import six.moves.urllib.request
 import six.moves.urllib.parse
 import six.moves.urllib.error
-
 try:
     from enigma import eDVBDB
 except ImportError:
@@ -131,7 +130,7 @@ except:
 
 def checkInternet():
     try:
-        response = urlopen("http://google.com", None, 5)
+        response = checkStr(urlopen("http://google.com", None, 5))
         response.close()
     except HTTPError:
         return False
@@ -142,7 +141,7 @@ def checkInternet():
 
 def check(url):
     try:
-        response = urlopen(url, None, 5)
+        response = checkStr(urlopen(url, None, 5))
         response.close()
         return True
     except HTTPError:
@@ -153,6 +152,8 @@ def check(url):
         return False
 
 def getUrl(url):
+        link = []
+
         print(  "Here in getUrl url =", url)
         req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
@@ -206,8 +207,11 @@ class free2list(MenuList):
 
 def show_(name, link):
     res = [(name,link)]
+
     if sz_w.width() > 1280:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+
+
     else:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
@@ -259,6 +263,7 @@ class freearhey(Screen):
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
+
         # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
@@ -267,6 +272,7 @@ class freearhey(Screen):
         self.loading_ok = False
         self.count = 0
         self.loading = 0
+
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.updateMenuList)
 
@@ -279,6 +285,8 @@ class freearhey(Screen):
         png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/res/pics/setting.png'
         for x in Panel_list:
             list.append(FreeListEntry(x, png))
+
+
             self.menu_list.append(x)
             idx += 1
         self['menulist'].setList(list)
@@ -356,9 +364,11 @@ class freearhey(Screen):
 
 class select(Screen):
 
+
     def __init__(self, session, namex, lnk):
         if sz_w.width() > 1280:
             path = skin_path + 'defaultListScreen_new.xml'
+
         else:
             path =  skin_path + 'defaultListScreen.xml'
         with open(path, 'r') as f:
@@ -432,17 +442,26 @@ class select(Screen):
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
 
-
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
         print('name: ', name)
         print('url: ', url)
+
+
+
+
+
+
+
+
         self.session.open(selectplay, namex, url)
+
 
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
+
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
@@ -450,6 +469,7 @@ class select(Screen):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
+
         # self.load_poster()
 
     def left(self):
@@ -457,6 +477,7 @@ class select(Screen):
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
         # self.load_poster()
+
 
     def right(self):
         self[self.currentList].pageDown()
@@ -466,6 +487,7 @@ class select(Screen):
 
     def message2(self):
         name = self['menulist'].l.getCurrentSelection()[0][0]
+
         self.session.openWithCallback(self.convert,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
 
     def convert(self, result):
@@ -486,7 +508,7 @@ class select(Screen):
             os.remove(xxxname)
         try:
             if PY3:
-                url = six.ensure_str(url)        
+                url = six.ensure_str(url)
             print('read url: ',  url)
             req = Request(url, None, headers=headers)
             content = urlopen(req, timeout=30).read()
@@ -584,9 +606,9 @@ class selectplay(Screen):
         if check(self.url):
             content = getUrl(self.url)
             if PY3:
-                content = content.decode("utf-8")            
+                content = content.decode("utf-8")
             # if PY3:
-                # content = six.ensure_str(self.url)           
+                # content = six.ensure_str(self.url)
             # print( "content A =", content)
             regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
@@ -616,15 +638,14 @@ class selectplay(Screen):
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
 
-
     def updateMenuListx(self):
         self.menu_list = []
         if check(self.url):
             content = getUrl(self.url)
             # if PY3:
-                # content = six.ensure_str(content) 
+                # content = six.ensure_str(content)
             if PY3:
-                content = content.decode("utf-8")                  
+                content = content.decode("utf-8")
             print( "content A =", content)
             regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
@@ -804,21 +825,19 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'InfobarActions',
          'InfobarSeekActions'], {'leavePlayer': self.cancel,
          'epg': self.showIMDB,
-         'info': self.showinfo,
+         'info': self.cicleStreamType,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
         self.allowPiP = False
-        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
         self.service = None
         service = None
-        url = url.replace(':', '%3a')
+        self.url = url.replace(':', '%3a').replace(' ','%20')
+
         self.icount = 0
-        # self.desc = desc
         self.pcip = 'None'
-        self.url = url
-        self.name = name
+        self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
@@ -882,6 +901,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
+
         return
 
     def showIMDB(self):
@@ -897,11 +917,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = self.name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            # text_clear = self.name
+            # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            self.showinfo()
 
     def openPlay(self,servicetype, url):
-        url = url
+        if url.endswith('m3u8'):
+            servicetype = "4097"
         ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
         print('final reference :   ', ref)
         sref = eServiceReference(ref)
@@ -911,7 +933,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def cicleStreamType(self):
         from itertools import cycle, islice
-        self.servicetype = '4097'
+        self.servicetype ='4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -968,6 +990,119 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def leavePlayer(self):
         self.close()
+
+def decodeUrl(text):
+	text = text.replace('%20',' ')
+	text = text.replace('%21','!')
+	text = text.replace('%22','"')
+	text = text.replace('%23','&')
+	text = text.replace('%24','$')
+	text = text.replace('%25','%')
+	text = text.replace('%26','&')
+	text = text.replace('%2B','+')
+	text = text.replace('%2F','/')
+	text = text.replace('%3A',':')
+	text = text.replace('%3B',';')
+	text = text.replace('%3D','=')
+	text = text.replace('&#x3D;','=')
+	text = text.replace('%3F','?')
+	text = text.replace('%40','@')
+	return text
+
+def decodeHtml(text):
+	text = text.replace('&auml;','ä')
+	text = text.replace('\u00e4','ä')
+	text = text.replace('&#228;','ä')
+	text = text.replace('&oacute;','ó')
+	text = text.replace('&eacute;','e')
+	text = text.replace('&aacute;','a')
+	text = text.replace('&ntilde;','n')
+
+	text = text.replace('&Auml;','Ä')
+	text = text.replace('\u00c4','Ä')
+	text = text.replace('&#196;','Ä')
+
+	text = text.replace('&ouml;','ö')
+	text = text.replace('\u00f6','ö')
+	text = text.replace('&#246;','ö')
+
+	text = text.replace('&ouml;','Ö')
+	text = text.replace('\u00d6','Ö')
+	text = text.replace('&#214;','Ö')
+
+	text = text.replace('&uuml;','ü')
+	text = text.replace('\u00fc','ü')
+	text = text.replace('&#252;','ü')
+
+	text = text.replace('&Uuml;','Ü')
+	text = text.replace('\u00dc','Ü')
+	text = text.replace('&#220;','Ü')
+
+	text = text.replace('&szlig;','ß')
+	text = text.replace('\u00df','ß')
+	text = text.replace('&#223;','ß')
+
+	text = text.replace('&amp;','&')
+	text = text.replace('&quot;','\"')
+	text = text.replace('&quot_','\"')
+
+	text = text.replace('&gt;','>')
+	text = text.replace('&apos;',"'")
+	text = text.replace('&acute;','\'')
+	text = text.replace('&ndash;','-')
+	text = text.replace('&bdquo;','"')
+	text = text.replace('&rdquo;','"')
+	text = text.replace('&ldquo;','"')
+	text = text.replace('&lsquo;','\'')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&#034;','\'')
+	text = text.replace('&#038;','&')
+	text = text.replace('&#039;','\'')
+	text = text.replace('&#39;','\'')
+	text = text.replace('&#160;',' ')
+	text = text.replace('\u00a0',' ')
+	text = text.replace('&#174;','')
+	text = text.replace('&#225;','a')
+	text = text.replace('&#233;','e')
+	text = text.replace('&#243;','o')
+	text = text.replace('&#8211;',"-")
+	text = text.replace('\u2013',"-")
+	text = text.replace('&#8216;',"'")
+	text = text.replace('&#8217;',"'")
+	text = text.replace('#8217;',"'")
+	text = text.replace('&#8220;',"'")
+	text = text.replace('&#8221;','"')
+	text = text.replace('&#8222;',',')
+	text = text.replace('&#x27;',"'")
+	text = text.replace('&#8230;','...')
+	text = text.replace('\u2026','...')
+	text = text.replace('&#41;',')')
+	text = text.replace('&lowbar;','_')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&lpar;','(')
+	text = text.replace('&rpar;',')')
+	text = text.replace('&comma;',',')
+	text = text.replace('&period;','.')
+	text = text.replace('&plus;','+')
+	text = text.replace('&num;','#')
+	text = text.replace('&excl;','!')
+	text = text.replace('&#039','\'')
+	text = text.replace('&semi;','')
+	text = text.replace('&lbrack;','[')
+	text = text.replace('&rsqb;',']')
+	text = text.replace('&nbsp;','')
+	text = text.replace('&#133;','')
+	text = text.replace('&#4','')
+	text = text.replace('&#40;','')
+
+	text = text.replace('&atilde;',"'")
+	text = text.replace('&colon;',':')
+	text = text.replace('&sol;','/')
+	text = text.replace('&percnt;','%')
+	text = text.replace('&commmat;',' ')
+	text = text.replace('&#58;',':')
+
+	return text
 
 def charRemove(text):
     char = ["1080p",
@@ -1032,8 +1167,10 @@ def charRemove(text):
     return myreplace
 
 def main(session, **kwargs):
-    session.open(freearhey)
-
+    if checkInternet():
+        session.open(freearhey)
+    else:
+        session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 def Plugins(**kwargs):
     icona = 'plugin.png'
     extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)

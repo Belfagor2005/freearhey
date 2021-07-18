@@ -8,7 +8,7 @@
 #######################################################################
 from __future__ import print_function
 from Components.AVSwitch import AVSwitch
-from Components.ActionMap import *
+from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -82,7 +82,7 @@ except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
-currversion = '2.0'
+currversion = '2.1'
 estm3u = 'aHR0cHM6Ly90aXZ1c3RyZWFtLndlYnNpdGUvcGhwX2ZpbHRlci9maC5waHA='
 m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
@@ -135,6 +135,19 @@ def checkInternet():
     except socket.timeout:
         return False
 
+
+def check(url):
+    try:
+        response = urlopen(url, None, 5)
+        response.close()
+        return True
+    except HTTPError:
+        return False
+    except URLError:
+        return False
+    except socket.timeout:
+        return False
+
 def getUrl(url):
     try:
         req = Request(url)
@@ -161,19 +174,6 @@ def getUrlresp(url):
         link=response.read()
         response.close()
         return link
-
-def check(url):
-    try:
-        response = urlopen(url, None, 5)
-        response.close()
-        return True
-    except HTTPError:
-        return False
-    except URLError:
-        return False
-    except socket.timeout:
-        return False
-
 def ReloadBouquet():
     try:
         eDVBDB.getInstance().reloadServicelist()
@@ -204,6 +204,10 @@ class m2list(MenuList):
         self.l.setFont(7, gFont('Regular', 28))
         self.l.setFont(8, gFont('Regular', 32))
         self.l.setFont(9, gFont('Regular', 38))
+        if sz_w.width() > 1280:
+            self.l.setItemHeight(50)
+        else:
+            self.l.setItemHeight(40)
 
 def show_(name, link):
     res = [(name,link)]
@@ -272,18 +276,21 @@ class xfreearhey(Screen):
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
+
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
+
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
+
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
@@ -343,6 +350,11 @@ class xfreearhey(Screen):
         content = urlopen(req, timeout=30).read()
         content = six.ensure_str(content)
         print("content 3 =", content)
+
+
+
+
+
 
         if '#EXTINF' in content:
             print("#EXTINF in content =========")
@@ -433,7 +445,9 @@ class xfreearhey(Screen):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)
         try:
-            url = six.ensure_str(host) + url
+            url = host + url
+            if PY3:
+                url = six.ensure_str(host) + url
             print('read url: ',  url)
             req = Request(url, None, headers=headers)
             content = urlopen(req, timeout=30).read()
@@ -565,7 +579,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def __init__(self, session, name, url):
         global SREF
         Screen.__init__(self, session)
-        self.session = session #edit
+        self.session = session
         self.skinName = 'MoviePlayer'
         title = 'Play Stream'
         InfoBarMenu.__init__(self)
@@ -592,21 +606,20 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'InfobarActions',
          'InfobarSeekActions'], {'leavePlayer': self.cancel,
          'epg': self.showIMDB,
-         'info': self.showinfo,
+         'info': self.cicleStreamType,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
         self.allowPiP = False
-        # InfoBarSeek.__init__(self, ActionMap='InfobarSeekActions')
         self.service = None
         service = None
-        url = url.replace(':', '%3a')
+        self.url = url.replace(':', '%3a').replace(' ','%20')
         self.icount = 0
-        # self.desc = desc
+
         self.pcip = 'None'
-        self.url = url
-        self.name = name
+
+        self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
         SREF = self.srefOld
@@ -685,11 +698,13 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             HHHHH = text
             self.session.open(IMDB, HHHHH)
         else:
-            text_clear = self.name
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            # text_clear = self.name
+            # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+            self.showinfo()
 
     def openPlay(self,servicetype, url):
-        url = url
+        if url.endswith('m3u8'):
+            servicetype = "4097"
         ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
         print('final reference :   ', ref)
         sref = eServiceReference(ref)
@@ -699,7 +714,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def cicleStreamType(self):
         from itertools import cycle, islice
-        self.servicetype = '4097'
+        self.servicetype ='4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
         currentindex = 0
@@ -756,6 +771,119 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def leavePlayer(self):
         self.close()
+
+def decodeUrl(text):
+	text = text.replace('%20',' ')
+	text = text.replace('%21','!')
+	text = text.replace('%22','"')
+	text = text.replace('%23','&')
+	text = text.replace('%24','$')
+	text = text.replace('%25','%')
+	text = text.replace('%26','&')
+	text = text.replace('%2B','+')
+	text = text.replace('%2F','/')
+	text = text.replace('%3A',':')
+	text = text.replace('%3B',';')
+	text = text.replace('%3D','=')
+	text = text.replace('&#x3D;','=')
+	text = text.replace('%3F','?')
+	text = text.replace('%40','@')
+	return text
+
+def decodeHtml(text):
+	text = text.replace('&auml;','ä')
+	text = text.replace('\u00e4','ä')
+	text = text.replace('&#228;','ä')
+	text = text.replace('&oacute;','ó')
+	text = text.replace('&eacute;','e')
+	text = text.replace('&aacute;','a')
+	text = text.replace('&ntilde;','n')
+
+	text = text.replace('&Auml;','Ä')
+	text = text.replace('\u00c4','Ä')
+	text = text.replace('&#196;','Ä')
+
+	text = text.replace('&ouml;','ö')
+	text = text.replace('\u00f6','ö')
+	text = text.replace('&#246;','ö')
+
+	text = text.replace('&ouml;','Ö')
+	text = text.replace('\u00d6','Ö')
+	text = text.replace('&#214;','Ö')
+
+	text = text.replace('&uuml;','ü')
+	text = text.replace('\u00fc','ü')
+	text = text.replace('&#252;','ü')
+
+	text = text.replace('&Uuml;','Ü')
+	text = text.replace('\u00dc','Ü')
+	text = text.replace('&#220;','Ü')
+
+	text = text.replace('&szlig;','ß')
+	text = text.replace('\u00df','ß')
+	text = text.replace('&#223;','ß')
+
+	text = text.replace('&amp;','&')
+	text = text.replace('&quot;','\"')
+	text = text.replace('&quot_','\"')
+
+	text = text.replace('&gt;','>')
+	text = text.replace('&apos;',"'")
+	text = text.replace('&acute;','\'')
+	text = text.replace('&ndash;','-')
+	text = text.replace('&bdquo;','"')
+	text = text.replace('&rdquo;','"')
+	text = text.replace('&ldquo;','"')
+	text = text.replace('&lsquo;','\'')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&#034;','\'')
+	text = text.replace('&#038;','&')
+	text = text.replace('&#039;','\'')
+	text = text.replace('&#39;','\'')
+	text = text.replace('&#160;',' ')
+	text = text.replace('\u00a0',' ')
+	text = text.replace('&#174;','')
+	text = text.replace('&#225;','a')
+	text = text.replace('&#233;','e')
+	text = text.replace('&#243;','o')
+	text = text.replace('&#8211;',"-")
+	text = text.replace('\u2013',"-")
+	text = text.replace('&#8216;',"'")
+	text = text.replace('&#8217;',"'")
+	text = text.replace('#8217;',"'")
+	text = text.replace('&#8220;',"'")
+	text = text.replace('&#8221;','"')
+	text = text.replace('&#8222;',',')
+	text = text.replace('&#x27;',"'")
+	text = text.replace('&#8230;','...')
+	text = text.replace('\u2026','...')
+	text = text.replace('&#41;',')')
+	text = text.replace('&lowbar;','_')
+	text = text.replace('&rsquo;','\'')
+	text = text.replace('&lpar;','(')
+	text = text.replace('&rpar;',')')
+	text = text.replace('&comma;',',')
+	text = text.replace('&period;','.')
+	text = text.replace('&plus;','+')
+	text = text.replace('&num;','#')
+	text = text.replace('&excl;','!')
+	text = text.replace('&#039','\'')
+	text = text.replace('&semi;','')
+	text = text.replace('&lbrack;','[')
+	text = text.replace('&rsqb;',']')
+	text = text.replace('&nbsp;','')
+	text = text.replace('&#133;','')
+	text = text.replace('&#4','')
+	text = text.replace('&#40;','')
+
+	text = text.replace('&atilde;',"'")
+	text = text.replace('&colon;',':')
+	text = text.replace('&sol;','/')
+	text = text.replace('&percnt;','%')
+	text = text.replace('&commmat;',' ')
+	text = text.replace('&#58;',':')
+
+	return text
 
 def charRemove(text):
     char = ["1080p",
