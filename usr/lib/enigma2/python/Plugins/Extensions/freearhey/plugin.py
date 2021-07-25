@@ -44,10 +44,8 @@ import ssl
 import sys
 # import time
 from . import xfree
-
 global faDreamOS, skin_path
 faDreamOS = False
-
 PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
@@ -85,7 +83,6 @@ except:
 currversion = '2.1'
 host0="https://iptv-org.github.io/iptv/categories/xxx.m3u"
 host1="https://github.com/iptv-org/iptv"
-
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey International Channel List'
@@ -130,14 +127,10 @@ except:
 
 def checkInternet():
     try:
-        response = checkStr(urlopen("http://google.com", None, 5))
-        response.close()
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
         return True
-    except HTTPError:
-        return False
-    except URLError:
-        return False
-    except socket.timeout:
+    except:
         return False
 
 def check(url):

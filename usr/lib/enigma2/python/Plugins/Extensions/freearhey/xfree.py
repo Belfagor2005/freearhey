@@ -64,7 +64,6 @@ from six.moves.urllib.parse import urlencode
 import six.moves.urllib.request
 import six.moves.urllib.parse
 import six.moves.urllib.error
-
 try:
     from enigma import eDVBDB
 except ImportError:
@@ -74,7 +73,6 @@ try:
     faDreamOS = True
 except:
     faDreamOS = False
-
 try:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
@@ -88,29 +86,18 @@ m3uest = base64.b64decode(estm3u)
 m31 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2ZyZWVhcmhleS9pcHR2L21hc3Rlci9pbmRleC5tM3U='
 host11= base64.b64decode(m31)
 m3 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2lwdHYtb3JnL2lwdHYvbWFzdGVyLw=='
-
 host= base64.b64decode(m3)
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey International Channel List'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-
 cj = {}
 sz_w = getDesktop(0).size()
 if sz_w.width() > 1280:
     Height = 60
 else:
     Height = 40
-
-def checkStr(txt):
-    if PY3:
-        if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8')
-    else:
-        if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8')
-    return txt
 
 skin_path= PLUGIN_PATH +'/skin'
 if faDreamOS:
@@ -123,18 +110,22 @@ try:
     addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
 except Exception as ex:
     print('addfont', ex)
-
+    
+def checkStr(txt):
+    if PY3:
+        if type(txt) == type(bytes()):
+            txt = txt.decode('utf-8')
+    else:
+        if type(txt) == type(unicode()):
+            txt = txt.encode('utf-8')
+    return txt
 def checkInternet():
     try:
-        response = urlopen("http://google.com", None, 5)
-        response.close()
-    except HTTPError:
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
+        return True
+    except:
         return False
-    except URLError:
-        return False
-    except socket.timeout:
-        return False
-
 
 def check(url):
     try:
@@ -174,6 +165,7 @@ def getUrlresp(url):
         link=response.read()
         response.close()
         return link
+
 def ReloadBouquet():
     try:
         eDVBDB.getInstance().reloadServicelist()
