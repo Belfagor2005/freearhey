@@ -42,10 +42,8 @@ import six
 import socket
 import ssl
 import sys
-# import time
 from . import xfree
-global faDreamOS, skin_path
-faDreamOS = False
+global skin_path
 PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 from six.moves.urllib.request import urlopen
@@ -67,12 +65,6 @@ try:
     from enigma import eDVBDB
 except ImportError:
     eDVBDB = None
-try:
-    from enigma import eMediaDatabase
-    faDreamOS = True
-except:
-    faDreamOS = False
-
 try:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
@@ -105,7 +97,7 @@ def checkStr(txt):
     return txt
 
 skin_path= PLUGIN_PATH +'/skin'
-if faDreamOS:
+if os.path.exists('/var/lib/dpkg/status'):
     skin_path= skin_path + '/skin_cvs/'
 else:
     skin_path= skin_path + '/skin_pli/'
@@ -441,16 +433,7 @@ class select(Screen):
         url = self['menulist'].getCurrent()[0][1]
         print('name: ', name)
         print('url: ', url)
-
-
-
-
-
-
-
-
         self.session.open(selectplay, namex, url)
-
 
     def up(self):
         self[self.currentList].up()
@@ -879,11 +862,11 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         sServiceref = ''
         try:
             servicename, serviceurl = getserviceinfo(sref)
-            if servicename is not None:
+            if servicename != None:
                 sTitle = servicename
             else:
                 sTitle = ''
-            if serviceurl is not None:
+            if serviceurl != None:
                 sServiceref = serviceurl
             else:
                 sServiceref = ''
@@ -974,7 +957,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def showVideoInfo(self):
         if self.shown:
             self.hideInfobar()
-        if self.infoCallback is not None:
+        if self.infoCallback != None:
             self.infoCallback()
         return
 
@@ -1099,66 +1082,100 @@ def decodeHtml(text):
 	return text
 
 def charRemove(text):
-    char = ["1080p",
-     "2018",
-     "2019",
-     "2020",
-     "2021",
-     "480p",
-     "4K",
-     "720p",
-     "ANIMAZIONE",
-     "APR",
-     "AVVENTURA",
-     "BIOGRAFICO",
-     "BDRip",
-     "BluRay",
-     "CINEMA",
-     "COMMEDIA",
-     "DOCUMENTARIO",
-     "DRAMMATICO",
-     "FANTASCIENZA",
-     "FANTASY",
-     "FEB",
-     "GEN",
-     "GIU",
-     "HDCAM",
-     "HDTC",
-     "HDTS",
-     "LD",
-     "MAFIA",
-     "MAG",
-     "MARVEL",
-     "MD",
-     "ORROR",
-     "NEW_AUDIO",
-     "POLIZ",
-     "R3",
-     "R6",
-     "SD",
-     "SENTIMENTALE",
-     "TC",
-     "TEEN",
-     "TELECINE",
-     "TELESYNC",
-     "THRILLER",
-     "Uncensored",
-     "V2",
-     "WEBDL",
-     "WEBRip",
-     "WEB",
-     "WESTERN",
-     "-",
-     "_",
-     ".",
-     "+",
-     "[",
-     "]"]
+        char = ["1080p",
+                 "2018",
+                 "2019",
+                 "2020",
+                 "2021",
+                 "2022"
+                 "PF1",
+                 "PF2",
+                 "PF3",
+                 "PF4",
+                 "PF5",
+                 "PF6",
+                 "PF7",
+                 "PF8",
+                 "PF9",
+                 "PF10",
+                 "PF11",
+                 "PF12",
+                 "PF13",
+                 "PF14",
+                 "PF15",
+                 "PF16",
+                 "PF17",
+                 "PF18",
+                 "PF19",
+                 "PF20",
+                 "PF21",
+                 "PF22",
+                 "PF23",
+                 "PF24",
+                 "PF25",
+                 "PF26",
+                 "PF27",
+                 "PF28",
+                 "PF29",
+                 "PF30"
+                 "480p",
+                 "4K",
+                 "720p",
+                 "ANIMAZIONE",
+                 # "APR",
+                 # "AVVENTURA",
+                 "BIOGRAFICO",
+                 "BDRip",
+                 "BluRay",
+                 "CINEMA",
+                 # "COMMEDIA",
+                 "DOCUMENTARIO",
+                 "DRAMMATICO",
+                 "FANTASCIENZA",
+                 "FANTASY",
+                 # "FEB",
+                 # "GEN",
+                 # "GIU",
+                 "HDCAM",
+                 "HDTC",
+                 "HDTS",
+                 "LD",
+                 "MAFIA",
+                 # "MAG",
+                 "MARVEL",
+                 "MD",
+                 # "ORROR",
+                 "NEW_AUDIO",
+                 "POLIZ",
+                 "R3",
+                 "R6",
+                 "SD",
+                 "SENTIMENTALE",
+                 "TC",
+                 "TEEN",
+                 "TELECINE",
+                 "TELESYNC",
+                 "THRILLER",
+                 "Uncensored",
+                 "V2",
+                 "WEBDL",
+                 "WEBRip",
+                 "WEB",
+                 "WESTERN",
+                 "-",
+                 "_",
+                 ".",
+                 "+",
+                 "[",
+                 "]"
+                 ]
 
-    myreplace = text
-    for ch in char:
-        myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("       ", " ").strip()
-    return myreplace
+        myreplace = text.lower()
+        for ch in char:
+            ch= ch.lower()
+            # if myreplace == ch:
+            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+        return myreplace
 
 def main(session, **kwargs):
     if checkInternet():
