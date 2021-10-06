@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#13/07/2021
+#05/09/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
 #   But no delete this message support on forum linuxsat-support      #
 #######################################################################
 from __future__ import print_function
+# from time import strptime, mktime
+# from twisted.web.client import downloadPage, getPage, error
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap, NumberActionMap
 from Components.Console import Console as iConsole
@@ -16,7 +18,9 @@ from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixm
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
+from Plugins.Extensions.freearhey.xfree import xfreearhey
 from Plugins.Plugin import PluginDescriptor
+from random import choice
 from Screens.InfoBar import MoviePlayer, InfoBar
 from Screens.InfoBarGenerics import *
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
@@ -31,9 +35,19 @@ from enigma import eSize, iServiceInformation
 from enigma import eTimer, gFont, eListbox
 from enigma import getDesktop
 from enigma import loadPNG
-from sys import version_info
-# from time import strptime, mktime
-# from twisted.web.client import downloadPage, getPage, error
+from six.moves.urllib.error import HTTPError, URLError
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import quote_plus
+from six.moves.urllib.parse import unquote
+from six.moves.urllib.parse import unquote_plus
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlparse
+from six.moves.urllib.request import Request
+from six.moves.urllib.request import build_opener
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.request import urlretrieve
+global skin_path
 import base64
 import hashlib
 import os
@@ -42,25 +56,10 @@ import six
 import socket
 import ssl
 import sys
-from . import xfree
-global skin_path
-PY3 = sys.version_info.major >= 3
-print('Py3: ',PY3)
-from six.moves.urllib.request import urlopen
-from six.moves.urllib.request import Request
-from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.request import urlretrieve
-from six.moves.urllib.parse import urlparse
-from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.request import build_opener
-from six.moves.urllib.parse import quote_plus
-from six.moves.urllib.parse import unquote_plus
-from six.moves.urllib.parse import quote
-from six.moves.urllib.parse import unquote
-from six.moves.urllib.parse import urlencode
-import six.moves.urllib.request
-import six.moves.urllib.parse
-import six.moves.urllib.error
+global downloadfree
+global search
+search = False
+downloadfree = None
 try:
     from enigma import eDVBDB
 except ImportError:
@@ -72,50 +71,97 @@ except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
-currversion = '2.1'
-host0="https://iptv-org.github.io/iptv/categories/xxx.m3u"
-host1="https://github.com/iptv-org/iptv"
+currversion = '2.4'
+host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
+host1='https://github.com/iptv-org/iptv'
+host2='https://iptv-org.github.io/iptv/index.language.m3u'
 PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
-desc_plugin = ('..:: Freearhey Free V. %s ::.. ' % currversion)
-name_plugin = 'Freearhey International Channel List'
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-
+desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
+name_plugin = 'Freearhey Plugin'
+skin_path= PLUGIN_PATH +'/skin'
 sz_w = getDesktop(0).size()
 if sz_w.width() > 1280:
     Height = 60
 else:
     Height = 40
 
-def checkStr(txt):
-    if PY3:
-        if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8')
-    else:
-        if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8')
-    return txt
-
-skin_path= PLUGIN_PATH +'/skin'
 if os.path.exists('/var/lib/dpkg/status'):
     skin_path= skin_path + '/skin_cvs/'
 else:
     skin_path= skin_path + '/skin_pli/'
-
 from enigma import addFont
 try:
     addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
 except Exception as ex:
     print('addfont', ex)
-
-global downloadfree
-downloadfree = None
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadfree = defaultMoviePath()
 except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadfree = ('/media/hdd/movie/')
+ListAgent = [
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
+          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+          ]
+
+def checkStr(txt):
+    if six.PY3:
+        if type(txt) == type(bytes()):
+            txt = txt.decode('utf-8')
+    else:
+        if type(txt) == type(unicode()):
+            txt = txt.encode('utf-8')
+    return txt
 
 def checkInternet():
     try:
@@ -138,23 +184,22 @@ def check(url):
         return False
 
 def getUrl(url):
-        link = []
-
-        print(  "Here in getUrl url =", url)
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-        try:
-               response = urlopen(req)
-               link=response.read()
-               response.close()
-               return link
-        except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               link=response.read()
-               response.close()
-               return link
+    link = []
+    print(  "Here in getUrl url =", url)
+    req = Request(url)
+    req.add_header('User-Agent',RequestAgent())
+    try:
+        response = urlopen(req)
+        link=response.read()
+        response.close()
+        return link
+    except:
+        import ssl
+        gcontext = ssl._create_unverified_context()
+        response = urlopen(req, context=gcontext)
+        link=response.read()
+        response.close()
+        return link
 
 def ReloadBouquet():
     try:
@@ -172,8 +217,11 @@ def remove_line(filename, what):
                 file_write.write(line)
         file_write.close()
 
-class free2list(MenuList):
+def RequestAgent():
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
 
+class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
         self.l.setFont(0, gFont('Regular', 14))
@@ -189,15 +237,12 @@ class free2list(MenuList):
         if sz_w.width() > 1280:
             self.l.setItemHeight(50)
         else:
-            self.l.setItemHeight(40)
+            self.l.setItemHeight(50)
 
 def show_(name, link):
     res = [(name,link)]
-
     if sz_w.width() > 1280:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
-
-
     else:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
@@ -206,11 +251,11 @@ def FreeListEntry(name,png):
     res = [name]
     png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/setting.png'
     if sz_w.width() > 1280:
-            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-            res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-            res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
-            res.append(MultiContentEntryText(pos=(60, 7), size=(1000, 50), font=2, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT))# | RT_VALIGN_CENTER
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=4, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 Panel_list = [
@@ -221,7 +266,6 @@ Panel_list = [
  ('MOVIE XXX')]
 
 class freearhey(Screen):
-
     def __init__(self, session):
         if sz_w.width() > 1280:
             path = skin_path + 'defaultListScreen_new.xml'
@@ -246,10 +290,10 @@ class freearhey(Screen):
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label('')
+        self['Title'] = Label("Plugins Channels Free by Lululla")        
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
-
         # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
@@ -258,7 +302,6 @@ class freearhey(Screen):
         self.loading_ok = False
         self.count = 0
         self.loading = 0
-
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.updateMenuList)
 
@@ -271,8 +314,6 @@ class freearhey(Screen):
         png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/res/pics/setting.png'
         for x in Panel_list:
             list.append(FreeListEntry(x, png))
-
-
             self.menu_list.append(x)
             idx += 1
         self['menulist'].setList(list)
@@ -287,12 +328,14 @@ class freearhey(Screen):
         global namex, lnk
         namex = ''
         lnk = host1
-        if PY3:
+        if six.PY3:
             url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
         if sel == ("PLAYLISTS DIRECT"):
                 namex = "Directy"
-                self.session.open(xfree.xfreearhey)
+                lnk = host2
+                # self.session.open(xfreearhey)
+                self.session.open(selectplay, namex, lnk)
         elif sel == ("PLAYLISTS BY CATEGORY"):
                 namex = "Category"
                 self.session.open(select, namex, lnk)
@@ -306,9 +349,8 @@ class freearhey(Screen):
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
                 lnk = host0
-                if PY3:
+                if six.PY3:
                     url = six.ensure_str(lnk)
-                # self.session.open(adultonly, namex, lnk)
                 self.adultonly(namex, lnk)
 
     def adultonly(self, namex, lnk):
@@ -349,12 +391,9 @@ class freearhey(Screen):
         # self.load_poster()
 
 class select(Screen):
-
-
     def __init__(self, session, namex, lnk):
         if sz_w.width() > 1280:
             path = skin_path + 'defaultListScreen_new.xml'
-
         else:
             path =  skin_path + 'defaultListScreen.xml'
         with open(path, 'r') as f:
@@ -376,6 +415,7 @@ class select(Screen):
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label(_('Export'))
+        self['Title'].setText(str(namex))
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
@@ -396,7 +436,7 @@ class select(Screen):
         self.menu_list = []
         if check(self.url):
             content = getUrl(self.url)
-            if PY3:
+            if six.PY3:
                 content = six.ensure_str(content)
             n1 = content.find("user-content-playlists-by-category", 0)
             n2 = content.find("user-content-playlists-by-language", n1)
@@ -404,13 +444,13 @@ class select(Screen):
             n4 = content.find("</table>", n3)
             if "Category" in self.name:
                     content2 = content[n1:n2]
-                    regexcat = 'td align="left">(.*?)<.*?<code>(.*?)<'
+                    regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
             elif "Language" in self.name:
                     content2 = content[n2:n3]
-                    regexcat = 'td align="left">(.*?)<.*?<code>(.*?)<'
+                    regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
             elif "Country" in self.name:
                     content2 = content[n3:n4]
-                    regexcat = 'alias="(.*?)".*?<code>(.*?)<'
+                    regexcat = 'alias="(.+?)".*?<code>(.+?)<'
             match = re.compile(regexcat,re.DOTALL).findall(content2)
             pic = " "
             for name, url in match:
@@ -433,7 +473,7 @@ class select(Screen):
         url = self['menulist'].getCurrent()[0][1]
         print('name: ', name)
         print('url: ', url)
-        self.session.open(selectplay, namex, url)
+        self.session.open(selectplay, name, url)
 
     def up(self):
         self[self.currentList].up()
@@ -454,7 +494,6 @@ class select(Screen):
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
         # self.load_poster()
-
 
     def right(self):
         self[self.currentList].pageDown()
@@ -484,12 +523,13 @@ class select(Screen):
             print('permantly remove file ', xxxname)
             os.remove(xxxname)
         try:
-            if PY3:
-                url = six.ensure_str(url)
+            # if six.PY3:
+                # url = six.ensure_str(url)
             print('read url: ',  url)
             req = Request(url, None, headers=headers)
             content = urlopen(req, timeout=30).read()
-            content = six.ensure_str(content)
+            if six.PY3:
+                content = six.ensure_str(content)
             print("content =", content)
             with open('/tmp/temporary.m3u', 'w') as f:
                 f.write(content)
@@ -521,7 +561,6 @@ class select(Screen):
                 for line in open('/etc/enigma2/bouquets.tv'):
                     if bqtname in line:
                         in_bouquets = 1
-
                 if in_bouquets == 0:
                     if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
                         remove_line('/etc/enigma2/bouquets.tv', bqtname)
@@ -553,50 +592,120 @@ class selectplay(Screen):
          'left': self.left,
          'right': self.right,
          'ok': self.ok,
-		 # 'green': self.message2,
-         'cancel': self.close,
-         'red': self.close}, -1)
+		 'green': self.search_text,
+         'cancel': self.returnback,
+         'red': self.returnback}, -1)
+        
+        self.menulist = []
+        self.loading_ok = False
+        self.count = 0
+        self.loading = 0
+        self.name =namex
+        self.url = lnk        
         self['menulist'] = free2list([])
-        self['red'] = Label(_('Exit'))
-        self['green'] = Label('')
+        self['red'] = Label(_('Exit'))   
+        # self['green'] = Label('')
+        # if 'Directy' in self.name:
+        self['green'] = Label(_('Search'))
         self['title'] = Label("Thank's Freearhey")
+        self['Title'].setText(str(namex))
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
-        self.menulist = []
-        self.loading_ok = False
-        self.count = 0
-        self.loading = 0
-        self.name =namex
-        self.url = lnk
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         if self.name == 'moviexxx':
             self.onLayoutFinish.append(self.updateMenuListx)
         else:
             self.onLayoutFinish.append(self.updateMenuList)
 
+    def search_text(self):
+        # if 'Directy' in self.name:
+            from Screens.VirtualKeyBoard import VirtualKeyBoard
+            print('Search go movie: ', search)
+            self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
+        # else:
+            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+            # return
+
+    def filterChannels(self, callback = None):
+        global search    
+        if callback is not None and len(callback):  
+            callback=callback.lower()
+            del self.menu_list
+            self.menu_list = []
+            if check(self.url):
+                content = getUrl(self.url)
+                if six.PY3:
+                    content = content.decode("utf-8")
+                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                match = re.compile(regexcat,re.DOTALL).findall(content)
+                print( "In showContent match =", match)
+                for name, url in match:
+                    if callback in name.lower():
+                        print('callback: ', callback)
+                        search = True
+                        url = url.replace(" ", "")
+                        url = url.replace("\\n", "")
+                        url = url.replace('\r','')
+                        name = name.replace('\r','')
+                        # print( "In showContent name =", name)
+                        # print( "In showContent url =", url)
+                        self.menu_list.append(show_(name, url))
+                        self['menulist'].l.setList(self.menu_list)
+                        self['menulist'].l.setItemHeight(40)
+                        # self['menulist'].moveToIndex(0)
+                        auswahl = self['menulist'].getCurrent()[0][0]
+                        self['name'].setText(str(auswahl))
+                        self['text'].setText('')
+            else:
+                self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+                return
+        else:
+            self.resetSearch()
+
+    def returnback(self):
+        global search
+        if search == True:
+            search = False
+            del self.menu_list
+            print('sono di la')
+            self.updateMenuList()
+            
+        else:    
+            search = False
+            del self.menu_list
+            print('sono di qua')            
+            self.close()
+
+    def resetSearch(self):
+        global search
+        search = False
+        del self.menu_list
+        self.updateMenuList()
+
     def updateMenuList(self):
         self.menu_list = []
         if check(self.url):
             content = getUrl(self.url)
-            if PY3:
+            if six.PY3:
                 content = content.decode("utf-8")
-            # if PY3:
+            # if six.PY3:
                 # content = six.ensure_str(self.url)
             # print( "content A =", content)
-            regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            ##EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
+            regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
             print( "In showContent match =", match)
-            n1 = 0
+            # n1 = 0
             for name, url in match:
                 if not ".m3u8" in url:
-                       continue
-                n1 = n1+1
-                if n1 > 50:
-                       break
+                    continue
+                # n1 = n1+1
+                # if n1 > 100:
+                       # break
                 url = url.replace(" ", "")
                 url = url.replace("\\n", "")
                 url = url.replace('\r','')
@@ -605,9 +714,9 @@ class selectplay(Screen):
                 print( "In showContent url =", url)
                 pic = " "
                 self.menu_list.append(show_(name, url))
-                self['menulist'].l.setList(self.menu_list)
-                self['menulist'].l.setItemHeight(40)
-                # self['menulist'].moveToIndex(0)
+            self['menulist'].l.setList(self.menu_list)
+            self['menulist'].l.setItemHeight(40)
+            # self['menulist'].moveToIndex(0)
             auswahl = self['menulist'].getCurrent()[0][0]
             self['name'].setText(str(auswahl))
             self['text'].setText('')
@@ -619,21 +728,21 @@ class selectplay(Screen):
         self.menu_list = []
         if check(self.url):
             content = getUrl(self.url)
-            # if PY3:
+            # if six.PY3:
                 # content = six.ensure_str(content)
-            if PY3:
+            if six.PY3:
                 content = content.decode("utf-8")
             print( "content A =", content)
-            regexcat = 'EXTINF.*?,(.*?)\\n(.*?)\\n'
+            regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
             match = re.compile(regexcat,re.DOTALL).findall(content)
             print( "In showContent match =", match)
-            n1 = 0
+            # n1 = 0
             for name, url in match:
                 if not ".m3u8" in url:
                     continue
-                n1 = n1+1
-                if n1 > 50:
-                    break
+                # n1 = n1+1
+                # if n1 > 50:
+                    # break
                 url = url.replace(" ", "")
                 url = url.replace("\\n", "")
                 url = url.replace('\r','')
@@ -642,10 +751,10 @@ class selectplay(Screen):
                 print( "In showContent url =", url)
                 pic = " "
                 self.menu_list.append(show_(name, url))
-                self['menulist'].l.setList(self.menu_list)
-                self['menulist'].l.setItemHeight(40)
-                # self['menulist'].moveToIndex(0)
-            if n1 == 0: return
+            self['menulist'].l.setList(self.menu_list)
+            self['menulist'].l.setItemHeight(40)
+            # self['menulist'].moveToIndex(0)
+            # if n1 == 0: return
             auswahl = self['menulist'].getCurrent()[0][0]
             self['name'].setText(str(auswahl))
             self['text'].setText('')
@@ -882,12 +991,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def showIMDB(self):
-        if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD/plugin.pyo"):
+        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb/plugin.pyo"):
+        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)

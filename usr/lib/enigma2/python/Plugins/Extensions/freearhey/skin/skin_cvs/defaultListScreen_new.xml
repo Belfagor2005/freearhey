@@ -1,23 +1,22 @@
 <screen name="freearhey" position="0,0" size="1920,1080" backgroundColor="transparent" flags="wfNoBorder">
-	<eLabel text="freearhey plugin" position="105,18" size="1062,75" noWrap="1" transparent="1" font="Regular;45" backgroundColor="#30000000" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="6" />
-	<widget name="name" position="1214,629" size="701,60" noWrap="1" zPosition="1" transparent="1" font="Regular;38" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
-	<widget name="menulist" position="124,183" size="1011,670" backgroundColor="#30000000" zPosition="1" scrollbarMode="showOnDemand" transparent="1" foregroundColor="#00ffffff" />
-	<widget name="text" position="111,111" size="1027,76" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular; 38" halign="center" foregroundColor="#f4b700" />
+	<widget name="name" position="1315,596" size="497,60" noWrap="1" zPosition="1" transparent="1" font="Regular; 40" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
+	<widget name="menulist" position="153,212" size="921,588" backgroundColor="#30000000" zPosition="1" scrollbarMode="showOnDemand" transparent="1" foregroundColor="#00ffffff" />
+	<widget name="text" position="158,127" size="900,73" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular; 38" halign="center" foregroundColor="#f4b700" />
 	<widget name="red" font="Regular;30" halign="left" valign="center" position="96,993" size="222,72" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
 	<widget name="green" font="Regular;30" halign="left" valign="center" position="396,993" size="222,72" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
 	<!--  
-	<widget name="poster" pixmap="/tmp/freearhey/poster.jpg" position="911,196" size="260,340" zPosition="4" backgroundColor="#30000000" transparent="1" borderWidth="3" borderColor="#00ffffff" flags="wfBorder" alphatest="blend" />
+	<widget name="poster" position="911,196" size="260,340" zPosition="4" backgroundColor="#30000000" transparent="1" alphatest="blend" />
 	-->
-	<widget name="title" position="1358,581" size="400,40" noWrap="1" zPosition="1" transparent="1" font="Regular; 34" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
+	<widget name="title" position="1359,554" size="400,40" noWrap="1" zPosition="1" transparent="1" font="Regular; 34" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
 	<widget source="Title" backgroundColor="#30000000" font="Regular;51" foregroundColor="#00ffffff" position="105,18" render="Label" size="1062,69" transparent="1" halign="center" valign="center" noWrap="1" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images_new/key_red1.png" position="33,1005" size="48,56" backgroundColor="#30000000" alphatest="blend" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images_new/key_green1.png" position="333,1005" size="48,56" backgroundColor="#30000000" alphatest="blend" />
-	<widget source="global.CurrentTime" render="Label" position="1731,24" size="150,42" font="Regular;39" halign="right" backgroundColor="#30000000" transparent="1" valign="center" foregroundColor="#00ffffff">
+	<widget source="global.CurrentTime" render="Label" position="1731,24" size="150,70" font="Regular; 50" halign="right" backgroundColor="#30000000" transparent="1" valign="center" foregroundColor="#00ffffff">
 		<convert type="ClockToText">Default</convert>
 	</widget>
-	<eLabel backgroundColor="#30000000" position="0,0" size="1920,1080" transparent="0" zPosition="-9" foregroundColor="#00ffffff" />
+	<eLabel backgroundColor="#30000000" position="0,0" size="1920,1080" transparent="1" zPosition="-9" foregroundColor="#00ffffff" />
 	<eLabel backgroundColor="#00ffffff" position="0,96" size="1920,3" zPosition="2" />
 	<eLabel backgroundColor="#00ffffff" position="0,984" size="1920,3" zPosition="2" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images_new/main.png" position="0,0" size="1920,1080" alphatest="blend" zPosition="-8" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images/icon.png" position="1431,271" size="256,256" alphatest="blend" zPosition="3" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images/icon.png" position="1410,286" size="256,256" alphatest="blend" zPosition="3" />
 </screen>
