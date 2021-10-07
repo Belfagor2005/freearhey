@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#05/09/2021
+#07/09/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -70,6 +70,15 @@ try:
 except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+
+global downloadm3u
+downloadm3u = None
+try:
+    from Components.UsageConfig import defaultMoviePath
+    downloadm3u = defaultMoviePath()
+except:
+    if os.path.exists("/usr/bin/apt-get"):
+        downloadm3u = ('/media/hdd/movie/')
 
 currversion = '2.4'
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
@@ -513,67 +522,67 @@ class select(Screen):
             name = self['menulist'].l.getCurrentSelection()[0][0]
             url = self['menulist'].getCurrent()[0][1]
             url = str(url)
-            print('url convert: ', url)
+            # print('url convert: ', url)
             self.convert_bouquet(url, name)
 
     def convert_bouquet(self, url, name):
-        # xxxname = downloadfree + 'temporary.m3u'
-        xxxname = '/tmp/temporary.m3u'
-        if os.path.exists(xxxname):
-            print('permantly remove file ', xxxname)
-            os.remove(xxxname)
-        try:
-            # if six.PY3:
-                # url = six.ensure_str(url)
-            print('read url: ',  url)
-            req = Request(url, None, headers=headers)
-            content = urlopen(req, timeout=30).read()
+        if check(url):
+            name = name.strip()
+            name = name.lower()
+            content = getUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
-            print("content =", content)
-            with open('/tmp/temporary.m3u', 'w') as f:
-                f.write(content)
-            bqtname = 'userbouquet.%s.tv' % name
-            bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + bqtname + '" ORDER BY bouquet\n'
-            bouquet = 'bouquets.tv'
-            desk_tmp = ''
-            in_bouquets = 0
-            if os.path.isfile('/etc/enigma2/%s' % bqtname):
-                    os.remove('/etc/enigma2/%s' % bqtname)
-            with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
-                outfile.write('#NAME %s\r\n' % name.capitalize())
-                for line in open(xxxname ):
-                    if line.startswith('http://') or line.startswith('https'):
-                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
-                        outfile.write('#DESCRIPTION %s' % desk_tmp)
-                    elif line.startswith('#EXTINF'):
-                        desk_tmp = '%s' % line.split(',')[-1]
-                    elif '<stream_url><![CDATA' in line:
-                        outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
-                        outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
-                    elif '<title>' in line:
-                        if '<![CDATA[' in line:
-                            desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
-                        else:
-                            desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-                outfile.close()
-            if os.path.isfile('/etc/enigma2/bouquets.tv'):
-                for line in open('/etc/enigma2/bouquets.tv'):
-                    if bqtname in line:
-                        in_bouquets = 1
-                if in_bouquets == 0:
-                    if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
-                        remove_line('/etc/enigma2/bouquets.tv', bqtname)
-                        with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                            outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
-                            outfile.close()
-            self.mbox = self.session.open(MessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), MessageBox.TYPE_INFO, timeout=5)
-            ReloadBouquet()
-        except:
-            return
+            if os.path.exists(downloadm3u):
+                xxxname = downloadm3u + name + '.m3u'  
+            else:
+                xxxname = '/tmp/' + name + '.m3u'
+            print('path m3u: ', xxxname)
+            try:
+                print("content =", content)
+                with open(xxxname, 'w') as f:
+                    f.write(content)
+                f.close()
+                bqtname = 'userbouquet.%s.tv' % name
+                bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + bqtname + '" ORDER BY bouquet\n'
+                bouquet = 'bouquets.tv'
+                desk_tmp = ''
+                in_bouquets = 0
+                if os.path.isfile('/etc/enigma2/%s' % bqtname):
+                        os.remove('/etc/enigma2/%s' % bqtname)
+                with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
+                    outfile.write('#NAME %s\r\n' % name.capitalize())
+                    for line in open(xxxname ):
+                        if line.startswith('http://') or line.startswith('https'):
+                            outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
+                            outfile.write('#DESCRIPTION %s' % desk_tmp)
+                        elif line.startswith('#EXTINF'):
+                            desk_tmp = '%s' % line.split(',')[-1]
+                            
+                        elif '<stream_url><![CDATA' in line:
+                            outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
+                            outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
+                        elif '<title>' in line:
+                            if '<![CDATA[' in line:
+                                desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
+                            else:
+                                desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
+                    outfile.close()
+                if os.path.isfile('/etc/enigma2/bouquets.tv'):
+                    for line in open('/etc/enigma2/bouquets.tv'):
+                        if bqtname in line:
+                            in_bouquets = 1
+                    if in_bouquets == 0:
+                        if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
+                            remove_line('/etc/enigma2/bouquets.tv', bqtname)
+                            with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
+                                outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
+                                outfile.close()
+                self.mbox = self.session.open(MessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), MessageBox.TYPE_INFO, timeout=7)
+                ReloadBouquet()
+            except:
+                return
 
 class selectplay(Screen):
-
     def __init__(self, session, namex, lnk):
         if sz_w.width() > 1280:
             path = skin_path + 'defaultListScreen_new.xml'
