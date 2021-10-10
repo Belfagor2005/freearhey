@@ -18,7 +18,7 @@ from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixm
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
-from Plugins.Extensions.freearhey.xfree import xfreearhey
+# from Plugins.Extensions.freearhey.xfree import xfreearhey
 from Plugins.Plugin import PluginDescriptor
 from random import choice
 from Screens.InfoBar import MoviePlayer, InfoBar
@@ -80,7 +80,7 @@ except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadm3u = ('/media/hdd/movie/')
 
-currversion = '2.4'
+currversion = '2.5'
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
 host1='https://github.com/iptv-org/iptv'
 host2='https://iptv-org.github.io/iptv/index.language.m3u'
@@ -89,20 +89,21 @@ desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currver
 name_plugin = 'Freearhey Plugin'
 skin_path= PLUGIN_PATH +'/skin'
 sz_w = getDesktop(0).size()
-if sz_w.width() > 1280:
-    Height = 60
-else:
-    Height = 40
+# if sz_w.width() > 1280:
+    # Height = 60
+# else:
+    # Height = 50
+
 
 if os.path.exists('/var/lib/dpkg/status'):
     skin_path= skin_path + '/skin_cvs/'
 else:
     skin_path= skin_path + '/skin_pli/'
-from enigma import addFont
-try:
-    addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
-except Exception as ex:
-    print('addfont', ex)
+# from enigma import addFont
+# try:
+    # addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
+# except Exception as ex:
+    # print('addfont', ex)
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadfree = defaultMoviePath()
@@ -192,6 +193,10 @@ def check(url):
     except socket.timeout:
         return False
 
+def RequestAgent():
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
+
 def getUrl(url):
     link = []
     print(  "Here in getUrl url =", url)
@@ -201,14 +206,14 @@ def getUrl(url):
         response = urlopen(req)
         link=response.read()
         response.close()
-        return link
+        # return link
     except:
         import ssl
         gcontext = ssl._create_unverified_context()
         response = urlopen(req, context=gcontext)
         link=response.read()
         response.close()
-        return link
+    return link
 
 def ReloadBouquet():
     try:
@@ -226,10 +231,6 @@ def remove_line(filename, what):
                 file_write.write(line)
         file_write.close()
 
-def RequestAgent():
-    RandomAgent = choice(ListAgent)
-    return RandomAgent
-
 class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
@@ -246,7 +247,7 @@ class free2list(MenuList):
         if sz_w.width() > 1280:
             self.l.setItemHeight(50)
         else:
-            self.l.setItemHeight(50)
+            self.l.setItemHeight(40)
 
 def show_(name, link):
     res = [(name,link)]
@@ -299,7 +300,7 @@ class freearhey(Screen):
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label('')
-        self['Title'] = Label("Plugins Channels Free by Lululla")        
+        self['category'] = Label("Plugins Channels Free by Lululla")
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
@@ -424,7 +425,8 @@ class select(Screen):
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label(_('Export'))
-        self['Title'].setText(str(namex))
+        self['category'] = Label('')
+        self['category'].setText(str(namex))
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
@@ -467,7 +469,7 @@ class select(Screen):
                     continue
                 self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
-                # self['menulist'].l.setItemHeight(40)
+                # self['menulist'].l.setItemHeight(50)
                 # self['menulist'].moveToIndex(0)
             auswahl = self['menulist'].getCurrent()[0][0]
             print('auswahl: ', auswahl)
@@ -533,7 +535,7 @@ class select(Screen):
             if six.PY3:
                 content = six.ensure_str(content)
             if os.path.exists(downloadm3u):
-                xxxname = downloadm3u + name + '.m3u'  
+                xxxname = downloadm3u + name + '.m3u'
             else:
                 xxxname = '/tmp/' + name + '.m3u'
             print('path m3u: ', xxxname)
@@ -557,7 +559,7 @@ class select(Screen):
                             outfile.write('#DESCRIPTION %s' % desk_tmp)
                         elif line.startswith('#EXTINF'):
                             desk_tmp = '%s' % line.split(',')[-1]
-                            
+
                         elif '<stream_url><![CDATA' in line:
                             outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
                             outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
@@ -604,20 +606,21 @@ class selectplay(Screen):
 		 'green': self.search_text,
          'cancel': self.returnback,
          'red': self.returnback}, -1)
-        
+
         self.menulist = []
         self.loading_ok = False
         self.count = 0
         self.loading = 0
         self.name =namex
-        self.url = lnk        
+        self.url = lnk
         self['menulist'] = free2list([])
-        self['red'] = Label(_('Exit'))   
+        self['red'] = Label(_('Exit'))
         # self['green'] = Label('')
         # if 'Directy' in self.name:
         self['green'] = Label(_('Search'))
         self['title'] = Label("Thank's Freearhey")
-        self['Title'].setText(str(namex))
+        self['category'] = Label('')
+        self['category'].setText(str(namex))
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
@@ -640,8 +643,8 @@ class selectplay(Screen):
             # return
 
     def filterChannels(self, callback = None):
-        global search    
-        if callback is not None and len(callback):  
+        global search
+        if callback is not None and len(callback):
             callback=callback.lower()
             del self.menu_list
             self.menu_list = []
@@ -664,7 +667,7 @@ class selectplay(Screen):
                         # print( "In showContent url =", url)
                         self.menu_list.append(show_(name, url))
                         self['menulist'].l.setList(self.menu_list)
-                        self['menulist'].l.setItemHeight(40)
+                        # self['menulist'].l.setItemHeight(40)
                         # self['menulist'].moveToIndex(0)
                         auswahl = self['menulist'].getCurrent()[0][0]
                         self['name'].setText(str(auswahl))
@@ -682,11 +685,11 @@ class selectplay(Screen):
             del self.menu_list
             print('sono di la')
             self.updateMenuList()
-            
-        else:    
+
+        else:
             search = False
             del self.menu_list
-            print('sono di qua')            
+            print('sono di qua')
             self.close()
 
     def resetSearch(self):
@@ -724,7 +727,7 @@ class selectplay(Screen):
                 pic = " "
                 self.menu_list.append(show_(name, url))
             self['menulist'].l.setList(self.menu_list)
-            self['menulist'].l.setItemHeight(40)
+            # self['menulist'].l.setItemHeight(40)
             # self['menulist'].moveToIndex(0)
             auswahl = self['menulist'].getCurrent()[0][0]
             self['name'].setText(str(auswahl))
@@ -761,7 +764,7 @@ class selectplay(Screen):
                 pic = " "
                 self.menu_list.append(show_(name, url))
             self['menulist'].l.setList(self.menu_list)
-            self['menulist'].l.setItemHeight(40)
+            # self['menulist'].l.setItemHeight(40)
             # self['menulist'].moveToIndex(0)
             # if n1 == 0: return
             auswahl = self['menulist'].getCurrent()[0][0]
@@ -1292,7 +1295,7 @@ def charRemove(text):
         for ch in char:
             ch= ch.lower()
             # if myreplace == ch:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+            myreplace = myreplace.replace(ch, "").replace("  ", " ").strip()
         return myreplace
 
 def main(session, **kwargs):

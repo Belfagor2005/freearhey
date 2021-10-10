@@ -1,17 +1,17 @@
 <screen name="freearhey" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder">
-	<widget name="name" position="755,458" size="497,40" noWrap="1" zPosition="1" transparent="1" font="Regular; 24" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
+	<widget name="name" position="755,458" size="497,40" noWrap="1" zPosition="1" transparent="1" font="Regular;24" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
 	<widget name="menulist" position="71,127" size="670,432" backgroundColor="#30000000" zPosition="1" scrollbarMode="showOnDemand" transparent="1" foregroundColor="#00ffffff" />
-	<widget name="text" position="64,72" size="690,50" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular; 24" halign="center" foregroundColor="#f4b700" />
-	<widget name="title" position="830,415" size="339,40" noWrap="1" zPosition="1" transparent="1" font="Regular; 26" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
-	<widget name="red" font="Regular; 20" halign="left" valign="center" position="64,662" size="148,48" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
-	<widget name="green" font="Regular; 20" halign="left" valign="center" position="264,662" size="148,48" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
+	<widget name="text" position="64,72" size="690,50" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular;24" halign="center" foregroundColor="#f4b700" />
+	<widget name="title" position="830,415" size="339,40" noWrap="1" zPosition="1" transparent="1" font="Regular;26" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
+	<widget name="red" font="Regular;20" halign="left" valign="center" position="64,662" size="148,48" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
+	<widget name="green" font="Regular;20" halign="left" valign="center" position="264,662" size="148,48" backgroundColor="#30000000" foregroundColor="#00ffffff" transparent="1" zPosition="1" />
 	<!--  
 	<widget name="poster" position="911,196" size="260,340" zPosition="4" backgroundColor="#30000000" transparent="1" alphatest="blend" />
 	-->
-	<widget source="Title" backgroundColor="#30000000" font="Regular; 34" foregroundColor="#00ffffff" position="70,12" render="Label" size="708,46" transparent="1" halign="center" valign="center" noWrap="1" />
+	<widget name="category" position="105,18" size="1062,69" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular;38" halign="center" foregroundColor="#f4b700" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images/key_red1.png" position="22,670" size="32,37" backgroundColor="#30000000" alphatest="blend" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/images/key_green1.png" position="222,670" size="32,37" backgroundColor="#30000000" alphatest="blend" />
-	<widget source="global.CurrentTime" render="Label" position="1109,6" size="150,60" font="Regular; 40" halign="right" backgroundColor="#30000000" transparent="1" valign="center" foregroundColor="#00ffffff">
+	<widget source="global.CurrentTime" render="Label" position="1109,6" size="150,60" font="Regular;40" halign="right" backgroundColor="#30000000" transparent="1" valign="center" foregroundColor="#00ffffff">
 		<convert type="ClockToText">Default</convert>
 	</widget>
 	<eLabel backgroundColor="#00ffffff" position="0,64" size="1280,2" zPosition="2" />
