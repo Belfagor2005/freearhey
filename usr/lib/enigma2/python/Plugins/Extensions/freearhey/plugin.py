@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#07/09/2021
+#25/11/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
 #   But no delete this message support on forum linuxsat-support      #
 #######################################################################
 from __future__ import print_function
-# from time import strptime, mktime
-# from twisted.web.client import downloadPage, getPage, error
 from Components.AVSwitch import AVSwitch
-from Components.ActionMap import ActionMap, NumberActionMap
+from Components.ActionMap import ActionMap
 from Components.Console import Console as iConsole
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -18,9 +16,7 @@ from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixm
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
-# from Plugins.Extensions.freearhey.xfree import xfreearhey
 from Plugins.Plugin import PluginDescriptor
-from random import choice
 from Screens.InfoBar import MoviePlayer, InfoBar
 from Screens.InfoBarGenerics import *
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
@@ -35,6 +31,12 @@ from enigma import eSize, iServiceInformation
 from enigma import eTimer, gFont, eListbox
 from enigma import getDesktop
 from enigma import loadPNG
+import hashlib
+import os
+import re
+import six
+import sys
+
 from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import parse_qs
 from six.moves.urllib.parse import quote
@@ -47,23 +49,14 @@ from six.moves.urllib.request import Request
 from six.moves.urllib.request import build_opener
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.request import urlretrieve
-global skin_path
-import base64
-import hashlib
-import os
-import re
-import six
-import socket
-import ssl
-import sys
-global downloadfree
-global search
-search = False
-downloadfree = None
 try:
-    from enigma import eDVBDB
-except ImportError:
-    eDVBDB = None
+    from Plugins.Extensions.freearhey.Utils import *
+except:
+    from . import Utils
+global skin_path, search, downloadm3u
+search = False
+downloadm3u = '/media/hdd/movie/'
+
 try:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
@@ -71,16 +64,14 @@ except:
     import cookielib
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
-global downloadm3u
-downloadm3u = None
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadm3u = defaultMoviePath()
 except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadm3u = ('/media/hdd/movie/')
-
-currversion = '2.5'
+        
+currversion = '2.6'
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
 host1='https://github.com/iptv-org/iptv'
 host2='https://iptv-org.github.io/iptv/index.language.m3u'
@@ -88,139 +79,12 @@ PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 name_plugin = 'Freearhey Plugin'
 skin_path= PLUGIN_PATH +'/skin'
-sz_w = getDesktop(0).size()
-# if sz_w.width() > 1280:
-    # Height = 60
-# else:
-    # Height = 50
 
-
-if os.path.exists('/var/lib/dpkg/status'):
+# if os.path.exists('/var/lib/dpkg/status'):
+if DreamOS():
     skin_path= skin_path + '/skin_cvs/'
 else:
     skin_path= skin_path + '/skin_pli/'
-# from enigma import addFont
-# try:
-    # addFont('%s/nxt1.ttf' % PLUGIN_PATH, 'RegularIPTV', 100, 1)
-# except Exception as ex:
-    # print('addfont', ex)
-try:
-    from Components.UsageConfig import defaultMoviePath
-    downloadfree = defaultMoviePath()
-except:
-    if os.path.exists("/usr/bin/apt-get"):
-        downloadfree = ('/media/hdd/movie/')
-ListAgent = [
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
-          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
-          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
-          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
-          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
-          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
-          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
-          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
-          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
-          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
-          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-          'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
-          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
-          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
-          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
-          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
-          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
-          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
-          ]
-
-def checkStr(txt):
-    if six.PY3:
-        if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8')
-    else:
-        if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8')
-    return txt
-
-def checkInternet():
-    try:
-        socket.setdefaulttimeout(0.5)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", 53))
-        return True
-    except:
-        return False
-
-def check(url):
-    try:
-        response = checkStr(urlopen(url, None, 5))
-        response.close()
-        return True
-    except HTTPError:
-        return False
-    except URLError:
-        return False
-    except socket.timeout:
-        return False
-
-def RequestAgent():
-    RandomAgent = choice(ListAgent)
-    return RandomAgent
-
-def getUrl(url):
-    link = []
-    print(  "Here in getUrl url =", url)
-    req = Request(url)
-    req.add_header('User-Agent',RequestAgent())
-    try:
-        response = urlopen(req)
-        link=response.read()
-        response.close()
-        # return link
-    except:
-        import ssl
-        gcontext = ssl._create_unverified_context()
-        response = urlopen(req, context=gcontext)
-        link=response.read()
-        response.close()
-    return link
-
-def ReloadBouquet():
-    try:
-        eDVBDB.getInstance().reloadServicelist()
-        eDVBDB.getInstance().reloadBouquets()
-    except:
-        os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
 
 def remove_line(filename, what):
     if os.path.isfile(filename):
@@ -244,23 +108,23 @@ class free2list(MenuList):
         self.l.setFont(7, gFont('Regular', 28))
         self.l.setFont(8, gFont('Regular', 32))
         self.l.setFont(9, gFont('Regular', 38))
-        if sz_w.width() > 1280:
+        if isFHD():
             self.l.setItemHeight(50)
         else:
-            self.l.setItemHeight(40)
+            self.l.setItemHeight(50)
 
 def show_(name, link):
     res = [(name,link)]
-    if sz_w.width() > 1280:
+    if isFHD():
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=8, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=6, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
 
 def FreeListEntry(name,png):
     res = [name]
     png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/setting.png'
-    if sz_w.width() > 1280:
+    if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -277,7 +141,7 @@ Panel_list = [
 
 class freearhey(Screen):
     def __init__(self, session):
-        if sz_w.width() > 1280:
+        if isFHD():
             path = skin_path + 'defaultListScreen_new.xml'
         else:
             path =  skin_path + 'defaultListScreen.xml'
@@ -338,9 +202,10 @@ class freearhey(Screen):
         global namex, lnk
         namex = ''
         lnk = host1
-        if six.PY3:
-            url = six.ensure_str(lnk)
+        # if six.PY3:
+            # url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
+        # sel = self['menulist'].getCurrent()[0][0]
         if sel == ("PLAYLISTS DIRECT"):
                 namex = "Directy"
                 lnk = host2
@@ -348,13 +213,13 @@ class freearhey(Screen):
                 self.session.open(selectplay, namex, lnk)
         elif sel == ("PLAYLISTS BY CATEGORY"):
                 namex = "Category"
-                self.session.open(select, namex, lnk)
+                self.session.open(main2, namex, lnk)
         elif sel == ("PLAYLISTS BY LANGUAGE"):
                 namex = "Language"
-                self.session.open(select, namex, lnk)
+                self.session.open(main2, namex, lnk)
         elif sel == ("PLAYLISTS BY COUNTRY"):
                 namex = "Country"
-                self.session.open(select, namex, lnk)
+                self.session.open(main2, namex, lnk)
         else:
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
@@ -400,17 +265,26 @@ class freearhey(Screen):
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
-class select(Screen):
+class main2(Screen):
     def __init__(self, session, namex, lnk):
-        if sz_w.width() > 1280:
+        self.session = session
+        Screen.__init__(self, session)    
+        if isFHD():
             path = skin_path + 'defaultListScreen_new.xml'
         else:
             path =  skin_path + 'defaultListScreen.xml'
         with open(path, 'r') as f:
             self.skin = f.read()
             f.close()
-        self.session = session
-        Screen.__init__(self, session)
+        self['menulist'] = free2list([])
+        self['red'] = Label(_('Exit'))
+        self['green'] = Label(_('Export'))
+        self['category'] = Label('')
+        self['category'].setText(str(namex))
+        self['title'] = Label("Thank's Freearhey")
+        self['name'] = Label('')
+        self['text'] = Label('')
+        # self['poster'] = Pixmap()
         self['actions'] = ActionMap(['OkCancelActions',
          'ColorActions',
          'DirectionActions',
@@ -422,15 +296,6 @@ class select(Screen):
 		 'green': self.message2,
          'cancel': self.close,
          'red': self.close}, -1)
-        self['menulist'] = free2list([])
-        self['red'] = Label(_('Exit'))
-        self['green'] = Label(_('Export'))
-        self['category'] = Label('')
-        self['category'].setText(str(namex))
-        self['title'] = Label("Thank's Freearhey")
-        self['name'] = Label('')
-        self['text'] = Label('')
-        # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
@@ -445,10 +310,11 @@ class select(Screen):
 
     def updateMenuList(self):
         self.menu_list = []
+        items = []
         if check(self.url):
-            content = getUrl(self.url)
-            if six.PY3:
-                content = six.ensure_str(content)
+            content = ReadUrl(self.url)
+            # if six.PY3:
+                # content = six.ensure_str(content)
             n1 = content.find("user-content-playlists-by-category", 0)
             n2 = content.find("user-content-playlists-by-language", n1)
             n3 = content.find("user-content-playlists-by-country", n2)
@@ -456,17 +322,66 @@ class select(Screen):
             if "Category" in self.name:
                     content2 = content[n1:n2]
                     regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
+                    match = re.compile(regexcat,re.DOTALL).findall(content2)
+                    pic = " "
+                    item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
+                    items.append(item)
+                    for name, url in match:
+                        a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
+                        if any(s in str(name).lower() for s in a):
+                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
+                            continue
+                        name = name.replace('%20', ' ')
+                        item = name + "###" + url
+                        items.append(item)
             elif "Language" in self.name:
                     content2 = content[n2:n3]
                     regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
+                    match = re.compile(regexcat,re.DOTALL).findall(content2)
+                    pic = " "  
+                    item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
+                    items.append(item)                  
+                    for name, url in match:
+                        a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
+                        if any(s in str(name).lower() for s in a):
+                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
+                            continue
+                        name = name.replace('%20', ' ')
+                        item = name + "###" + url
+                        items.append(item)
             elif "Country" in self.name:
                     content2 = content[n3:n4]
                     regexcat = 'alias="(.+?)".*?<code>(.+?)<'
-            match = re.compile(regexcat,re.DOTALL).findall(content2)
-            pic = " "
-            for name, url in match:
-                if "xxx" in name.lower():
-                    continue
+                    
+                    match = re.compile(regexcat,re.DOTALL).findall(content2)
+                    pic = " "                    
+                    
+                    item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
+                    items.append(item)
+                    for name, url in match:
+                        a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
+                        if any(s in str(name).lower() for s in a):
+                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
+                            continue
+                        name = name.replace('%20', ' ')
+                        item = name + "###" + url
+                        items.append(item)
+            items.sort()
+            for item in items:
+                name = item.split("###")[0]
+                url = item.split("###")[1]
+                pic = " "
+            # match = re.compile(regexcat,re.DOTALL).findall(content2)
+            # pic = " "
+            # for name, url in match:
+                # if "xxx" in name.lower():
+                    # continue                
+                # if "adult" in name.lower():                
+                    # continue
+                # if "XXX" in name.lower():
+                    # continue                
+                # if "Adult" in name.lower():                
+                    # continue                    
                 self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(50)
@@ -531,7 +446,7 @@ class select(Screen):
         if check(url):
             name = name.strip()
             name = name.lower()
-            content = getUrl(url)
+            content = ReadUrl(url)
             if six.PY3:
                 content = six.ensure_str(content)
             if os.path.exists(downloadm3u):
@@ -549,8 +464,8 @@ class select(Screen):
                 bouquet = 'bouquets.tv'
                 desk_tmp = ''
                 in_bouquets = 0
-                if os.path.isfile('/etc/enigma2/%s' % bqtname):
-                        os.remove('/etc/enigma2/%s' % bqtname)
+                # if os.path.isfile('/etc/enigma2/%s' % bqtname):
+                        # os.remove('/etc/enigma2/%s' % bqtname)
                 with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
                     outfile.write('#NAME %s\r\n' % name.capitalize())
                     for line in open(xxxname ):
@@ -586,7 +501,7 @@ class select(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
-        if sz_w.width() > 1280:
+        if isFHD():
             path = skin_path + 'defaultListScreen_new.xml'
         else:
             path =  skin_path + 'defaultListScreen.xml'
@@ -606,7 +521,6 @@ class selectplay(Screen):
 		 'green': self.search_text,
          'cancel': self.returnback,
          'red': self.returnback}, -1)
-
         self.menulist = []
         self.loading_ok = False
         self.count = 0
@@ -634,13 +548,9 @@ class selectplay(Screen):
             self.onLayoutFinish.append(self.updateMenuList)
 
     def search_text(self):
-        # if 'Directy' in self.name:
-            from Screens.VirtualKeyBoard import VirtualKeyBoard
-            print('Search go movie: ', search)
-            self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
-        # else:
-            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
-            # return
+        from Screens.VirtualKeyBoard import VirtualKeyBoard
+        print('Search go movie: ', search)
+        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
 
     def filterChannels(self, callback = None):
         global search
@@ -649,9 +559,11 @@ class selectplay(Screen):
             del self.menu_list
             self.menu_list = []
             if check(self.url):
-                content = getUrl(self.url)
+                content = ReadUrl(self.url)
+                # if six.PY3:
+                    # content = content.decode("utf-8")
                 if six.PY3:
-                    content = content.decode("utf-8")
+                    content = six.ensure_str(self.url)
                 regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
@@ -685,7 +597,6 @@ class selectplay(Screen):
             del self.menu_list
             print('sono di la')
             self.updateMenuList()
-
         else:
             search = False
             del self.menu_list
@@ -701,37 +612,40 @@ class selectplay(Screen):
     def updateMenuList(self):
         self.menu_list = []
         if check(self.url):
-            content = getUrl(self.url)
-            if six.PY3:
-                content = content.decode("utf-8")
-            # if six.PY3:
-                # content = six.ensure_str(self.url)
-            # print( "content A =", content)
-            ##EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
-            regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-            match = re.compile(regexcat,re.DOTALL).findall(content)
-            print( "In showContent match =", match)
-            # n1 = 0
-            for name, url in match:
-                if not ".m3u8" in url:
-                    continue
-                # n1 = n1+1
-                # if n1 > 100:
-                       # break
-                url = url.replace(" ", "")
-                url = url.replace("\\n", "")
-                url = url.replace('\r','')
-                name = name.replace('\r','')
-                print( "In showContent name =", name)
-                print( "In showContent url =", url)
-                pic = " "
-                self.menu_list.append(show_(name, url))
-            self['menulist'].l.setList(self.menu_list)
-            # self['menulist'].l.setItemHeight(40)
-            # self['menulist'].moveToIndex(0)
-            auswahl = self['menulist'].getCurrent()[0][0]
-            self['name'].setText(str(auswahl))
-            self['text'].setText('')
+            try:
+                content = ReadUrl(self.url)
+                # if six.PY3:
+                    # content = content.decode("utf-8")
+                # if six.PY3:
+                    # content = six.ensure_str(self.url)
+                # print( "content A =", content)
+                ##EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
+                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                match = re.compile(regexcat,re.DOTALL).findall(content)
+                print( "In showContent match =", match)
+                # n1 = 0
+                for name, url in match:
+                    if not ".m3u8" in url:
+                        continue
+                    # n1 = n1+1
+                    # if n1 > 100:
+                           # break
+                    url = url.replace(" ", "")
+                    url = url.replace("\\n", "")
+                    url = url.replace('\r','')
+                    name = name.replace('\r','')
+                    print( "In showContent name =", name)
+                    print( "In showContent url =", url)
+                    pic = " "
+                    self.menu_list.append(show_(name, url))
+                self['menulist'].l.setList(self.menu_list)
+                # self['menulist'].l.setItemHeight(40)
+                # self['menulist'].moveToIndex(0)
+                auswahl = self['menulist'].getCurrent()[0][0]
+                self['name'].setText(str(auswahl))
+                self['text'].setText('')
+            except Exception as e:
+                print('exception error II ', e)              
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
@@ -739,40 +653,44 @@ class selectplay(Screen):
     def updateMenuListx(self):
         self.menu_list = []
         if check(self.url):
-            content = getUrl(self.url)
-            # if six.PY3:
-                # content = six.ensure_str(content)
-            if six.PY3:
-                content = content.decode("utf-8")
-            print( "content A =", content)
-            regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-            match = re.compile(regexcat,re.DOTALL).findall(content)
-            print( "In showContent match =", match)
-            # n1 = 0
-            for name, url in match:
-                if not ".m3u8" in url:
-                    continue
-                # n1 = n1+1
-                # if n1 > 50:
-                    # break
-                url = url.replace(" ", "")
-                url = url.replace("\\n", "")
-                url = url.replace('\r','')
-                name = name.replace('\r','')
-                print( "In showContent name =", name)
-                print( "In showContent url =", url)
-                pic = " "
-                self.menu_list.append(show_(name, url))
-            self['menulist'].l.setList(self.menu_list)
-            # self['menulist'].l.setItemHeight(40)
-            # self['menulist'].moveToIndex(0)
-            # if n1 == 0: return
-            auswahl = self['menulist'].getCurrent()[0][0]
-            self['name'].setText(str(auswahl))
-            self['text'].setText('')
+            try:
+                content = ReadUrl(self.url)
+                # if six.PY3:
+                    # content = six.ensure_str(content)
+                # if six.PY3:
+                    # content = content.decode("utf-8")
+                print( "content A =", content)
+                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                match = re.compile(regexcat,re.DOTALL).findall(content)
+                print( "In showContent match =", match)
+                # n1 = 0
+                for name, url in match:
+                    if not ".m3u8" in url:
+                        continue
+                    # n1 = n1+1
+                    # if n1 > 50:
+                        # break
+                    url = url.replace(" ", "")
+                    url = url.replace("\\n", "")
+                    url = url.replace('\r','')
+                    name = name.replace('\r','')
+                    print( "In showContent name =", name)
+                    print( "In showContent url =", url)
+                    pic = " "
+                    self.menu_list.append(show_(name, url))
+                self['menulist'].l.setList(self.menu_list)
+                # self['menulist'].l.setItemHeight(40)
+                # self['menulist'].moveToIndex(0)
+                # if n1 == 0: return
+                auswahl = self['menulist'].getCurrent()[0][0]
+                self['name'].setText(str(auswahl))
+                self['text'].setText('')
+                
+            except Exception as e:
+                print('exception error ', e)                
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
-            return
+
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
@@ -1089,223 +1007,20 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def leavePlayer(self):
         self.close()
 
-def decodeUrl(text):
-	text = text.replace('%20',' ')
-	text = text.replace('%21','!')
-	text = text.replace('%22','"')
-	text = text.replace('%23','&')
-	text = text.replace('%24','$')
-	text = text.replace('%25','%')
-	text = text.replace('%26','&')
-	text = text.replace('%2B','+')
-	text = text.replace('%2F','/')
-	text = text.replace('%3A',':')
-	text = text.replace('%3B',';')
-	text = text.replace('%3D','=')
-	text = text.replace('&#x3D;','=')
-	text = text.replace('%3F','?')
-	text = text.replace('%40','@')
-	return text
-
-def decodeHtml(text):
-	text = text.replace('&auml;','ä')
-	text = text.replace('\u00e4','ä')
-	text = text.replace('&#228;','ä')
-	text = text.replace('&oacute;','ó')
-	text = text.replace('&eacute;','e')
-	text = text.replace('&aacute;','a')
-	text = text.replace('&ntilde;','n')
-
-	text = text.replace('&Auml;','Ä')
-	text = text.replace('\u00c4','Ä')
-	text = text.replace('&#196;','Ä')
-
-	text = text.replace('&ouml;','ö')
-	text = text.replace('\u00f6','ö')
-	text = text.replace('&#246;','ö')
-
-	text = text.replace('&ouml;','Ö')
-	text = text.replace('\u00d6','Ö')
-	text = text.replace('&#214;','Ö')
-
-	text = text.replace('&uuml;','ü')
-	text = text.replace('\u00fc','ü')
-	text = text.replace('&#252;','ü')
-
-	text = text.replace('&Uuml;','Ü')
-	text = text.replace('\u00dc','Ü')
-	text = text.replace('&#220;','Ü')
-
-	text = text.replace('&szlig;','ß')
-	text = text.replace('\u00df','ß')
-	text = text.replace('&#223;','ß')
-
-	text = text.replace('&amp;','&')
-	text = text.replace('&quot;','\"')
-	text = text.replace('&quot_','\"')
-
-	text = text.replace('&gt;','>')
-	text = text.replace('&apos;',"'")
-	text = text.replace('&acute;','\'')
-	text = text.replace('&ndash;','-')
-	text = text.replace('&bdquo;','"')
-	text = text.replace('&rdquo;','"')
-	text = text.replace('&ldquo;','"')
-	text = text.replace('&lsquo;','\'')
-	text = text.replace('&rsquo;','\'')
-	text = text.replace('&#034;','\'')
-	text = text.replace('&#038;','&')
-	text = text.replace('&#039;','\'')
-	text = text.replace('&#39;','\'')
-	text = text.replace('&#160;',' ')
-	text = text.replace('\u00a0',' ')
-	text = text.replace('&#174;','')
-	text = text.replace('&#225;','a')
-	text = text.replace('&#233;','e')
-	text = text.replace('&#243;','o')
-	text = text.replace('&#8211;',"-")
-	text = text.replace('\u2013',"-")
-	text = text.replace('&#8216;',"'")
-	text = text.replace('&#8217;',"'")
-	text = text.replace('#8217;',"'")
-	text = text.replace('&#8220;',"'")
-	text = text.replace('&#8221;','"')
-	text = text.replace('&#8222;',',')
-	text = text.replace('&#x27;',"'")
-	text = text.replace('&#8230;','...')
-	text = text.replace('\u2026','...')
-	text = text.replace('&#41;',')')
-	text = text.replace('&lowbar;','_')
-	text = text.replace('&rsquo;','\'')
-	text = text.replace('&lpar;','(')
-	text = text.replace('&rpar;',')')
-	text = text.replace('&comma;',',')
-	text = text.replace('&period;','.')
-	text = text.replace('&plus;','+')
-	text = text.replace('&num;','#')
-	text = text.replace('&excl;','!')
-	text = text.replace('&#039','\'')
-	text = text.replace('&semi;','')
-	text = text.replace('&lbrack;','[')
-	text = text.replace('&rsqb;',']')
-	text = text.replace('&nbsp;','')
-	text = text.replace('&#133;','')
-	text = text.replace('&#4','')
-	text = text.replace('&#40;','')
-
-	text = text.replace('&atilde;',"'")
-	text = text.replace('&colon;',':')
-	text = text.replace('&sol;','/')
-	text = text.replace('&percnt;','%')
-	text = text.replace('&commmat;',' ')
-	text = text.replace('&#58;',':')
-
-	return text
-
-def charRemove(text):
-        char = ["1080p",
-                 "2018",
-                 "2019",
-                 "2020",
-                 "2021",
-                 "2022"
-                 "PF1",
-                 "PF2",
-                 "PF3",
-                 "PF4",
-                 "PF5",
-                 "PF6",
-                 "PF7",
-                 "PF8",
-                 "PF9",
-                 "PF10",
-                 "PF11",
-                 "PF12",
-                 "PF13",
-                 "PF14",
-                 "PF15",
-                 "PF16",
-                 "PF17",
-                 "PF18",
-                 "PF19",
-                 "PF20",
-                 "PF21",
-                 "PF22",
-                 "PF23",
-                 "PF24",
-                 "PF25",
-                 "PF26",
-                 "PF27",
-                 "PF28",
-                 "PF29",
-                 "PF30"
-                 "480p",
-                 "4K",
-                 "720p",
-                 "ANIMAZIONE",
-                 # "APR",
-                 # "AVVENTURA",
-                 "BIOGRAFICO",
-                 "BDRip",
-                 "BluRay",
-                 "CINEMA",
-                 # "COMMEDIA",
-                 "DOCUMENTARIO",
-                 "DRAMMATICO",
-                 "FANTASCIENZA",
-                 "FANTASY",
-                 # "FEB",
-                 # "GEN",
-                 # "GIU",
-                 "HDCAM",
-                 "HDTC",
-                 "HDTS",
-                 "LD",
-                 "MAFIA",
-                 # "MAG",
-                 "MARVEL",
-                 "MD",
-                 # "ORROR",
-                 "NEW_AUDIO",
-                 "POLIZ",
-                 "R3",
-                 "R6",
-                 "SD",
-                 "SENTIMENTALE",
-                 "TC",
-                 "TEEN",
-                 "TELECINE",
-                 "TELESYNC",
-                 "THRILLER",
-                 "Uncensored",
-                 "V2",
-                 "WEBDL",
-                 "WEBRip",
-                 "WEB",
-                 "WESTERN",
-                 "-",
-                 "_",
-                 ".",
-                 "+",
-                 "[",
-                 "]"
-                 ]
-
-        myreplace = text.lower()
-        for ch in char:
-            ch= ch.lower()
-            # if myreplace == ch:
-            myreplace = myreplace.replace(ch, "").replace("  ", " ").strip()
-        return myreplace
-
 def main(session, **kwargs):
     if checkInternet():
+        try:
+            from Plugins.Extensions.freearhey.Update import upd_done
+            upd_done()
+        except:
+            pass    
+    
         session.open(freearhey)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 def Plugins(**kwargs):
     icona = 'plugin.png'
-    extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_EXTENSIONSMENU, icon=icona, fnc=main)
+    extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], icon=icona, fnc=main)
     result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=icona, fnc=main)]
     result.append(extDescriptor)
     return result
