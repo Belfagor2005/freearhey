@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#25/11/2021
+#01/12/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -37,7 +37,7 @@ import re
 import six
 import sys
 
-from six.moves.urllib.error import HTTPError, URLError
+# from six.moves.urllib.error import HTTPError, URLError
 from six.moves.urllib.parse import parse_qs
 from six.moves.urllib.parse import quote
 from six.moves.urllib.parse import quote_plus
@@ -70,7 +70,7 @@ try:
 except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadm3u = ('/media/hdd/movie/')
-        
+
 currversion = '2.6'
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
 host1='https://github.com/iptv-org/iptv'
@@ -158,12 +158,12 @@ class freearhey(Screen):
          'left': self.left,
          'right': self.right,
          'ok': self.ok,
-		 # 'green': self.message2,
+		 'green': self.ok,
          'cancel': self.close,
          'red': self.close}, -1)
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
-        self['green'] = Label('')
+        self['green'] = Label('Select')
         self['category'] = Label("Plugins Channels Free by Lululla")
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
@@ -268,7 +268,7 @@ class freearhey(Screen):
 class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
-        Screen.__init__(self, session)    
+        Screen.__init__(self, session)
         if isFHD():
             path = skin_path + 'defaultListScreen_new.xml'
         else:
@@ -277,7 +277,7 @@ class main2(Screen):
             self.skin = f.read()
             f.close()
         self['menulist'] = free2list([])
-        self['red'] = Label(_('Exit'))
+        self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
         self['category'] = Label('')
         self['category'].setText(str(namex))
@@ -338,9 +338,9 @@ class main2(Screen):
                     content2 = content[n2:n3]
                     regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
                     match = re.compile(regexcat,re.DOTALL).findall(content2)
-                    pic = " "  
+                    pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
-                    items.append(item)                  
+                    items.append(item)
                     for name, url in match:
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
@@ -352,10 +352,10 @@ class main2(Screen):
             elif "Country" in self.name:
                     content2 = content[n3:n4]
                     regexcat = 'alias="(.+?)".*?<code>(.+?)<'
-                    
+
                     match = re.compile(regexcat,re.DOTALL).findall(content2)
-                    pic = " "                    
-                    
+                    pic = " "
+
                     item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
                     items.append(item)
                     for name, url in match:
@@ -375,13 +375,13 @@ class main2(Screen):
             # pic = " "
             # for name, url in match:
                 # if "xxx" in name.lower():
-                    # continue                
-                # if "adult" in name.lower():                
+                    # continue
+                # if "adult" in name.lower():
                     # continue
                 # if "XXX" in name.lower():
-                    # continue                
-                # if "Adult" in name.lower():                
-                    # continue                    
+                    # continue
+                # if "Adult" in name.lower():
+                    # continue
                 self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(50)
@@ -645,7 +645,7 @@ class selectplay(Screen):
                 self['name'].setText(str(auswahl))
                 self['text'].setText('')
             except Exception as e:
-                print('exception error II ', e)              
+                print('exception error II ', e)
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
@@ -685,9 +685,9 @@ class selectplay(Screen):
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
                 self['text'].setText('')
-                
+
             except Exception as e:
-                print('exception error ', e)                
+                print('exception error ', e)
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
 
@@ -739,7 +739,7 @@ class TvInfoBarShowHide():
     STATE_HIDING = 1
     STATE_SHOWING = 2
     STATE_SHOWN = 3
-
+    skipToggleShow = False
     def __init__(self):
         self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.toggleShow,
          "hide": self.hide}, 0)
@@ -747,11 +747,12 @@ class TvInfoBarShowHide():
         self.__state = self.STATE_SHOWN
         self.__locked = 0
         self.hideTimer = eTimer()
-        self.hideTimer.start(5000, True)
+
         try:
             self.hideTimer_conn = self.hideTimer.timeout.connect(self.doTimerHide)
         except:
             self.hideTimer.callback.append(self.doTimerHide)
+        self.hideTimer.start(5000, True)
         self.onShow.append(self.__onShow)
         self.onHide.append(self.__onHide)
 
@@ -764,16 +765,18 @@ class TvInfoBarShowHide():
         self.__state = self.STATE_SHOWN
         self.startHideTimer()
 
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
+        
     def startHideTimer(self):
         if self.__state == self.STATE_SHOWN and not self.__locked:
+            self.hideTimer.stop()
             idx = config.usage.infobar_timeout.index
             if idx:
                 self.hideTimer.start(idx * 1500, True)
 
-    def __onHide(self):
-        self.__state = self.STATE_HIDDEN
-
     def doShow(self):
+        self.hideTimer.stop()
         self.show()
         self.startHideTimer()
 
@@ -782,21 +785,37 @@ class TvInfoBarShowHide():
         if self.__state == self.STATE_SHOWN:
             self.hide()
 
+    def OkPressed(self):
+        self.toggleShow()
     def toggleShow(self):
-        if self.__state == self.STATE_SHOWN:
-            self.hide()
-            self.hideTimer.stop()
-        elif self.__state == self.STATE_HIDDEN:
+        if self.skipToggleShow:
+            self.skipToggleShow = False
+            return
+
+        if self.__state == self.STATE_HIDDEN:
             self.show()
+            self.hideTimer.stop()
+        else:
+            self.hide()
+            self.startHideTimer()
 
     def lockShow(self):
-        self.__locked = self.__locked + 1
+        try:
+            self.__locked += 1
+        except:
+            self.__locked = 0
         if self.execing:
             self.show()
             self.hideTimer.stop()
+            self.skipToggleShow = False
 
     def unlockShow(self):
-        self.__locked = self.__locked - 1
+        try:
+            self.__locked -= 1
+        except:
+            self.__locked = 0
+        if self.__locked < 0:
+            self.__locked = 0
         if self.execing:
             self.startHideTimer()
 
@@ -816,7 +835,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
-        title = 'Play Stream'
+        title = name
         InfoBarMenu.__init__(self)
         InfoBarNotifications.__init__(self)
         InfoBarBase.__init__(self, steal_current_service=True)
@@ -855,11 +874,10 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.pcip = 'None'
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
-        self.srefOld = self.session.nav.getCurrentlyPlayingServiceReference()
-        SREF = self.srefOld
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         self.onLayoutFinish.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
-        return
+        # return
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -913,7 +931,7 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
             sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
             sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec:' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec :' + str(sTagAudioCodec)
+            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec: ' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec :' + str(sTagAudioCodec)
             self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
         except:
             pass
@@ -921,17 +939,18 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         return
 
     def showIMDB(self):
-        if os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/TMBD"):
+        TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+        IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+        if os.path.exists(TMDB):
             from Plugins.Extensions.TMBD.plugin import TMBD
             text_clear = self.name
             text = charRemove(text_clear)
             self.session.open(TMBD, text, False)
-        elif os.path.exists("/usr/lib/enigma2/python/Plugins/Extensions/IMDb"):
+        elif os.path.exists(IMDb):
             from Plugins.Extensions.IMDb.plugin import IMDB
             text_clear = self.name
             text = charRemove(text_clear)
-            HHHHH = text
-            self.session.open(IMDB, HHHHH)
+            self.session.open(IMDB, text)
         else:
             # text_clear = self.name
             # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
@@ -940,10 +959,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     def openPlay(self,servicetype, url):
         if url.endswith('m3u8'):
             servicetype = "4097"
-        ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
+        name = self.name
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        # ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
         print('final reference :   ', ref)
         sref = eServiceReference(ref)
-        sref.setName(self.name)
+        sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
@@ -952,6 +973,9 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.servicetype ='4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
+        # if str(os.path.splitext(url)[-1]) == ".m3u8":
+            # if self.servicetype == "1":
+                # self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
         if os.path.exists("/usr/bin/gstplayer"):
@@ -965,13 +989,22 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
                 currentindex = index
                 break
         nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
-        self.servicetype = int(next(nextStreamType))
+        self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openPlay(self.servicetype, url)
 
-    def keyNumberGlobal(self, number):
-        self['text'].number(number)
+    def up(self):
+        pass
 
+    def down(self):
+        # pass
+        self.up()
+
+    def doEofInternal(self, playing):
+        self.close()
+
+    def __evEOF(self):
+        self.end = True
     def cancel(self):
         if os.path.exists('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
@@ -986,12 +1019,6 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             except:
                 pass
         self.close()
-
-    def keyLeft(self):
-        self['text'].left()
-
-    def keyRight(self):
-        self['text'].right()
 
     def showVideoInfo(self):
         if self.shown:
@@ -1013,8 +1040,8 @@ def main(session, **kwargs):
             from Plugins.Extensions.freearhey.Update import upd_done
             upd_done()
         except:
-            pass    
-    
+            pass
+
         session.open(freearhey)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
