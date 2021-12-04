@@ -538,6 +538,7 @@ class selectplay(Screen):
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
+        self.search = ''
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
@@ -552,24 +553,24 @@ class selectplay(Screen):
         print('Search go movie: ', search)
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
 
-    def filterChannels(self, callback = None):
-        global search
-        if callback is not None and len(callback):
-            callback=callback.lower()
-            del self.menu_list
-            self.menu_list = []
-            if check(self.url):
+    def filterChannels(self, result):   
+        global search        
+        if result:
+            self.menu_list = []  
+            print('callback: ', result)
+            if result is not None and len(result):
                 content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = content.decode("utf-8")
-                if six.PY3:
-                    content = six.ensure_str(self.url)
-                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                # if six.PY3:
+                    # content = six.ensure_str(self.url)
+                print( "In showContent content =", content)
+                regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
                 for name, url in match:
-                    if callback in name.lower():
-                        print('callback: ', callback)
+                    if str(result).lower() in name.lower():
+                        print('callback: ', name)
                         search = True
                         url = url.replace(" ", "")
                         url = url.replace("\\n", "")
@@ -578,14 +579,15 @@ class selectplay(Screen):
                         # print( "In showContent name =", name)
                         # print( "In showContent url =", url)
                         self.menu_list.append(show_(name, url))
-                        self['menulist'].l.setList(self.menu_list)
-                        # self['menulist'].l.setItemHeight(40)
-                        # self['menulist'].moveToIndex(0)
-                        auswahl = self['menulist'].getCurrent()[0][0]
-                        self['name'].setText(str(auswahl))
-                        self['text'].setText('')
+                    self['menulist'].l.setList(self.menu_list)
+                    # self['menulist'].l.setItemHeight(40)
+                    # self['menulist'].moveToIndex(0)
+                auswahl = self['menulist'].getCurrent()[0][0]
+                self['name'].setText(str(auswahl))
+                self['text'].setText('')
             else:
                 self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
+                search = False
                 return
         else:
             self.resetSearch()
