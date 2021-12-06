@@ -312,7 +312,25 @@ class main2(Screen):
         self.menu_list = []
         items = []
         if check(self.url):
-            content = ReadUrl(self.url)
+        
+            if sys.version_info.major == 3:
+                 import urllib.request as urllib2
+            elif sys.version_info.major == 2:
+                 import urllib2
+            req = urllib2.Request(self.url)                      
+            req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+            r = urllib2.urlopen(req,None,15)
+            link = r.read()
+            r.close()
+            content = link
+            if str(type(content)).find('bytes') != -1:
+                try:
+                    content = content.decode("utf-8")                
+                except Exception as e:                   
+                       print("Error: %s." % e)        
+        
+        
+            # content = ReadUrl(self.url)
             # if six.PY3:
                 # content = six.ensure_str(content)
             n1 = content.find("user-content-playlists-by-category", 0)
@@ -444,11 +462,26 @@ class main2(Screen):
 
     def convert_bouquet(self, url, name):
         if check(url):
-            name = name.strip()
+            name = name.replace(' ','_').strip()
             name = name.lower()
-            content = ReadUrl(url)
-            if six.PY3:
-                content = six.ensure_str(content)
+            if sys.version_info.major == 3:
+                 import urllib.request as urllib2
+            elif sys.version_info.major == 2:
+                 import urllib2
+            req = urllib2.Request(url)                      
+            req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+            r = urllib2.urlopen(req,None,15)
+            link = r.read()
+            r.close()
+            content = link
+            if str(type(content)).find('bytes') != -1:
+                try:
+                    content = content.decode("utf-8")                
+                except Exception as e:                   
+                       print("Error: %s." % e)
+            # content = ReadUrl(url)
+            # if six.PY3:
+                # content = six.ensure_str(content)
             if os.path.exists(downloadm3u):
                 xxxname = downloadm3u + name + '.m3u'
             else:
@@ -493,9 +526,9 @@ class main2(Screen):
                             remove_line('/etc/enigma2/bouquets.tv', bqtname)
                             with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
                                 outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
-                                outfile.close()
+                            outfile.close()
                 self.mbox = self.session.open(MessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), MessageBox.TYPE_INFO, timeout=7)
-                ReloadBouquet()
+                ReloadBouquets()
             except:
                 return
 
@@ -559,7 +592,26 @@ class selectplay(Screen):
             self.menu_list = []  
             print('callback: ', result)
             if result is not None and len(result):
-                content = ReadUrl(self.url)
+                # content = ReadUrl(self.url)
+                
+                
+                if sys.version_info.major == 3:
+                     import urllib.request as urllib2
+                elif sys.version_info.major == 2:
+                     import urllib2
+                req = urllib2.Request(self.url)                      
+                req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+                r = urllib2.urlopen(req,None,15)
+                link = r.read()
+                r.close()
+                content = link
+                if str(type(content)).find('bytes') != -1:
+                    try:
+                        content = content.decode("utf-8")                
+                    except Exception as e:                   
+                           print("Error: %s." % e)                   
+                
+                
                 # if six.PY3:
                     # content = content.decode("utf-8")
                 # if six.PY3:
@@ -615,7 +667,25 @@ class selectplay(Screen):
         self.menu_list = []
         if check(self.url):
             try:
-                content = ReadUrl(self.url)
+
+                if sys.version_info.major == 3:
+                     import urllib.request as urllib2
+                elif sys.version_info.major == 2:
+                     import urllib2
+                req = urllib2.Request(self.url)                      
+                req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+                r = urllib2.urlopen(req,None,15)
+                link = r.read()
+                r.close()
+                content = link
+                if str(type(content)).find('bytes') != -1:
+                    try:
+                        content = content.decode("utf-8")                
+                    except Exception as e:                   
+                           print("Error: %s." % e)              
+            
+            
+                # content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = content.decode("utf-8")
                 # if six.PY3:
@@ -656,7 +726,25 @@ class selectplay(Screen):
         self.menu_list = []
         if check(self.url):
             try:
-                content = ReadUrl(self.url)
+            
+                if sys.version_info.major == 3:
+                     import urllib.request as urllib2
+                elif sys.version_info.major == 2:
+                     import urllib2
+                req = urllib2.Request(self.url)                      
+                req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+                r = urllib2.urlopen(req,None,15)
+                link = r.read()
+                r.close()
+                content = link
+                if str(type(content)).find('bytes') != -1:
+                    try:
+                        content = content.decode("utf-8")                
+                    except Exception as e:                   
+                           print("Error: %s." % e)  
+                           
+            
+                # content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = six.ensure_str(content)
                 # if six.PY3:

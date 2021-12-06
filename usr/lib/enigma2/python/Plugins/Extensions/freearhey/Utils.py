@@ -69,6 +69,15 @@ def listDir(what):
         pass
 
     return f
+    
+def remove_line(filename, what):
+    if os.path.isfile(filename):
+        file_read = open(filename).readlines()
+        file_write = open(filename, 'w')
+        for line in file_read:
+            if what not in line:
+                file_write.write(line)
+        file_write.close()
 
 def getLanguage():
     try:
@@ -120,6 +129,7 @@ def checkInternet():
         return False
 
 def check(url):
+    import socket
     try:
         response = checkStr(urlopen(url, None, 5))
         response.close()
@@ -130,6 +140,15 @@ def check(url):
         return False
     except socket.timeout:
         return False
+        
+def testWebConnection(host="www.google.com", port=80, timeout=3):
+	import socket
+	try:
+		socket.setdefaulttimeout(timeout)
+		socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+		return True
+	except Exception as ex:
+		return False
 
 def checkStr(txt):
     # convert variable to type str both in Python 2 and 3
@@ -425,6 +444,24 @@ ListAgent = [
 def RequestAgent():
 	RandomAgent = choice(ListAgent)
 	return RandomAgent
+
+def ReadUrl2(url):
+    if sys.version_info.major == 3:
+         import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+         import urllib2
+    req = urllib2.Request(url)                      
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+    r = urllib2.urlopen(req, None, 15)
+    link = r.read()
+    r.close()
+    content = link
+    if str(type(content)).find('bytes') != -1:
+        try:
+            content = content.decode("utf-8")                
+        except Exception as e:                   
+               print("Error: %s." % e)   
+    return content
 
 def ReadUrl(url):
     if sys.version_info.major == 3:
