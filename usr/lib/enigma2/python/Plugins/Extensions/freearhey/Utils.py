@@ -67,7 +67,6 @@ def listDir(what):
         f = listdir(what)
     except:
         pass
-
     return f
     
 def remove_line(filename, what):
