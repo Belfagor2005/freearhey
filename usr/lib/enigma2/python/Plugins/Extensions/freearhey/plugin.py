@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#01/12/2021
+#10/12/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -9,7 +9,9 @@
 from __future__ import print_function
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
+from Components.config import *
 from Components.Console import Console as iConsole
+from Components.Input import Input                                  
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
@@ -17,20 +19,24 @@ from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBar import MoviePlayer, InfoBar
-from Screens.InfoBarGenerics import *
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications, InfoBarMenu, InfoBarSubtitleSupport
+from Screens.InfoBar import InfoBar
+from Screens.InfoBar import MoviePlayer
+from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
+    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
+from Tools.BoundFunction import boundFunction
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
+from Screens.Standby import TryQuitMainloop, Standby
+from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.LoadPixmap import LoadPixmap
-from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
-from enigma import eConsoleAppContainer,eServiceReference, iPlayableService, eListboxPythonMultiContent
-from enigma import ePicLoad
+from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
+from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT                
+from enigma import eServiceCenter, eServiceReference, iPlayableService
+from enigma import eConsoleAppContainer, eListboxPythonMultiContent
+from enigma import ePicLoad, loadPNG
 from enigma import eSize, iServiceInformation
 from enigma import eTimer, gFont, eListbox
-from enigma import getDesktop
-from enigma import loadPNG
 import hashlib
 import os
 import re
@@ -38,17 +44,18 @@ import six
 import sys
 
 # from six.moves.urllib.error import HTTPError, URLError
-from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.parse import quote
-from six.moves.urllib.parse import quote_plus
-from six.moves.urllib.parse import unquote
-from six.moves.urllib.parse import unquote_plus
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.parse import urlparse
+# from six.moves.urllib.parse import parse_qs
+# from six.moves.urllib.parse import quote
+# from six.moves.urllib.parse import quote_plus
+# from six.moves.urllib.parse import unquote
+# from six.moves.urllib.parse import unquote_plus
+# from six.moves.urllib.parse import urlencode
+# from six.moves.urllib.parse import urlparse
+# from six.moves.urllib.request import build_opener
+# from six.moves.urllib.request import urlretrieve
 from six.moves.urllib.request import Request
-from six.moves.urllib.request import build_opener
 from six.moves.urllib.request import urlopen
-from six.moves.urllib.request import urlretrieve
+
 try:
     from Plugins.Extensions.freearhey.Utils import *
 except:
@@ -80,20 +87,11 @@ desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currver
 name_plugin = 'Freearhey Plugin'
 skin_path= PLUGIN_PATH +'/skin'
 
-# if os.path.exists('/var/lib/dpkg/status'):
 if DreamOS():
     skin_path= skin_path + '/skin_cvs/'
+
 else:
     skin_path= skin_path + '/skin_pli/'
-
-def remove_line(filename, what):
-    if os.path.isfile(filename):
-        file_read = open(filename).readlines()
-        file_write = open(filename, 'w')
-        for line in file_read:
-            if what not in line:
-                file_write.write(line)
-        file_write.close()
 
 class free2list(MenuList):
     def __init__(self, list):
@@ -118,6 +116,7 @@ def show_(name, link):
     if isFHD():
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     else:
+
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=6, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
 
@@ -141,6 +140,7 @@ Panel_list = [
 
 class freearhey(Screen):
     def __init__(self, session):
+        self.session = session    
         if isFHD():
             path = skin_path + 'defaultListScreen_new.xml'
         else:
@@ -148,7 +148,6 @@ class freearhey(Screen):
         with open(path, 'r') as f:
             self.skin = f.read()
             f.close()
-        self.session = session
         Screen.__init__(self, session)
         self['actions'] = ActionMap(['OkCancelActions',
          'ColorActions',
@@ -312,12 +311,11 @@ class main2(Screen):
         self.menu_list = []
         items = []
         if check(self.url):
-        
             if sys.version_info.major == 3:
                  import urllib.request as urllib2
             elif sys.version_info.major == 2:
                  import urllib2
-            req = urllib2.Request(self.url)                      
+            req = urllib2.Request(self.url)
             req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
             r = urllib2.urlopen(req,None,15)
             link = r.read()
@@ -325,11 +323,9 @@ class main2(Screen):
             content = link
             if str(type(content)).find('bytes') != -1:
                 try:
-                    content = content.decode("utf-8")                
-                except Exception as e:                   
-                       print("Error: %s." % e)        
-        
-        
+                    content = content.decode("utf-8")
+                except Exception as e:
+                       print("Error: %s." % e)
             # content = ReadUrl(self.url)
             # if six.PY3:
                 # content = six.ensure_str(content)
@@ -422,7 +418,6 @@ class main2(Screen):
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
-
         self['name'].setText(str(auswahl))
         # self.load_poster()
 
@@ -430,7 +425,6 @@ class main2(Screen):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-
         # self.load_poster()
 
     def left(self):
@@ -468,7 +462,7 @@ class main2(Screen):
                  import urllib.request as urllib2
             elif sys.version_info.major == 2:
                  import urllib2
-            req = urllib2.Request(url)                      
+            req = urllib2.Request(url)
             req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
             r = urllib2.urlopen(req,None,15)
             link = r.read()
@@ -476,8 +470,8 @@ class main2(Screen):
             content = link
             if str(type(content)).find('bytes') != -1:
                 try:
-                    content = content.decode("utf-8")                
-                except Exception as e:                   
+                    content = content.decode("utf-8")
+                except Exception as e:
                        print("Error: %s." % e)
             # content = ReadUrl(url)
             # if six.PY3:
@@ -586,20 +580,20 @@ class selectplay(Screen):
         print('Search go movie: ', search)
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
 
-    def filterChannels(self, result):   
-        global search        
+    def filterChannels(self, result):
+        global search
         if result:
-            self.menu_list = []  
+            self.menu_list = []
             print('callback: ', result)
             if result is not None and len(result):
                 # content = ReadUrl(self.url)
-                
-                
+
+
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
                 elif sys.version_info.major == 2:
                      import urllib2
-                req = urllib2.Request(self.url)                      
+                req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urllib2.urlopen(req,None,15)
                 link = r.read()
@@ -607,11 +601,9 @@ class selectplay(Screen):
                 content = link
                 if str(type(content)).find('bytes') != -1:
                     try:
-                        content = content.decode("utf-8")                
-                    except Exception as e:                   
-                           print("Error: %s." % e)                   
-                
-                
+                        content = content.decode("utf-8")
+                    except Exception as e:
+                           print("Error: %s." % e)
                 # if six.PY3:
                     # content = content.decode("utf-8")
                 # if six.PY3:
@@ -672,7 +664,7 @@ class selectplay(Screen):
                      import urllib.request as urllib2
                 elif sys.version_info.major == 2:
                      import urllib2
-                req = urllib2.Request(self.url)                      
+                req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urllib2.urlopen(req,None,15)
                 link = r.read()
@@ -680,11 +672,9 @@ class selectplay(Screen):
                 content = link
                 if str(type(content)).find('bytes') != -1:
                     try:
-                        content = content.decode("utf-8")                
-                    except Exception as e:                   
-                           print("Error: %s." % e)              
-            
-            
+                        content = content.decode("utf-8")
+                    except Exception as e:
+                           print("Error: %s." % e)
                 # content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = content.decode("utf-8")
@@ -726,12 +716,11 @@ class selectplay(Screen):
         self.menu_list = []
         if check(self.url):
             try:
-            
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
                 elif sys.version_info.major == 2:
                      import urllib2
-                req = urllib2.Request(self.url)                      
+                req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urllib2.urlopen(req,None,15)
                 link = r.read()
@@ -739,11 +728,10 @@ class selectplay(Screen):
                 content = link
                 if str(type(content)).find('bytes') != -1:
                     try:
-                        content = content.decode("utf-8")                
-                    except Exception as e:                   
-                           print("Error: %s." % e)  
-                           
-            
+                        content = content.decode("utf-8")
+                    except Exception as e:
+                           print("Error: %s." % e)
+
                 # content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = six.ensure_str(content)
@@ -780,7 +768,6 @@ class selectplay(Screen):
                 print('exception error ', e)
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
-
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
@@ -846,37 +833,9 @@ class TvInfoBarShowHide():
         self.onShow.append(self.__onShow)
         self.onHide.append(self.__onHide)
 
-    def serviceStarted(self):
-        if self.execing:
-            if config.usage.show_infobar_on_zap.value:
-                self.doShow()
-
-    def __onShow(self):
-        self.__state = self.STATE_SHOWN
-        self.startHideTimer()
-
-    def __onHide(self):
-        self.__state = self.STATE_HIDDEN
-        
-    def startHideTimer(self):
-        if self.__state == self.STATE_SHOWN and not self.__locked:
-            self.hideTimer.stop()
-            idx = config.usage.infobar_timeout.index
-            if idx:
-                self.hideTimer.start(idx * 1500, True)
-
-    def doShow(self):
-        self.hideTimer.stop()
-        self.show()
-        self.startHideTimer()
-
-    def doTimerHide(self):
-        self.hideTimer.stop()
-        if self.__state == self.STATE_SHOWN:
-            self.hide()
-
     def OkPressed(self):
         self.toggleShow()
+
     def toggleShow(self):
         if self.skipToggleShow:
             self.skipToggleShow = False
@@ -888,6 +847,33 @@ class TvInfoBarShowHide():
         else:
             self.hide()
             self.startHideTimer()
+    def serviceStarted(self):
+        if self.execing:
+            if config.usage.show_infobar_on_zap.value:
+                self.doShow()
+
+    def __onShow(self):
+        self.__state = self.STATE_SHOWN
+        self.startHideTimer()
+
+    def startHideTimer(self):
+        if self.__state == self.STATE_SHOWN and not self.__locked:
+            self.hideTimer.stop()
+            idx = config.usage.infobar_timeout.index
+            if idx:
+                self.hideTimer.start(idx * 1500, True)
+
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
+    def doShow(self):
+        self.hideTimer.stop()
+        self.show()
+        self.startHideTimer()
+
+    def doTimerHide(self):
+        self.hideTimer.stop()
+        if self.__state == self.STATE_SHOWN:
+            self.hide()
 
     def lockShow(self):
         try:
@@ -912,7 +898,16 @@ class TvInfoBarShowHide():
     def debug(obj, text = ""):
         print(text + " %s\n" % obj)
 
-class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarAudioSelection, TvInfoBarShowHide):#,InfoBarSubtitleSupport
+class Playstream2(
+    InfoBarBase,
+    InfoBarMenu,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarSubtitleSupport,
+    InfoBarNotifications,
+    TvInfoBarShowHide,
+    Screen
+):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -921,25 +916,29 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
     screen_timeout = 5000
 
     def __init__(self, session, name, url):
-        global SREF
+        global SREF, streaml
         Screen.__init__(self, session)
         self.session = session
+        global _session
+        _session = session
         self.skinName = 'MoviePlayer'
         title = name
-        InfoBarMenu.__init__(self)
-        InfoBarNotifications.__init__(self)
-        InfoBarBase.__init__(self, steal_current_service=True)
-        TvInfoBarShowHide.__init__(self)
-        InfoBarAudioSelection.__init__(self)
-        InfoBarSeek.__init__(self)
-        # InfoBarSubtitleSupport.__init__(self)
+        streaml = False
+
+        for x in InfoBarBase, \
+                InfoBarMenu, \
+                InfoBarSeek, \
+                InfoBarAudioSelection, \
+                InfoBarSubtitleSupport, \
+                InfoBarNotifications, \
+                TvInfoBarShowHide:
+            x.__init__(self)
         try:
             self.init_aspect = int(self.getAspect())
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        self['actions'] = ActionMap(['WizardActions',
-         'MoviePlayerActions',
+        self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
          'EPGSelectActions',
@@ -950,7 +949,8 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
          'InfobarActions',
          'InfobarSeekActions'], {'leavePlayer': self.cancel,
          'epg': self.showIMDB,
-         'info': self.cicleStreamType,
+         'info': self.showinfo,
+         # 'info': self.cicleStreamType,
          'tv': self.cicleStreamType,
          'stop': self.leavePlayer,
          'cancel': self.cancel,
@@ -958,16 +958,19 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         self.allowPiP = False
         self.service = None
         service = None
-        self.url = url.replace(':', '%3a').replace(' ','%20')
-
-        self.icount = 0
+        self.url = url
         self.pcip = 'None'
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
         SREF = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.cicleStreamType)
+        # self.onLayoutFinish.append(self.cicleStreamType)
+        if '8088' in str(self.url):
+            # self.onLayoutFinish.append(self.slinkPlay)
+            self.onFirstExecBegin.append(self.slinkPlay)
+        else:
+            # self.onLayoutFinish.append(self.cicleStreamType)
+            self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
-        # return
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -1046,28 +1049,47 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
             # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
             self.showinfo()
 
-    def openPlay(self,servicetype, url):
-        if url.endswith('m3u8'):
-            servicetype = "4097"
+    def slinkPlay(self, url):
+        name = self.name
+        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+        print('final reference:   ', ref)
+        sref = eServiceReference(ref)
+        sref.setName(name)
+        self.session.nav.stopService()
+        self.session.nav.playService(sref)
+
+    def openTest(self, servicetype, url):
         name = self.name
         ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
-        # ref = str(servicetype) +':0:1:0:0:0:0:0:0:0:' + str(url)
-        print('final reference :   ', ref)
+        print('reference:   ', ref)
+        if streaml == True:
+            url = 'http://127.0.0.1:8088/' + str(url)
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            print('streaml reference:   ', ref)
+        print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
     def cicleStreamType(self):
+        global streaml
+        streaml = False
         from itertools import cycle, islice
-        self.servicetype ='4097'
+        self.servicetype = '4097'
         print('servicetype1: ', self.servicetype)
         url = str(self.url)
-        # if str(os.path.splitext(url)[-1]) == ".m3u8":
-            # if self.servicetype == "1":
-                # self.servicetype = "4097"
+        if str(os.path.splitext(self.url)[-1]) == ".m3u8":
+            if self.servicetype == "1":
+                self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
+        # if "youtube" in str(self.url):
+            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
+            # return
+        if isStreamlinkAvailable():
+            streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
             streamtypelist.append("5001")
         if os.path.exists("/usr/bin/exteplayer3"):
@@ -1081,13 +1103,12 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
         nextStreamType = islice(cycle(streamtypelist), currentindex + 1, None)
         self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
-        self.openPlay(self.servicetype, url)
+        self.openTest(self.servicetype, url)
 
     def up(self):
         pass
 
     def down(self):
-        # pass
         self.up()
 
     def doEofInternal(self, playing):
@@ -1095,46 +1116,54 @@ class Playstream2(Screen, InfoBarMenu, InfoBarBase, InfoBarSeek, InfoBarNotifica
 
     def __evEOF(self):
         self.end = True
-    def cancel(self):
-        if os.path.exists('/tmp/hls.avi'):
-            os.remove('/tmp/hls.avi')
-        self.session.nav.stopService()
-        self.session.nav.playService(SREF)
-        if self.pcip != 'None':
-            url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
-            resp = urlopen(url2)
-        if not self.new_aspect == self.init_aspect:
-            try:
-                self.setAspect(self.init_aspect)
-            except:
-                pass
-        self.close()
-
     def showVideoInfo(self):
         if self.shown:
             self.hideInfobar()
         if self.infoCallback != None:
             self.infoCallback()
         return
-
     def showAfterSeek(self):
         if isinstance(self, TvInfoBarShowHide):
             self.doShow()
+    def cancel(self):
+        if os.path.isfile('/tmp/hls.avi'):
+            os.remove('/tmp/hls.avi')
+        self.session.nav.stopService()
+        self.session.nav.playService(SREF)
+        # if self.pcip != 'None':
+            # url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
+            # resp = urlopen(url2)
+        if not self.new_aspect == self.init_aspect:
+            try:
+                self.setAspect(self.init_aspect)
+            except:
+                pass
+        streaml = False
+        self.close()
+
 
     def leavePlayer(self):
         self.close()
 
-def main(session, **kwargs):
+def checks():
+    from Plugins.Extensions.Filmon.Utils import checkInternet
+    checkInternet()
+    chekin= False
     if checkInternet():
+        chekin = True
+    return chekin
+
+def main(session, **kwargs):
+    if checks:
         try:
             from Plugins.Extensions.freearhey.Update import upd_done
             upd_done()
         except:
             pass
-
         session.open(freearhey)
     else:
         session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
+
 def Plugins(**kwargs):
     icona = 'plugin.png'
     extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], icon=icona, fnc=main)

@@ -14,21 +14,22 @@ import base64
 PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
-    PY3 = True; unicode = str; unichr = chr; long = int
-    # str = unicode = basestring = str
-    unichr = chr; long = int
+    PY3 = True
+    # unicode = str; unichr = chr; long = int
+    # # str = unicode = basestring = str
+    # unichr = chr; long = int
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
     from urllib.error import HTTPError, URLError
     
 else:
-    # Python 2
-    _str = str
-    str = unicode
-    range = xrange
-    unicode = unicode
-    basestring = basestring
+    # # Python 2
+    # _str = str
+    # str = unicode
+    # range = xrange
+    # unicode = unicode
+    # basestring = basestring
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -67,6 +68,7 @@ def listDir(what):
         f = listdir(what)
     except:
         pass
+
     return f
     
 def remove_line(filename, what):
