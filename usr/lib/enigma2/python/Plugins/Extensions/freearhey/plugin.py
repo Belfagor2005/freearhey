@@ -21,8 +21,9 @@ from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarMenu, InfoBarSeek, InfoBarAudioSelection, InfoBarMoviePlayerSummarySupport, \
-    InfoBarSubtitleSupport, InfoBarSummarySupport, InfoBarServiceErrorPopupSupport, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
+	InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
+	InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
@@ -64,10 +65,9 @@ except:
     from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException   
     
 global skin_path, search, downloadm3u
-
+currversion = '2.6'
 name_plugin = 'Freearhey Plugin'        
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
-currversion = '2.6'
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
 host1='https://github.com/iptv-org/iptv'
 host2='https://iptv-org.github.io/iptv/index.language.m3u'
