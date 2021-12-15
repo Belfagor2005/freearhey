@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#10/12/2021
+#14/12/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -32,27 +32,22 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT                
-from enigma import eServiceCenter, eServiceReference, iPlayableService
 from enigma import eConsoleAppContainer, eListboxPythonMultiContent
-from enigma import ePicLoad, loadPNG
-from enigma import eSize, iServiceInformation
-from enigma import eTimer, gFont, eListbox
+from enigma import ePicLoad 
+from enigma import iServiceInformation
+from enigma import eTimer,eListbox
+from enigma import eServiceCenter
+from enigma import eServiceReference
+from enigma import eSize 
+from enigma import loadPNG, gFont
+from enigma import quitMainloop
+from enigma import iPlayableService 
 import hashlib
 import os
 import re
 import six
 import sys
 
-# from six.moves.urllib.error import HTTPError, URLError
-# from six.moves.urllib.parse import parse_qs
-# from six.moves.urllib.parse import quote
-# from six.moves.urllib.parse import quote_plus
-# from six.moves.urllib.parse import unquote
-# from six.moves.urllib.parse import unquote_plus
-# from six.moves.urllib.parse import urlencode
-# from six.moves.urllib.parse import urlparse
-# from six.moves.urllib.request import build_opener
-# from six.moves.urllib.request import urlretrieve
 from six.moves.urllib.request import Request
 from six.moves.urllib.request import urlopen
 
@@ -60,38 +55,37 @@ try:
     from Plugins.Extensions.freearhey.Utils import *
 except:
     from . import Utils
-global skin_path, search, downloadm3u
-search = False
-downloadm3u = '/media/hdd/movie/'
 
 try:
     import http.cookiejar
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 except:
     import cookielib
-    from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+    from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException   
+    
+global skin_path, search, downloadm3u
 
+name_plugin = 'Freearhey Plugin'        
+desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
+currversion = '2.6'
+host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
+host1='https://github.com/iptv-org/iptv'
+host2='https://iptv-org.github.io/iptv/index.language.m3u'
+PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
+skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+search = False
+downloadm3u = '/media/hdd/movie/'
+if DreamOS():
+    skin_path= skin_path + '/skin_cvs/'
+else:
+    skin_path= skin_path + '/skin_pli/'
+    
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadm3u = defaultMoviePath()
 except:
     if os.path.exists("/usr/bin/apt-get"):
         downloadm3u = ('/media/hdd/movie/')
-
-currversion = '2.6'
-host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
-host1='https://github.com/iptv-org/iptv'
-host2='https://iptv-org.github.io/iptv/index.language.m3u'
-PLUGIN_PATH = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey'
-desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
-name_plugin = 'Freearhey Plugin'
-skin_path= PLUGIN_PATH +'/skin'
-
-if DreamOS():
-    skin_path= skin_path + '/skin_cvs/'
-
-else:
-    skin_path= skin_path + '/skin_pli/'
 
 class free2list(MenuList):
     def __init__(self, list):
@@ -122,7 +116,7 @@ def show_(name, link):
 
 def FreeListEntry(name,png):
     res = [name]
-    png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/setting.png'
+    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -184,7 +178,7 @@ class freearhey(Screen):
             del self.menu_list[0]
         list = []
         idx = 0
-        png = '/usr/lib/enigma2/python/Plugins/Extensions/freearhey/res/pics/setting.png'
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
         for x in Panel_list:
             list.append(FreeListEntry(x, png))
             self.menu_list.append(x)

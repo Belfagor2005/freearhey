@@ -132,6 +132,10 @@ def checkInternet():
 def check(url):
     import socket
     try:
+        from urllib.error import HTTPError, URLError
+    except:
+        from urllib2 import HTTPError, URLError
+    try:
         response = checkStr(urlopen(url, None, 5))
         response.close()
         return True
