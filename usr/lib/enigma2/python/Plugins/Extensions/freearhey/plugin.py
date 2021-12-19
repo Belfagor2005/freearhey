@@ -68,11 +68,12 @@ global skin_path, search, downloadm3u
 currversion = '2.6'
 name_plugin = 'Freearhey Plugin'        
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
+PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
+skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
 host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
 host1='https://github.com/iptv-org/iptv'
 host2='https://iptv-org.github.io/iptv/index.language.m3u'
-PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
-skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+
 search = False
 downloadm3u = '/media/hdd/movie/'
 if DreamOS():
@@ -102,16 +103,19 @@ class free2list(MenuList):
         self.l.setFont(9, gFont('Regular', 38))
         if isFHD():
             self.l.setItemHeight(50)
+            textfont = int(34)
+            self.l.setFont(0, gFont('Regular', textfont))
         else:
             self.l.setItemHeight(50)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
 
 def show_(name, link):
     res = [(name,link)]
     if isFHD():
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=9, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     else:
-
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=6, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
 
 def FreeListEntry(name,png):
@@ -186,7 +190,7 @@ class freearhey(Screen):
         self['menulist'].setList(list)
         auswahl = self['menulist'].getCurrent()[0]#[0]
         print('auswahl: ', auswahl)
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
 
     def ok(self):
         self.keyNumberGlobalCB(self['menulist'].getSelectedIndex())
@@ -234,28 +238,28 @@ class freearhey(Screen):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0]#[0]
         print('auswahl: ', auswahl)
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0]#[0]
         print('auswahl: ', auswahl)
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0]#[0]
         print('auswahl: ', auswahl)
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0]#[0]
         print('auswahl: ', auswahl)
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
 class main2(Screen):
@@ -273,7 +277,7 @@ class main2(Screen):
         self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
         self['category'] = Label('')
-        self['category'].setText(str(namex))
+        self['category'].setText(namex)
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
@@ -396,7 +400,7 @@ class main2(Screen):
                 # self['menulist'].moveToIndex(0)
             auswahl = self['menulist'].getCurrent()[0][0]
             print('auswahl: ', auswahl)
-            self['name'].setText(str(auswahl))
+            self['name'].setText(auswahl)
             self['text'].setText('')
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
@@ -412,25 +416,25 @@ class main2(Screen):
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def message2(self):
@@ -555,7 +559,7 @@ class selectplay(Screen):
         self['green'] = Label(_('Search'))
         self['title'] = Label("Thank's Freearhey")
         self['category'] = Label('')
-        self['category'].setText(str(namex))
+        self['category'].setText(namex)
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
@@ -621,7 +625,7 @@ class selectplay(Screen):
                     # self['menulist'].l.setItemHeight(40)
                     # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
-                self['name'].setText(str(auswahl))
+                self['name'].setText(auswahl)
                 self['text'].setText('')
             else:
                 self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
@@ -698,7 +702,7 @@ class selectplay(Screen):
                 # self['menulist'].l.setItemHeight(40)
                 # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
-                self['name'].setText(str(auswahl))
+                self['name'].setText(auswahl)
                 self['text'].setText('')
             except Exception as e:
                 print('exception error II ', e)
@@ -755,7 +759,7 @@ class selectplay(Screen):
                 # self['menulist'].moveToIndex(0)
                 # if n1 == 0: return
                 auswahl = self['menulist'].getCurrent()[0][0]
-                self['name'].setText(str(auswahl))
+                self['name'].setText(auswahl)
                 self['text'].setText('')
 
             except Exception as e:
@@ -782,25 +786,25 @@ class selectplay(Screen):
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
-        self['name'].setText(str(auswahl))
+        self['name'].setText(auswahl)
         # self.load_poster()
 
 class TvInfoBarShowHide():
