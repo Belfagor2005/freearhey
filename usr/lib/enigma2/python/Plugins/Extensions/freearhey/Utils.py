@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#25.11.2021
+#30.12.2021
 #a common tips used from Lululla
 #
 import sys
@@ -15,9 +15,7 @@ PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
     PY3 = True
-    # unicode = str; unichr = chr; long = int
-    # # str = unicode = basestring = str
-    # unichr = chr; long = int
+    unicode = str; unichr = chr; long = int; xrange = range
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
@@ -62,6 +60,12 @@ def mySkin():
     currentSkin = config.skin.primary_skin.value.replace('/skin.xml', '')
     return currentSkin
 
+if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
+    from Plugins.Extensions.MediaPlayer import *
+    MediaPlayerInstalled = True
+else:
+    MediaPlayerInstalled = False
+
 def listDir(what):
     f = None
     try:
@@ -79,7 +83,31 @@ def remove_line(filename, what):
             if what not in line:
                 file_write.write(line)
         file_write.close()
-
+        
+#from kiddac plugin
+def badcar(name):
+    name = name
+    bad_chars = ["sd", "hd", "fhd", "uhd", "4k", "1080p", "720p", "blueray", "x264", "aac", "ozlem", "hindi", "hdrip", "(cache)", "(kids)", "[3d-en]", "[iran-dubbed]", "imdb", "top250", "multi-audio",
+                 "multi-subs", "multi-sub", "[audio-pt]", "[nordic-subbed]", "[nordic-subbeb]",
+                 "SD", "HD", "FHD", "UHD", "4K", "1080P", "720P", "BLUERAY", "X264", "AAC", "OZLEM", "HINDI", "HDRIP", "(CACHE)", "(KIDS)", "[3D-EN]", "[IRAN-DUBBED]", "IMDB", "TOP250", "MULTI-AUDIO",
+                 "MULTI-SUBS", "MULTI-SUB", "[AUDIO-PT]", "[NORDIC-SUBBED]", "[NORDIC-SUBBEB]",
+                 "-ae-", "-al-", "-ar-", "-at-", "-ba-", "-be-", "-bg-", "-br-", "-cg-", "-ch-", "-cz-", "-da-", "-de-", "-dk-", "-ee-", "-en-", "-es-", "-ex-yu-", "-fi-", "-fr-", "-gr-", "-hr-", "-hu-", "-in-", "-ir-", "-it-", "-lt-", "-mk-",
+                 "-mx-", "-nl-", "-no-", "-pl-", "-pt-", "-ro-", "-rs-", "-ru-", "-se-", "-si-", "-sk-", "-tr-", "-uk-", "-us-", "-yu-",
+                 "-AE-", "-AL-", "-AR-", "-AT-", "-BA-", "-BE-", "-BG-", "-BR-", "-CG-", "-CH-", "-CZ-", "-DA-", "-DE-", "-DK-", "-EE-", "-EN-", "-ES-", "-EX-YU-", "-FI-", "-FR-", "-GR-", "-HR-", "-HU-", "-IN-", "-IR-", "-IT-", "-LT-", "-MK-",
+                 "-MX-", "-NL-", "-NO-", "-PL-", "-PT-", "-RO-", "-RS-", "-RU-", "-SE-", "-SI-", "-SK-", "-TR-", "-UK-", "-US-", "-YU-",
+                 "|ae|", "|al|", "|ar|", "|at|", "|ba|", "|be|", "|bg|", "|br|", "|cg|", "|ch|", "|cz|", "|da|", "|de|", "|dk|", "|ee|", "|en|", "|es|", "|ex-yu|", "|fi|", "|fr|", "|gr|", "|hr|", "|hu|", "|in|", "|ir|", "|it|", "|lt|", "|mk|",
+                 "|mx|", "|nl|", "|no|", "|pl|", "|pt|", "|ro|", "|rs|", "|ru|", "|se|", "|si|", "|sk|", "|tr|", "|uk|", "|us|", "|yu|",
+                 "|AE|", "|AL|", "|AR|", "|AT|", "|BA|", "|BE|", "|BG|", "|BR|", "|CG|", "|CH|", "|CZ|", "|DA|", "|DE|", "|DK|", "|EE|", "|EN|", "|ES|", "|EX-YU|", "|FI|", "|FR|", "|GR|", "|HR|", "|HU|", "|IN|", "|IR|", "|IT|", "|LT|", "|MK|",
+                 "|MX|", "|NL|", "|NO|", "|PL|", "|PT|", "|RO|", "|RS|", "|RU|", "|SE|", "|SI|", "|SK|", "|TR|", "|UK|", "|US|", "|YU|",
+                 "|Ae|", "|Al|", "|Ar|", "|At|", "|Ba|", "|Be|", "|Bg|", "|Br|", "|Cg|", "|Ch|", "|Cz|", "|Da|", "|De|", "|Dk|", "|Ee|", "|En|", "|Es|", "|Ex-Yu|", "|Fi|", "|Fr|", "|Gr|", "|Hr|", "|Hu|", "|In|", "|Ir|", "|It|", "|Lt|", "|Mk|",
+                 "|Mx|", "|Nl|", "|No|", "|Pl|", "|Pt|", "|Ro|", "|Rs|", "|Ru|", "|Se|", "|Si|", "|Sk|", "|Tr|", "|Uk|", "|Us|", "|Yu|",
+                 "(", ")", "[", "]", "u-", "3d", "'", "#", "/"]
+    for j in range(1900, 2025):
+        bad_chars.append(str(j))
+    for i in bad_chars:
+        name = name.replace(i, '')
+    return name
+    
 def getLanguage():
     try:
         from Components.config import config
@@ -147,13 +175,13 @@ def check(url):
         return False
         
 def testWebConnection(host="www.google.com", port=80, timeout=3):
-	import socket
-	try:
-		socket.setdefaulttimeout(timeout)
-		socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-		return True
-	except Exception as ex:
-		return False
+    import socket
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except Exception as ex:
+        return False
 
 def checkStr(txt):
     # convert variable to type str both in Python 2 and 3
@@ -225,7 +253,16 @@ def b64decoder(s):
             outp = outp.decode('utf-8')
             print('outp2 ', outp)
         return outp
-        
+
+def MemClean():
+    try:
+        os.system("sync")
+        os.system("echo 1 > /proc/sys/vm/drop_caches")
+        os.system("echo 2 > /proc/sys/vm/drop_caches")
+        os.system("echo 3 > /proc/sys/vm/drop_caches")
+    except:
+        pass
+
 def __createdir(list):
     dir = ''
     for line in list[1:].split('/'):
@@ -237,16 +274,16 @@ def __createdir(list):
                 print('Mkdir Failed', dir)
 
 try:
-	from Plugins.Extensions.tmdb import tmdb
-	is_tmdb = True
+    from Plugins.Extensions.tmdb import tmdb
+    is_tmdb = True
 except Exception:
-	is_tmdb = False
+    is_tmdb = False
 
 try:
-	from Plugins.Extensions.IMDb.plugin import main as imdb
-	is_imdb = True
+    from Plugins.Extensions.IMDb.plugin import main as imdb
+    is_imdb = True
 except Exception:
-	is_imdb = False
+    is_imdb = False
 
 def substr(data,start,end):
     i1 = data.find(start)
@@ -338,6 +375,18 @@ def trace_error():
     except:
         pass
 
+def log(label,data):
+    data=str(data)
+    open("/tmp/my__debug.log","a").write("\n"+label+":>"+data)
+
+def del_jpg():
+    for i in glob.glob(os.path.join("/tmp", "*.jpg")):
+        try:
+            os.chmod(i, 0o777)
+            os.remove(i)
+        except OSError:
+            pass
+            
 def ConverDate(data):
     year = data[:2]
     month = data[-4:][:2]
@@ -409,68 +458,94 @@ def isStreamlinkAvailable():
         # return urlopen(url, context=sslContext)
     # else:
         # return urlopen(url)
-
+def AdultUrl(url):
+        if sys.version_info.major == 3:
+             import urllib.request as urllib2
+        elif sys.version_info.major == 2:
+             import urllib2
+        req = urllib2.Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+        r = urllib2.urlopen(req, None, 15)
+        link = r.read()
+        r.close()
+        tlink = link
+        if str(type(tlink)).find('bytes') != -1:
+            try:
+                tlink = tlink.decode("utf-8")
+            except Exception as e:
+                   print("Error: %s." % e)
+        return tlink
+        
+        
 from random import choice
+
+std_headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-us,en;q=0.5',
+}
+
 ListAgent = [
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
           'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
-		  'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-		  'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
-		  'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
-		  'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
-		  'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
-		  'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
-		  'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
-		  'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
-		  'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
-		  'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
-		  'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
-		  'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
-		  'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
-		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
-		  'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
-		  'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16.2',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.15 (KHTML, like Gecko) Chrome/24.0.1295.0 Safari/537.15',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.14 (KHTML, like Gecko) Chrome/24.0.1292.0 Safari/537.14',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1290.1 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.13 (KHTML, like Gecko) Chrome/24.0.1284.0 Safari/537.13',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.940.0 Safari/535.8',
+          'Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
+          'Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2',
+          'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.16) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20120427 Firefox/15.0a1',
+          'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:15.0) Gecko/20120910144328 Firefox/15.0.2',
+          'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:9.0a2) Gecko/20111101 Firefox/9.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110612 Firefox/6.0a2',
+          'Mozilla/5.0 (Windows NT 6.1; rv:6.0) Gecko/20110814 Firefox/6.0',
+          'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)',
+          'Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/5.0)',
+          'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0;  it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)'
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/13.0.782.215)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0) chromeframe/10.0.648.205',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.1; SV1; .NET CLR 2.8.52393; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0; chromeframe/11.0.696.57)',
+          'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/4.0; GTB7.4; InfoPath.3; SV1; .NET CLR 3.1.76908; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0; GTB7.4; InfoPath.2; SV1; .NET CLR 3.3.69573; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET CLR 1.0.3705; .NET CLR 1.1.4322)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; InfoPath.1; SV1; .NET CLR 3.8.36217; WOW64; en-US)',
+          'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 1.1.4322; .NET CLR 2.0.50727)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; it-IT)',
+          'Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)',
+          'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16.2',
           'Opera/12.80 (Windows NT 5.1; U; en) Presto/2.10.289 Version/12.02',
-		  'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
-		  'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
-		  'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
-		  'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
-		  'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
-		  'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
-		  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-		  'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
-		  ]
+          'Opera/9.80 (Windows NT 6.1; U; es-ES) Presto/2.9.181 Version/12.00',
+          'Opera/9.80 (Windows NT 5.1; U; zh-sg) Presto/2.9.181 Version/12.00',
+          'Opera/12.0(Windows NT 5.2;U;en)Presto/22.9.168 Version/12.00',
+          'Opera/12.0(Windows NT 5.1;U;en)Presto/22.9.168 Version/12.00',
+          'Mozilla/5.0 (Windows NT 5.1) Gecko/20100101 Firefox/14.0 Opera/12.0',
+          'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
+          'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+          ]
 
 def RequestAgent():
-	RandomAgent = choice(ListAgent)
-	return RandomAgent
+    RandomAgent = choice(ListAgent)
+    return RandomAgent
 
 def ReadUrl2(url):
     if sys.version_info.major == 3:
@@ -555,92 +630,116 @@ def ReadUrl(url):
 
 
 if PY3:
-	def getUrl(url):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		try:
-			   response = urlopen(req)
-			   link=response.read().decode(errors='ignore')
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read().decode(errors='ignore')
-			   response.close()
-			   return link
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               link=response.read().decode(errors='ignore')
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read().decode(errors='ignore')
+               response.close()
+               return link
 
-	def getUrl2(url, referer):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		req.add_header('Referer', referer)
-		try:
-			   response = urlopen(req)
-			   link=response.read().decode()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read().decode()
-			   response.close()
-			   return link
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+               response = urlopen(req)
+               link=response.read().decode()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read().decode()
+               response.close()
+               return link
 
+        def getUrlresp(url):
+            req = Request(url)
+            req.add_header('User-Agent',RequestAgent())
+            try:
+                   response = urlopen(req)
+                   return response
+            except:
+                   import ssl
+                   gcontext = ssl._create_unverified_context()
+                   response = urlopen(req, context=gcontext)
+                   return response
 else:
-	def getUrl(url):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		try:
-			   response = urlopen(req)
-			   pass#print "Here in getUrl response =", response
-			   link=response.read()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read()
-			   response.close()
-			   return link
+    def getUrl(url):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               pass#print "Here in getUrl response =", response
+               link=response.read()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read()
+               response.close()
+               return link
 
-	def getUrl2(url, referer):
-		req = Request(url)
-		req.add_header('User-Agent',RequestAgent())
-		req.add_header('Referer', referer)
-		try:
-			   response = urlopen(req)
-			   link=response.read()
-			   response.close()
-			   return link
-		except:
-			   import ssl
-			   gcontext = ssl._create_unverified_context()
-			   response = urlopen(req, context=gcontext)
-			   link=response.read()
-			   response.close()
-			   return link
+    def getUrl2(url, referer):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        req.add_header('Referer', referer)
+        try:
+               response = urlopen(req)
+               link=response.read()
+               response.close()
+               return link
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               link=response.read()
+               response.close()
+               return link
+
+        def getUrlresp(url):
+            pass#print "Here in getUrl url =", url
+            req = Request(url)
+            req.add_header('User-Agent',RequestAgent())
+            try:
+                   response = urlopen(req)
+                   return response
+            except:
+                   import ssl
+                   gcontext = ssl._create_unverified_context()
+                   response = urlopen(req, context=gcontext)
+                   return response
 
 #======================================end getUrl
 def decodeUrl(text):
-	text = text.replace('%20',' ')
-	text = text.replace('%21','!')
-	text = text.replace('%22','"')
-	text = text.replace('%23','&')
-	text = text.replace('%24','$')
-	text = text.replace('%25','%')
-	text = text.replace('%26','&')
-	text = text.replace('%2B','+')
-	text = text.replace('%2F','/')
-	text = text.replace('%3A',':')
-	text = text.replace('%3B',';')
-	text = text.replace('%3D','=')
-	text = text.replace('&#x3D;','=')
-	text = text.replace('%3F','?')
-	text = text.replace('%40','@')
-	return text
+    text = text.replace('%20',' ')
+    text = text.replace('%21','!')
+    text = text.replace('%22','"')
+    text = text.replace('%23','&')
+    text = text.replace('%24','$')
+    text = text.replace('%25','%')
+    text = text.replace('%26','&')
+    text = text.replace('%2B','+')
+    text = text.replace('%2F','/')
+    text = text.replace('%3A',':')
+    text = text.replace('%3B',';')
+    text = text.replace('%3D','=')
+    text = text.replace('&#x3D;','=')
+    text = text.replace('%3F','?')
+    text = text.replace('%40','@')
+    return text
 
 def decodeHtml(text):
     text = text.replace('&auml;','ä')
@@ -745,6 +844,92 @@ def decodeHtml(text):
     text = text.replace('&#8234;','')
     return text
 
+
+conversion = {
+    str("\xd0\xb0"): "a",
+    str("\xd0\x90"): "A",
+    str("\xd0\xb1"): "b",
+    str("\xd0\x91"): "B",
+    str("\xd0\xb2"): "v",
+    str("\xd0\x92"): "V",
+    str("\xd0\xb3"): "g",
+    str("\xd0\x93"): "G",
+    str("\xd0\xb4"): "d",
+    str("\xd0\x94"): "D",
+    str("\xd0\xb5"): "e",
+    str("\xd0\x95"): "E",
+    str("\xd1\x91"): "jo",
+    str("\xd0\x81"): "jo",
+    str("\xd0\xb6"): "zh",
+    str("\xd0\x96"): "ZH",
+    str("\xd0\xb7"): "z",
+    str("\xd0\x97"): "Z",
+    str("\xd0\xb8"): "i",
+    str("\xd0\x98"): "I",
+    str("\xd0\xb9"): "j",
+    str("\xd0\x99"): "J",
+    str("\xd0\xba"): "k",
+    str("\xd0\x9a"): "K",
+    str("\xd0\xbb"): "l",
+    str("\xd0\x9b"): "L",
+    str("\xd0\xbc"): "m",
+    str("\xd0\x9c"): "M",
+    str("\xd0\xbd"): "n",
+    str("\xd0\x9d"): "N",
+    str("\xd0\xbe"): "o",
+    str("\xd0\x9e"): "O",
+    str("\xd0\xbf"): "p",
+    str("\xd0\x9f"): "P",
+    str("\xd1\x80"): "r",
+    str("\xd0\xa0"): "R",
+    str("\xd1\x81"): "s",
+    str("\xd0\xa1"): "S",
+    str("\xd1\x82"): "t",
+    str("\xd0\xa2"): "T",
+    str("\xd1\x83"): "u",
+    str("\xd0\xa3"): "U",
+    str("\xd1\x84"): "f",
+    str("\xd0\xa4"): "F",
+    str("\xd1\x85"): "h",
+    str("\xd0\xa5"): "H",
+    str("\xd1\x86"): "c",
+    str("\xd0\xa6"): "C",
+    str("\xd1\x87"): "ch",
+    str("\xd0\xa7"): "CH",
+    str("\xd1\x88"): "sh",
+    str("\xd0\xa8"): "SH",
+    str("\xd1\x89"): "sh",
+    str("\xd0\xa9"): "SH",
+    str("\xd1\x8a"): "",
+    str("\xd0\xaa"): "",
+    str("\xd1\x8b"): "y",
+    str("\xd0\xab"): "Y",
+    str("\xd1\x8c"): "j",
+    str("\xd0\xac"): "J",
+    str("\xd1\x8d"): "je",
+    str("\xd0\xad"): "JE",
+    str("\xd1\x8e"): "ju",
+    str("\xd0\xae"): "JU",
+    str("\xd1\x8f"): "ja",
+    str("\xd0\xaf"): "JA"}
+
+def cyr2lat(text):
+    i = 0
+    text = text.strip(" \t\n\r")
+    text = str(text)
+    retval = ""
+    bukva_translit = ""
+    bukva_original = ""
+    while i < len(text):
+        bukva_original = text[i]
+        try:
+            bukva_translit = conversion[bukva_original]
+        except:
+            bukva_translit = bukva_original
+        i = i + 1
+        retval += bukva_translit
+    return retval
+    
 def charRemove(text):
     char = ["1080p",
              "2018",

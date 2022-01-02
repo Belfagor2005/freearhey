@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#14/12/2021
+#30/12/2021
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -27,7 +27,7 @@ from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, Inf
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.BoundFunction import boundFunction
-from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, pathExists
+from Tools.Directories import resolveFilename, SCOPE_PLUGINS#, pathExists
 from Screens.Standby import TryQuitMainloop, Standby
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.LoadPixmap import LoadPixmap
@@ -49,9 +49,17 @@ import re
 import six
 import sys
 
-from six.moves.urllib.request import Request
-from six.moves.urllib.request import urlopen
+# from six.moves.urllib.request import Request
+# from six.moves.urllib.request import urlopen
+PY3 = sys.version_info.major >= 3
+print('Py3: ',PY3)
 
+if PY3:
+    from urllib.request import urlopen
+    from urllib.request import Request
+else:
+    from urllib2 import Request
+    from urllib2 import urlopen  
 try:
     from Plugins.Extensions.freearhey.Utils import *
 except:
@@ -70,16 +78,20 @@ name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
 skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
-host0='https://iptv-org.github.io/iptv/categories/xxx.m3u'
-host1='https://github.com/iptv-org/iptv'
-host2='https://iptv-org.github.io/iptv/index.language.m3u'
-
 search = False
+host00='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
+host11='aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
+host22='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 downloadm3u = '/media/hdd/movie/'
-if DreamOS():
-    skin_path= skin_path + '/skin_cvs/'
+
+if isFHD():
+    skin_path= skin_path + '/fhd'
+
 else:
-    skin_path= skin_path + '/skin_pli/'
+    skin_path= skin_path + '/hd'
+
+if DreamOS():
+    skin_path= skin_path + '/dreamOs'
     
 try:
     from Components.UsageConfig import defaultMoviePath
@@ -91,16 +103,6 @@ except:
 class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, False, eListboxPythonMultiContent)
-        self.l.setFont(0, gFont('Regular', 14))
-        self.l.setFont(1, gFont('Regular', 16))
-        self.l.setFont(2, gFont('Regular', 18))
-        self.l.setFont(3, gFont('Regular', 20))
-        self.l.setFont(4, gFont('Regular', 22))
-        self.l.setFont(5, gFont('Regular', 24))
-        self.l.setFont(6, gFont('Regular', 26))
-        self.l.setFont(7, gFont('Regular', 28))
-        self.l.setFont(8, gFont('Regular', 32))
-        self.l.setFont(9, gFont('Regular', 38))
         if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
@@ -123,10 +125,10 @@ def FreeListEntry(name,png):
     png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=8, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=4, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 Panel_list = [
@@ -139,11 +141,8 @@ Panel_list = [
 class freearhey(Screen):
     def __init__(self, session):
         self.session = session    
-        if isFHD():
-            path = skin_path + 'defaultListScreen_new.xml'
-        else:
-            path =  skin_path + 'defaultListScreen.xml'
-        with open(path, 'r') as f:
+        skin = skin_path + '/defaultListScreen.xml'    
+        with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
         Screen.__init__(self, session)
@@ -198,14 +197,14 @@ class freearhey(Screen):
     def keyNumberGlobalCB(self, idx):
         global namex, lnk
         namex = ''
-        lnk = host1
+        lnk = b64decoder(host11)
         # if six.PY3:
             # url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
         # sel = self['menulist'].getCurrent()[0][0]
         if sel == ("PLAYLISTS DIRECT"):
                 namex = "Directy"
-                lnk = host2
+                lnk = b64decoder(host22)
                 # self.session.open(xfreearhey)
                 self.session.open(selectplay, namex, lnk)
         elif sel == ("PLAYLISTS BY CATEGORY"):
@@ -220,9 +219,9 @@ class freearhey(Screen):
         else:
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
-                lnk = host0
-                if six.PY3:
-                    url = six.ensure_str(lnk)
+                lnk = b64decoder(host00)
+                # if six.PY3:
+                    # url = six.ensure_str(lnk)
                 self.adultonly(namex, lnk)
 
     def adultonly(self, namex, lnk):
@@ -266,11 +265,13 @@ class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
-        if isFHD():
-            path = skin_path + 'defaultListScreen_new.xml'
-        else:
-            path =  skin_path + 'defaultListScreen.xml'
-        with open(path, 'r') as f:
+        # if isFHD():
+            # path = skin_path + 'defaultListScreen_new.xml'
+        # else:
+            # path =  skin_path + 'defaultListScreen.xml'
+            
+        skin = skin_path + '/defaultListScreen.xml'    
+        with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
         self['menulist'] = free2list([])
@@ -439,7 +440,6 @@ class main2(Screen):
 
     def message2(self):
         name = self['menulist'].l.getCurrentSelection()[0][0]
-
         self.session.openWithCallback(self.convert,MessageBox,_("Do you want to Convert %s to favorite .tv ?")% name, MessageBox.TYPE_YESNO, timeout = 15, default = True)
 
     def convert(self, result):
@@ -526,11 +526,12 @@ class main2(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
-        if isFHD():
-            path = skin_path + 'defaultListScreen_new.xml'
-        else:
-            path =  skin_path + 'defaultListScreen.xml'
-        with open(path, 'r') as f:
+        # if isFHD():
+            # path = skin_path + 'defaultListScreen_new.xml'
+        # else:
+            # path =  skin_path + 'defaultListScreen.xml'
+        skin = skin_path + '/defaultListScreen.xml'    
+        with open(skin, 'r') as f:
             self.skin = f.read()
             f.close()
         self.session = session
@@ -585,8 +586,6 @@ class selectplay(Screen):
             print('callback: ', result)
             if result is not None and len(result):
                 # content = ReadUrl(self.url)
-
-
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
                 elif sys.version_info.major == 2:
@@ -1049,7 +1048,7 @@ class Playstream2(
 
     def slinkPlay(self, url):
         name = self.name
-        ref = "{0}:{1}".format(url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:{1}".format(url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
         sref.setName(name)
@@ -1058,11 +1057,11 @@ class Playstream2(
 
     def openTest(self, servicetype, url):
         name = self.name
-        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('reference:   ', ref)
         if streaml == True:
             url = 'http://127.0.0.1:8088/' + str(url)
-            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3A"), name.replace(":", "%3A"))
+            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
             print('streaml reference:   ', ref)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
