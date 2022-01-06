@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#30/12/2021
+#06/01/2022
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
-#   But no delete this message support on forum linuxsat-support      #
+#   But no delete this message & support on forum linuxsat-support    #
 #######################################################################
 from __future__ import print_function
 from Components.AVSwitch import AVSwitch
@@ -155,8 +155,8 @@ class freearhey(Screen):
          'right': self.right,
          'ok': self.ok,
 		 'green': self.ok,
-         'cancel': self.close,
-         'red': self.close}, -1)
+         'cancel': self.exit,
+         'red': self.exit}, -1)
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label('Select')
@@ -260,7 +260,11 @@ class freearhey(Screen):
         print('auswahl: ', auswahl)
         self['name'].setText(auswahl)
         # self.load_poster()
-
+    
+    def exit(self):
+        deletetmp()
+        self.close()
+        
 class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session

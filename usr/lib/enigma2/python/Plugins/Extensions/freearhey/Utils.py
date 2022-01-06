@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#30.12.2021
+#05.01.2021
 #a common tips used from Lululla
 #
 import sys
@@ -204,7 +204,19 @@ def checkStr(txt):
         # if isinstance(txt, type(six.text_type())):
             # txt = txt.encode('utf-8')
     # return txt
-
+    #kiddac code        
+def checkRedirect(url):
+    # print("*** check redirect ***")
+    try:
+        import requests
+        x = requests.get(url, timeout=15, verify=False, stream=True)
+        print("**** redirect url 1 *** %s" % x.url)
+        return str(x.url)
+    except Exception as e:
+        print(e)
+        print("**** redirect url 2 *** %s" % url)
+        return str(url)
+            
 def freespace():
     try:
         diskSpace = os.statvfs('/')
@@ -316,6 +328,14 @@ def deletetmp():
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
     return
 
+def del_jpg():
+    for i in glob.glob(os.path.join("/tmp", "*.jpg")):
+        try:
+            os.chmod(i, 0o777)
+            os.remove(i)
+        except OSError:
+            pass
+    
 def OnclearMem():
     try:
         os.system("sync")
@@ -663,17 +683,17 @@ if PY3:
                response.close()
                return link
 
-        def getUrlresp(url):
-            req = Request(url)
-            req.add_header('User-Agent',RequestAgent())
-            try:
-                   response = urlopen(req)
-                   return response
-            except:
-                   import ssl
-                   gcontext = ssl._create_unverified_context()
-                   response = urlopen(req, context=gcontext)
-                   return response
+    def getUrlresp(url):
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               return response
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               return response
 else:
     def getUrl(url):
         req = Request(url)
@@ -709,18 +729,18 @@ else:
                response.close()
                return link
 
-        def getUrlresp(url):
-            pass#print "Here in getUrl url =", url
-            req = Request(url)
-            req.add_header('User-Agent',RequestAgent())
-            try:
-                   response = urlopen(req)
-                   return response
-            except:
-                   import ssl
-                   gcontext = ssl._create_unverified_context()
-                   response = urlopen(req, context=gcontext)
-                   return response
+    def getUrlresp(url):
+        pass#print "Here in getUrl url =", url
+        req = Request(url)
+        req.add_header('User-Agent',RequestAgent())
+        try:
+               response = urlopen(req)
+               return response
+        except:
+               import ssl
+               gcontext = ssl._create_unverified_context()
+               response = urlopen(req, context=gcontext)
+               return response
 
 #======================================end getUrl
 def decodeUrl(text):
