@@ -329,6 +329,7 @@ def deletetmp():
     return
 
 def del_jpg():
+    import glob
     for i in glob.glob(os.path.join("/tmp", "*.jpg")):
         try:
             os.chmod(i, 0o777)
