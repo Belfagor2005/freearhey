@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#06/01/2022
+#013/01/2022
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -49,8 +49,6 @@ import re
 import six
 import sys
 
-# from six.moves.urllib.request import Request
-# from six.moves.urllib.request import urlopen
 PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 
@@ -77,19 +75,15 @@ currversion = '2.6'
 name_plugin = 'Freearhey Plugin'        
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
-skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+# skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
 search = False
 host00='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11='aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 downloadm3u = '/media/hdd/movie/'
-
+skin_path= skin_path + '/hd'
 if isFHD():
     skin_path= skin_path + '/fhd'
-
-else:
-    skin_path= skin_path + '/hd'
-
 if DreamOS():
     skin_path= skin_path + '/dreamOs'
     
@@ -269,11 +263,6 @@ class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
-        # if isFHD():
-            # path = skin_path + 'defaultListScreen_new.xml'
-        # else:
-            # path =  skin_path + 'defaultListScreen.xml'
-            
         skin = skin_path + '/defaultListScreen.xml'    
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -328,7 +317,7 @@ class main2(Screen):
                 try:
                     content = content.decode("utf-8")
                 except Exception as e:
-                       print("Error: %s." % e)
+                       print("Error: %s." % str(e))
             # content = ReadUrl(self.url)
             # if six.PY3:
                 # content = six.ensure_str(content)
@@ -474,7 +463,7 @@ class main2(Screen):
                 try:
                     content = content.decode("utf-8")
                 except Exception as e:
-                       print("Error: %s." % e)
+                       print("Error: %s." % str(e))
             # content = ReadUrl(url)
             # if six.PY3:
                 # content = six.ensure_str(content)
@@ -530,10 +519,6 @@ class main2(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
-        # if isFHD():
-            # path = skin_path + 'defaultListScreen_new.xml'
-        # else:
-            # path =  skin_path + 'defaultListScreen.xml'
         skin = skin_path + '/defaultListScreen.xml'    
         with open(skin, 'r') as f:
             self.skin = f.read()
@@ -604,7 +589,7 @@ class selectplay(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                           print("Error: %s." % e)
+                           print("Error: %s." % str(e))
                 # if six.PY3:
                     # content = content.decode("utf-8")
                 # if six.PY3:
@@ -675,7 +660,7 @@ class selectplay(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                           print("Error: %s." % e)
+                           print("Error: %s." % str(e))
                 # content = ReadUrl(self.url)
                 # if six.PY3:
                     # content = content.decode("utf-8")
@@ -708,7 +693,7 @@ class selectplay(Screen):
                 self['name'].setText(auswahl)
                 self['text'].setText('')
             except Exception as e:
-                print('exception error II ', e)
+                print('exception error II ', str(e))
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
             return
@@ -731,7 +716,7 @@ class selectplay(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                           print("Error: %s." % e)
+                           print("Error: %s." % str(e))
 
                 # content = ReadUrl(self.url)
                 # if six.PY3:
@@ -766,7 +751,7 @@ class selectplay(Screen):
                 self['text'].setText('')
 
             except Exception as e:
-                print('exception error ', e)
+                print('exception error ', str(e))
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
 
@@ -1123,6 +1108,7 @@ class Playstream2(
         if self.infoCallback != None:
             self.infoCallback()
         return
+
     def showAfterSeek(self):
         if isinstance(self, TvInfoBarShowHide):
             self.doShow()
