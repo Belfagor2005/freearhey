@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#05.01.2021
+#14.01.2021
 #a common tips used from Lululla
 #
 import sys
@@ -180,7 +180,8 @@ def testWebConnection(host="www.google.com", port=80, timeout=3):
         socket.setdefaulttimeout(timeout)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
         return True
-    except Exception as ex:
+    except Exception as e:
+        print('error: ', str(e))
         return False
 
 def checkStr(txt):
@@ -213,7 +214,7 @@ def checkRedirect(url):
         print("**** redirect url 1 *** %s" % x.url)
         return str(x.url)
     except Exception as e:
-        print(str(e))
+        print('checkRedirect get failed: ', str(e))
         print("**** redirect url 2 *** %s" % url)
         return str(url)
             
@@ -288,13 +289,15 @@ def __createdir(list):
 try:
     from Plugins.Extensions.tmdb import tmdb
     is_tmdb = True
-except Exception:
+except Exception as e:
+    print('error: ', str(e))                            
     is_tmdb = False
 
 try:
     from Plugins.Extensions.IMDb.plugin import main as imdb
     is_imdb = True
-except Exception:
+except Exception as e:
+    print('error: ', str(e))                            
     is_imdb = False
 
 def substr(data,start,end):
@@ -385,7 +388,8 @@ def web_info(message):
         cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
         # debug(cmd, "CMD -> Console -> WEBIF")
         os.popen(cmd)
-    except:
+    except Exception as e:
+        print('error: ', str(e))
         print("web_info ERROR")
 
 def trace_error():
@@ -393,21 +397,14 @@ def trace_error():
     try:
         traceback.print_exc(file=sys.stdout)
         traceback.print_exc(file=open('/tmp/Error.log', 'a'))
-    except:
+    except Exception as e:
+        print('error: ', str(e))
         pass
 
 def log(label,data):
     data=str(data)
     open("/tmp/my__debug.log","a").write("\n"+label+":>"+data)
 
-def del_jpg():
-    for i in glob.glob(os.path.join("/tmp", "*.jpg")):
-        try:
-            os.chmod(i, 0o777)
-            os.remove(i)
-        except OSError:
-            pass
-            
 def ConverDate(data):
     year = data[:2]
     month = data[-4:][:2]
@@ -494,7 +491,7 @@ def AdultUrl(url):
             try:
                 tlink = tlink.decode("utf-8")
             except Exception as e:
-                   print("Error:", str(e))
+                print('error: ', str(e))
         return tlink
         
         
@@ -582,8 +579,8 @@ def ReadUrl2(url):
     if str(type(content)).find('bytes') != -1:
         try:
             content = content.decode("utf-8")                
-        except Exception as e:                   
-               print("Error:", str(e))   
+        except Exception as e:
+            print('error: ', str(e))  
     return content
 
 def ReadUrl(url):
@@ -607,7 +604,7 @@ def ReadUrl(url):
           r = urllib2.urlopen(req,None,TIMEOUT_URL,context=CONTEXT)
         except Exception as e:
           r = urllib2.urlopen(req,None,TIMEOUT_URL)
-          # CreateLog(_("ReadUrl1 - Errore: %s") % e)
+          print("CreateLog Codifica ReadUrl: %s." % str(e))
         link = r.read()
         r.close()
 
@@ -620,7 +617,7 @@ def ReadUrl(url):
                 dec = "utf-8"
             except Exception as e:
                 dcod = 1
-                print("ReadUrl2 - Errore: %s." % e)
+                print("ReadUrl2 - Error: ", str(e))
             if dcod == 1:
                 dcod = 0
                 try:
@@ -628,7 +625,7 @@ def ReadUrl(url):
                     dec = "cp437"
                 except Exception as e:
                     dcod = 1
-                    print("ReadUrl3 - Errore: %s." % e)
+                    print("ReadUrl3 - Error:", str(e))
             if dcod == 1:
                 dcod = 0
                 try:
@@ -636,7 +633,7 @@ def ReadUrl(url):
                     dec = "iso-8859-1"
                 except Exception as e:
                     dcod = 1
-                    CreateLog("ReadUrl4 - Errore: %s." % e)
+                    print("CreateLog Codific ReadUrl: ", str(e))
             link = tlink
 
         elif str(type(link)).find('str') != -1:
@@ -644,7 +641,7 @@ def ReadUrl(url):
 
         print("CreateLog Codifica ReadUrl: %s." % dec)
     except Exception as e:
-        print("ReadUrl5 - Errore: %s." % e)
+        print("ReadUrl5 - Error: ", str(e))
         link = None
     return link
 
