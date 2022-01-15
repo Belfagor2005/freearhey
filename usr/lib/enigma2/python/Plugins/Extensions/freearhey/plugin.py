@@ -75,19 +75,18 @@ currversion = '2.6'
 name_plugin = 'Freearhey Plugin'        
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
-skin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
 search = False
 host00='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11='aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 downloadm3u = '/media/hdd/movie/'
-
+skin_path = res_plugin_path + '/hd'
 if isFHD():
-    skin_path= skin_path + '/fhd'
-else:
-    skin_path= skin_path + '/hd'    
+    skin_path = res_plugin_path + '/fhd'
+    
 if DreamOS():
-    skin_path= skin_path + '/dreamOs'
+    skin_path = skin_path + '/dreamOs'
     
 try:
     from Components.UsageConfig import defaultMoviePath
@@ -110,21 +109,19 @@ class free2list(MenuList):
 
 def show_(name, link):
     res = [(name,link)]
+    res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     if isFHD():
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
-    else:
         res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
     return res
 
 def FreeListEntry(name,png):
     res = [name]
     png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
+    res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
+    res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 6), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 Panel_list = [
@@ -140,7 +137,7 @@ class freearhey(Screen):
         skin = skin_path + '/defaultListScreen.xml'    
         with open(skin, 'r') as f:
             self.skin = f.read()
-            f.close()
+        f.close()
         Screen.__init__(self, session)
         self['actions'] = ActionMap(['OkCancelActions',
          'ColorActions',
@@ -268,7 +265,7 @@ class main2(Screen):
         skin = skin_path + '/defaultListScreen.xml'    
         with open(skin, 'r') as f:
             self.skin = f.read()
-            f.close()
+        f.close()
         self['menulist'] = free2list([])
         self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
@@ -524,7 +521,7 @@ class selectplay(Screen):
         skin = skin_path + '/defaultListScreen.xml'    
         with open(skin, 'r') as f:
             self.skin = f.read()
-            f.close()
+        f.close()
         self.session = session
         Screen.__init__(self, session)
         self['actions'] = ActionMap(['OkCancelActions',
