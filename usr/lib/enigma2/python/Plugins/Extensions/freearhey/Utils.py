@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#14.01.2021
+#23.01.2021
 #a common tips used from Lululla
 #
 import sys
@@ -189,11 +189,11 @@ def checkStr(txt):
     if PY3:
         # Python 3
         if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8')
+            txt = txt.decode('utf-8').strip()
     else:
         #Python 2
         if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8')
+            txt = txt.encode('utf-8').strip()
     return txt
 
 # def checkStr(txt):
@@ -489,7 +489,8 @@ def AdultUrl(url):
         tlink = link
         if str(type(tlink)).find('bytes') != -1:
             try:
-                tlink = tlink.decode("utf-8")
+                tlink = tlink.decode("utf-8").strip()
+               
             except Exception as e:
                 print('error: ', str(e))
         return tlink
@@ -578,7 +579,7 @@ def ReadUrl2(url):
     content = link
     if str(type(content)).find('bytes') != -1:
         try:
-            content = content.decode("utf-8")                
+            content = content.decode("utf-8").strip()                
         except Exception as e:
             print('error: ', str(e))  
     return content
@@ -613,7 +614,7 @@ def ReadUrl(url):
         tlink = link
         if str(type(link)).find('bytes') != -1:
             try:
-                tlink = link.decode("utf-8")
+                tlink = link.decode("utf-8").strip()
                 dec = "utf-8"
             except Exception as e:
                 dcod = 1
@@ -621,7 +622,7 @@ def ReadUrl(url):
             if dcod == 1:
                 dcod = 0
                 try:
-                    tlink = link.decode("cp437")
+                    tlink = link.decode("cp437").strip()
                     dec = "cp437"
                 except Exception as e:
                     dcod = 1
@@ -629,7 +630,7 @@ def ReadUrl(url):
             if dcod == 1:
                 dcod = 0
                 try:
-                    tlink = link.decode("iso-8859-1")
+                    tlink = link.decode("iso-8859-1").strip()
                     dec = "iso-8859-1"
                 except Exception as e:
                     dcod = 1
@@ -653,14 +654,14 @@ if PY3:
         req.add_header('User-Agent',RequestAgent())
         try:
                response = urlopen(req)
-               link=response.read().decode(errors='ignore')
+               link=response.read().decode(errors='ignore').strip()
                response.close()
                return link
         except:
                import ssl
                gcontext = ssl._create_unverified_context()
                response = urlopen(req, context=gcontext)
-               link=response.read().decode(errors='ignore')
+               link=response.read().decode(errors='ignore').strip()
                response.close()
                return link
 
@@ -670,14 +671,14 @@ if PY3:
         req.add_header('Referer', referer)
         try:
                response = urlopen(req)
-               link=response.read().decode()
+               link=response.read().decode().strip()
                response.close()
                return link
         except:
                import ssl
                gcontext = ssl._create_unverified_context()
                response = urlopen(req, context=gcontext)
-               link=response.read().decode()
+               link=response.read().decode().strip()
                response.close()
                return link
 
