@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#25/01/2022
+#25/02/2022
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -11,7 +11,7 @@ from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.config import *
 from Components.Console import Console as iConsole
-from Components.Input import Input                                  
+from Components.Input import Input
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
@@ -32,17 +32,17 @@ from Screens.Standby import TryQuitMainloop, Standby
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_HALIGN_CENTER, RT_VALIGN_CENTER
-from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT                
+from enigma import RT_HALIGN_LEFT, RT_HALIGN_RIGHT
 from enigma import eConsoleAppContainer, eListboxPythonMultiContent
-from enigma import ePicLoad 
+from enigma import ePicLoad
 from enigma import iServiceInformation
 from enigma import eTimer,eListbox
 from enigma import eServiceCenter
 from enigma import eServiceReference
-from enigma import eSize 
+from enigma import eSize
 from enigma import loadPNG, gFont
 from enigma import quitMainloop
-from enigma import iPlayableService 
+from enigma import iPlayableService
 import hashlib
 import os
 import re
@@ -55,9 +55,13 @@ print('Py3: ',PY3)
 if PY3:
     from urllib.request import urlopen
     from urllib.request import Request
+    unicode = str
+    unichr = chr
+    long = int
+    PY3 = True       
 else:
     from urllib2 import Request
-    from urllib2 import urlopen  
+    from urllib2 import urlopen
 try:
     from Plugins.Extensions.freearhey.Utils import *
 except:
@@ -68,11 +72,11 @@ try:
     from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 except:
     import cookielib
-    from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException   
-    
+    from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
+
 global skin_path, search, downloadm3u
 currversion = '2.6'
-name_plugin = 'Freearhey Plugin'        
+name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
 res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
@@ -84,10 +88,10 @@ downloadm3u = '/media/hdd/movie/'
 skin_path = res_plugin_path + '/hd'
 if isFHD():
     skin_path = res_plugin_path + '/fhd'
-    
+
 if DreamOS():
     skin_path = skin_path + '/dreamOs'
-    
+
 try:
     from Components.UsageConfig import defaultMoviePath
     downloadm3u = defaultMoviePath()
@@ -97,10 +101,10 @@ except:
 
 class free2list(MenuList):
     def __init__(self, list):
-        MenuList.__init__(self, list, False, eListboxPythonMultiContent)
+        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         self.l.setItemHeight(50)
         textfont = int(24)
-        self.l.setFont(0, gFont('Regular', textfont))        
+        self.l.setFont(0, gFont('Regular', textfont))
         if isFHD():
             self.l.setItemHeight(50)
             textfont = int(34)
@@ -108,19 +112,45 @@ class free2list(MenuList):
 
 def show_(name, link):
     res = [(name,link)]
-    res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+    if 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif 'webcam' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
+    elif 'music' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'sport' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    else:
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+
     if isFHD():
-        res.append(MultiContentEntryText(pos=(0, 0), size=(800, 40), font=0, text=name, flags=RT_HALIGN_CENTER | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def FreeListEntry(name,png):
     res = [name]
-    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
-    res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-    res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
+    if 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif 'webcam' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
+    elif 'music' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'sport' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    else:
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+
     if isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    else:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 Panel_list = [
@@ -132,23 +162,13 @@ Panel_list = [
 
 class freearhey(Screen):
     def __init__(self, session):
-        self.session = session    
-        skin = skin_path + '/defaultListScreen.xml'    
+        self.session = session
+        skin = skin_path + '/defaultListScreen.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         f.close()
         Screen.__init__(self, session)
-        self['actions'] = ActionMap(['OkCancelActions',
-         'ColorActions',
-         'DirectionActions',
-         'MovieSelectionActions'], {'up': self.up,
-         'down': self.down,
-         'left': self.left,
-         'right': self.right,
-         'ok': self.ok,
-		 'green': self.ok,
-         'cancel': self.exit,
-         'red': self.exit}, -1)
+        self.setTitle("Thank's Freearhey")
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         self['green'] = Label('Select')
@@ -165,7 +185,23 @@ class freearhey(Screen):
         self.count = 0
         self.loading = 0
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        self['actions'] = ActionMap(['OkCancelActions',
+         'ColorActions',
+         'DirectionActions',
+         'MovieSelectionActions'], {'up': self.up,
+         'down': self.down,
+         'left': self.left,
+         'right': self.right,
+         'ok': self.ok,
+		 'green': self.ok,
+         'cancel': self.exit,
+         'red': self.exit}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
+        # self.onFirstExecBegin.append(self.updateMenuList)                                                 
+        # self.onLayoutFinish.append(self.__layoutFinished)
+
+    # def __layoutFinished(self):
+        # self.setTitle(self.setup_title)
 
     def updateMenuList(self):
         self.menu_list = []
@@ -252,19 +288,31 @@ class freearhey(Screen):
         print('auswahl: ', auswahl)
         self['name'].setText(auswahl)
         # self.load_poster()
-    
+
     def exit(self):
         deletetmp()
         self.close()
-        
+
 class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
-        skin = skin_path + '/defaultListScreen.xml'    
+
+        self.setup_title = ('Freearhey')        
+        skin = skin_path + '/defaultListScreen.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         f.close()
+        self.menulist = []        
+        self.picload = ePicLoad()
+        self.picfile = ''
+        self.currentList = 'menulist'
+        self.loading_ok = False
+        self.count = 0
+        self.loading = 0
+        self.name =namex
+        self.url = lnk
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()        
         self['menulist'] = free2list([])
         self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
@@ -285,17 +333,17 @@ class main2(Screen):
 		 'green': self.message2,
          'cancel': self.close,
          'red': self.close}, -1)
-        self.picload = ePicLoad()
-        self.picfile = ''
-        self.currentList = 'menulist'
-        self.menulist = []
-        self.loading_ok = False
-        self.count = 0
-        self.loading = 0
-        self.name =namex
-        self.url = lnk
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
-        self.onLayoutFinish.append(self.updateMenuList)
+        # self.onLayoutFinish.append(self.updateMenuList)
+        self.timer = eTimer()
+        if DreamOS():
+            self.timer_conn = self.timer.timeout.connect(self.updateMenuList)
+        else:
+            self.timer.callback.append(self.updateMenuList)
+        self.timer.start(100, True)
+        self.onLayoutFinish.append(self.__layoutFinished)
+        
+    def __layoutFinished(self):
+        self.setTitle(self.setup_title)
 
     def updateMenuList(self):
         self.menu_list = []
@@ -517,29 +565,23 @@ class main2(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
-        skin = skin_path + '/defaultListScreen.xml'    
+        skin = skin_path + '/defaultListScreen.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         f.close()
         self.session = session
         Screen.__init__(self, session)
-        self['actions'] = ActionMap(['OkCancelActions',
-         'ColorActions',
-         'DirectionActions',
-         'MovieSelectionActions'], {'up': self.up,
-         'down': self.down,
-         'left': self.left,
-         'right': self.right,
-         'ok': self.ok,
-		 'green': self.search_text,
-         'cancel': self.returnback,
-         'red': self.returnback}, -1)
         self.menulist = []
         self.loading_ok = False
         self.count = 0
         self.loading = 0
         self.name =namex
         self.url = lnk
+        self.search = ''
+        self.picload = ePicLoad()
+        self.picfile = ''
+        self.currentList = 'menulist'
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()        
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         # self['green'] = Label('')
@@ -551,11 +593,19 @@ class selectplay(Screen):
         self['name'] = Label('')
         self['text'] = Label('')
         # self['poster'] = Pixmap()
-        self.search = ''
-        self.picload = ePicLoad()
-        self.picfile = ''
-        self.currentList = 'menulist'
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+
+        self['actions'] = ActionMap(['OkCancelActions',
+         'ColorActions',
+         'DirectionActions',
+         'MovieSelectionActions'], {'up': self.up,
+         'down': self.down,
+         'left': self.left,
+         'right': self.right,
+         'ok': self.ok,
+		 'green': self.search_text,
+         'cancel': self.returnback,
+         'red': self.returnback}, -1)
+
         if self.name == 'moviexxx':
             self.onLayoutFinish.append(self.updateMenuListx)
         else:
@@ -593,10 +643,12 @@ class selectplay(Screen):
                 # if six.PY3:
                     # content = six.ensure_str(self.url)
                 print( "In showContent content =", content)
-                regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
+                # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'                
+                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
-                for name, url in match:
+                for country, name, url in match:
                     if str(result).lower() in name.lower():
                         print('callback: ', name)
                         search = True
@@ -604,6 +656,8 @@ class selectplay(Screen):
                         url = url.replace("\\n", "")
                         url = url.replace('\r','')
                         name = name.replace('\r','')
+                        
+                        name = country + ' | ' + name
                         # print( "In showContent name =", name)
                         # print( "In showContent url =", url)
                         self.menu_list.append(show_(name, url))
@@ -641,9 +695,9 @@ class selectplay(Screen):
 
     def updateMenuList(self):
         self.menu_list = []
+        items = []
         if check(self.url):
             try:
-
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
                 elif sys.version_info.major == 2:
@@ -666,23 +720,35 @@ class selectplay(Screen):
                     # content = six.ensure_str(self.url)
                 # print( "content A =", content)
                 ##EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
-                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                
+                # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'                 
+                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'                
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
                 # n1 = 0
-                for name, url in match:
+                for country, name, url in match:
                     if not ".m3u8" in url:
                         continue
-                    # n1 = n1+1
-                    # if n1 > 100:
-                           # break
                     url = url.replace(" ", "")
                     url = url.replace("\\n", "")
                     url = url.replace('\r','')
                     name = name.replace('\r','')
+                    name = country + ' | ' + name
                     print( "In showContent name =", name)
                     print( "In showContent url =", url)
                     pic = " "
+
+
+                    item = name + "###" + url
+                    # print('HasBahCa Items sort: ', item)
+                    items.append(item)
+                items.sort()
+                for item in items:
+                    name = item.split('###')[0]
+                    url = item.split('###')[1]
+                    
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(40)
@@ -698,6 +764,7 @@ class selectplay(Screen):
 
     def updateMenuListx(self):
         self.menu_list = []
+        items = []
         if check(self.url):
             try:
                 if sys.version_info.major == 3:
@@ -722,11 +789,16 @@ class selectplay(Screen):
                 # if six.PY3:
                     # content = content.decode("utf-8")
                 print( "content A =", content)
-                regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
+                
+                # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'               
+                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
+                
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
                 # n1 = 0
-                for name, url in match:
+                for country, name, url in match:
                     if not ".m3u8" in url:
                         continue
                     # n1 = n1+1
@@ -736,9 +808,20 @@ class selectplay(Screen):
                     url = url.replace("\\n", "")
                     url = url.replace('\r','')
                     name = name.replace('\r','')
+                    
+                    name = country + ' | ' + name
                     print( "In showContent name =", name)
                     print( "In showContent url =", url)
                     pic = " "
+                    
+                    item = name + "###" + url
+                    # print('HasBahCa Items sort: ', item)
+                    items.append(item)
+                items.sort()
+                for item in items:
+                    name = item.split('###')[0]
+                    url = item.split('###')[1]
+                    
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(40)
@@ -850,7 +933,7 @@ class TvInfoBarShowHide():
 
     def __onHide(self):
         self.__state = self.STATE_HIDDEN
-        
+
     def doShow(self):
         self.hideTimer.stop()
         self.show()
@@ -910,7 +993,13 @@ class Playstream2(
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-
+        self.allowPiP = False
+        self.service = None
+        service = None
+        self.url = url
+        self.pcip = 'None'
+        self.name = decodeHtml(name)
+        self.state = self.STATE_PLAYING
         for x in InfoBarBase, \
                 InfoBarMenu, \
                 InfoBarSeek, \
@@ -924,6 +1013,7 @@ class Playstream2(
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
+        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
@@ -941,14 +1031,6 @@ class Playstream2(
          'stop': self.leavePlayer,
          'cancel': self.cancel,
          'back': self.cancel}, -1)
-        self.allowPiP = False
-        self.service = None
-        service = None
-        self.url = url
-        self.pcip = 'None'
-        self.name = decodeHtml(name)
-        self.state = self.STATE_PLAYING
-        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         # self.onLayoutFinish.append(self.cicleStreamType)
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
@@ -993,7 +1075,7 @@ class Playstream2(
         self.setAspect(temp)
 
     def showinfo(self):
-        debug = True
+        # debug = True
         sTitle = ''
         sServiceref = ''
         try:

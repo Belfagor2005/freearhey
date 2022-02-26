@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#23.01.2021
+#19.02.2021
 #a common tips used from Lululla
 #
 import sys
@@ -74,7 +74,28 @@ def listDir(what):
         pass
 
     return f
-    
+
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        file_path = os.path.join(dir, f)
+        if os.path.isfile(file_path):
+            if re.search(pattern, f):
+                os.remove(file_path)
+
+def get_safe_filename(filename, fallback=''):
+    """Convert filename to safe filename
+    """
+    import unicodedata
+    import six
+    name = filename.replace(" ", "_").replace("/", "_")
+    if isinstance(name, six.text_type):
+        name = name.encode('utf-8')
+    name = unicodedata.normalize('NFKD', six.text_type(name, 'utf_8', errors='ignore')).encode('ASCII', 'ignore')
+    name = re.sub(b'[^a-z0-9-_]', b'', name.lower())
+    if not name:
+        name = fallback
+    return six.ensure_str(name)
+
 def remove_line(filename, what):
     if os.path.isfile(filename):
         file_read = open(filename).readlines()
@@ -101,13 +122,38 @@ def badcar(name):
                  "|MX|", "|NL|", "|NO|", "|PL|", "|PT|", "|RO|", "|RS|", "|RU|", "|SE|", "|SI|", "|SK|", "|TR|", "|UK|", "|US|", "|YU|",
                  "|Ae|", "|Al|", "|Ar|", "|At|", "|Ba|", "|Be|", "|Bg|", "|Br|", "|Cg|", "|Ch|", "|Cz|", "|Da|", "|De|", "|Dk|", "|Ee|", "|En|", "|Es|", "|Ex-Yu|", "|Fi|", "|Fr|", "|Gr|", "|Hr|", "|Hu|", "|In|", "|Ir|", "|It|", "|Lt|", "|Mk|",
                  "|Mx|", "|Nl|", "|No|", "|Pl|", "|Pt|", "|Ro|", "|Rs|", "|Ru|", "|Se|", "|Si|", "|Sk|", "|Tr|", "|Uk|", "|Us|", "|Yu|",
-                 "(", ")", "[", "]", "u-", "3d", "'", "#", "/"]
+                 "(", ")", "[", "]", "u-", "3d", "'", "#", "/",
+                 "PF1", "PF2", "PF3", "PF4", "PF5", "PF6", "PF7", "PF8", "PF9", "PF10", "PF11", "PF12", "PF13", "PF14", "PF15", "PF16", "PF17", "PF18", "PF19", "PF20", "PF21", "PF22", "PF23", "PF24", "PF25", "PF26", "PF27", "PF28", "PF29", "PF30",
+                 "480p", "4K", "720p", "ANIMAZIONE",  "AVVENTURA", "BIOGRAFICO",  "BDRip",  "BluRay",  "CINEMA", "COMMEDIA", "DOCUMENTARIO", "DRAMMATICO", "FANTASCIENZA", "FANTASY", "HDCAM", "HDTC", "HDTS", "LD", "MARVEL", "MD", "NEW_AUDIO", 
+                 "R3", "R6", "SD", "SENTIMENTALE", "TC", "TELECINE", "TELESYNC", "THRILLER", "Uncensored", "V2", "WEBDL", "WEBRip", "WEB", "WESTERN", "-", "_", ".", "+", "[", "]"                
+                 ]
+                 
     for j in range(1900, 2025):
         bad_chars.append(str(j))
     for i in bad_chars:
         name = name.replace(i, '')
     return name
-    
+
+def cleanTitle(x):
+	x = x.replace('~','')
+	x = x.replace('#','')
+	x = x.replace('%','')
+	x = x.replace('&','')
+	x = x.replace('*','')
+	x = x.replace('{','')
+	x = x.replace('}','')
+	x = x.replace(':','')
+	x = x.replace('<','')
+	x = x.replace('>','')
+	x = x.replace('?','')
+	x = x.replace('/','')
+	x = x.replace('+','')
+	x = x.replace('|','')
+	x = x.replace('"','')
+	x = x.replace('\\','')
+	x = x.replace('--','-')
+	return x 
+
 def getLanguage():
     try:
         from Components.config import config
@@ -189,11 +235,11 @@ def checkStr(txt):
     if PY3:
         # Python 3
         if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8').strip()
+            txt = txt.decode('utf-8')
     else:
         #Python 2
         if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8').strip()
+            txt = txt.encode('utf-8')
     return txt
 
 # def checkStr(txt):
@@ -322,7 +368,7 @@ def ReloadBouquets():
         from enigma import eDVBDB
         eDVBDB.getInstance().reloadBouquets()
         print('bouquets reloaded...')
-    except ImportError:
+    except:
         eDVBDB = None
         os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
         print('bouquets reloaded...')
@@ -382,7 +428,7 @@ def web_info(message):
     try:
         try:
             from urllib import quote_plus
-        except importError:
+        except :
             from urllib.parse import quote_plus
         message = quote_plus(message)
         cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
@@ -489,8 +535,7 @@ def AdultUrl(url):
         tlink = link
         if str(type(tlink)).find('bytes') != -1:
             try:
-                tlink = tlink.decode("utf-8").strip()
-               
+                tlink = tlink.decode("utf-8")
             except Exception as e:
                 print('error: ', str(e))
         return tlink
@@ -579,7 +624,7 @@ def ReadUrl2(url):
     content = link
     if str(type(content)).find('bytes') != -1:
         try:
-            content = content.decode("utf-8").strip()                
+            content = content.decode("utf-8")                
         except Exception as e:
             print('error: ', str(e))  
     return content
@@ -614,7 +659,7 @@ def ReadUrl(url):
         tlink = link
         if str(type(link)).find('bytes') != -1:
             try:
-                tlink = link.decode("utf-8").strip()
+                tlink = link.decode("utf-8")
                 dec = "utf-8"
             except Exception as e:
                 dcod = 1
@@ -622,7 +667,7 @@ def ReadUrl(url):
             if dcod == 1:
                 dcod = 0
                 try:
-                    tlink = link.decode("cp437").strip()
+                    tlink = link.decode("cp437")
                     dec = "cp437"
                 except Exception as e:
                     dcod = 1
@@ -630,7 +675,7 @@ def ReadUrl(url):
             if dcod == 1:
                 dcod = 0
                 try:
-                    tlink = link.decode("iso-8859-1").strip()
+                    tlink = link.decode("iso-8859-1")
                     dec = "iso-8859-1"
                 except Exception as e:
                     dcod = 1
@@ -654,14 +699,14 @@ if PY3:
         req.add_header('User-Agent',RequestAgent())
         try:
                response = urlopen(req)
-               link=response.read().decode(errors='ignore').strip()
+               link=response.read().decode(errors='ignore')
                response.close()
                return link
         except:
                import ssl
                gcontext = ssl._create_unverified_context()
                response = urlopen(req, context=gcontext)
-               link=response.read().decode(errors='ignore').strip()
+               link=response.read().decode(errors='ignore')
                response.close()
                return link
 
@@ -671,14 +716,14 @@ if PY3:
         req.add_header('Referer', referer)
         try:
                response = urlopen(req)
-               link=response.read().decode().strip()
+               link=response.read().decode()
                response.close()
                return link
         except:
                import ssl
                gcontext = ssl._create_unverified_context()
                response = urlopen(req, context=gcontext)
-               link=response.read().decode().strip()
+               link=response.read().decode()
                response.close()
                return link
 
@@ -1038,11 +1083,12 @@ def charRemove(text):
              "]"
              ]
 
-    myreplace = text.lower()
-    for ch in char:
-        ch= ch.lower()
-        # if myreplace == ch:
-        myreplace = myreplace.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+    myreplace = text#.lower()
+    for ch in char:  #.lower():
+        # ch= ch #.lower()
+        if text == ch:
+            myreplace = text.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
+    print('myreplace: ',myreplace)
     return myreplace
 
 def clean_html(html):
