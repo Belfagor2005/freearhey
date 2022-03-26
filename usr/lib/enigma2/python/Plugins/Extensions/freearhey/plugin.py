@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#25/02/2022
+#05/03/2022
 #######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd              #
 #   This is free software; you can redistribute it and/or modify it.  #
@@ -103,13 +103,13 @@ class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if isFHD():
-            self.l.setItemHeight(50)
+            self.l.setItemHeight(60)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-        else:
-            self.l.setItemHeight(50)
+        else:    
+            self.l.setItemHeight(60)
             textfont = int(24)
-            self.l.setFont(0, gFont('Regular', textfont))
+            self.l.setFont(0, gFont('Regular', textfont)) 
         
 def show_(name, link):
     res = [(name,link)]
@@ -125,11 +125,11 @@ def show_(name, link):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
 
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 def FreeListEntry(name,png):
@@ -147,11 +147,11 @@ def FreeListEntry(name,png):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
 
     if isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1200, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 12), size=(34, 25), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(60, 0), size=(1000, 50), font=0, text=name, color = 0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 Panel_list = [
@@ -435,6 +435,7 @@ class main2(Screen):
                     # continue
                 # if "Adult" in name.lower():
                     # continue
+                name = name.capitalize()
                 self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(50)
@@ -749,7 +750,7 @@ class selectplay(Screen):
                 for item in items:
                     name = item.split('###')[0]
                     url = item.split('###')[1]
-                    
+                    name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(40)
@@ -822,7 +823,7 @@ class selectplay(Screen):
                 for item in items:
                     name = item.split('###')[0]
                     url = item.split('###')[1]
-                    
+                    name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
                 # self['menulist'].l.setItemHeight(40)
