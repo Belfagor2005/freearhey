@@ -58,7 +58,7 @@ if PY3:
     unicode = str
     unichr = chr
     long = int
-    PY3 = True       
+    PY3 = True
 else:
     from urllib2 import Request
     from urllib2 import urlopen
@@ -106,11 +106,11 @@ class free2list(MenuList):
             self.l.setItemHeight(60)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
-        else:    
+        else:
             self.l.setItemHeight(60)
             textfont = int(24)
-            self.l.setFont(0, gFont('Regular', textfont)) 
-        
+            self.l.setFont(0, gFont('Regular', textfont))
+
 def show_(name, link):
     res = [(name,link)]
     if 'radio' in name.lower():
@@ -198,7 +198,7 @@ class freearhey(Screen):
          'cancel': self.exit,
          'red': self.exit}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
-        # self.onFirstExecBegin.append(self.updateMenuList)                                                 
+        # self.onFirstExecBegin.append(self.updateMenuList)
         # self.onLayoutFinish.append(self.__layoutFinished)
 
     # def __layoutFinished(self):
@@ -299,12 +299,12 @@ class main2(Screen):
         self.session = session
         Screen.__init__(self, session)
 
-        self.setup_title = ('Freearhey')        
+        self.setup_title = ('Freearhey')
         skin = skin_path + '/defaultListScreen.xml'
         with open(skin, 'r') as f:
             self.skin = f.read()
         f.close()
-        self.menulist = []        
+        self.menulist = []
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
@@ -313,7 +313,7 @@ class main2(Screen):
         self.loading = 0
         self.name =namex
         self.url = lnk
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()        
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
@@ -342,7 +342,7 @@ class main2(Screen):
             self.timer.callback.append(self.updateMenuList)
         self.timer.start(100, True)
         self.onLayoutFinish.append(self.__layoutFinished)
-        
+
     def __layoutFinished(self):
         self.setTitle(self.setup_title)
 
@@ -583,7 +583,7 @@ class selectplay(Screen):
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()        
+        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
         # self['green'] = Label('')
@@ -646,7 +646,7 @@ class selectplay(Screen):
                     # content = six.ensure_str(self.url)
                 print( "In showContent content =", content)
                 # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
-                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'                
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
@@ -658,7 +658,7 @@ class selectplay(Screen):
                         url = url.replace("\\n", "")
                         url = url.replace('\r','')
                         name = name.replace('\r','')
-                        
+
                         name = country + ' | ' + name
                         # print( "In showContent name =", name)
                         # print( "In showContent url =", url)
@@ -723,10 +723,10 @@ class selectplay(Screen):
                 # print( "content A =", content)
                 ##EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
                 # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-                
+
                 # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
-                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'                 
-                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'                
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
+                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
                 # n1 = 0
@@ -792,11 +792,11 @@ class selectplay(Screen):
                     # content = content.decode("utf-8")
                 print( "content A =", content)
                 # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-                
+
                 # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
-                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'               
+                regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
-                
+
                 match = re.compile(regexcat,re.DOTALL).findall(content)
                 print( "In showContent match =", match)
                 # n1 = 0
@@ -810,12 +810,12 @@ class selectplay(Screen):
                     url = url.replace("\\n", "")
                     url = url.replace('\r','')
                     name = name.replace('\r','')
-                    
+
                     name = country + ' | ' + name
                     print( "In showContent name =", name)
                     print( "In showContent url =", url)
                     pic = " "
-                    
+
                     item = name + "###" + url
                     # print('HasBahCa Items sort: ', item)
                     items.append(item)
@@ -987,21 +987,22 @@ class Playstream2(
     screen_timeout = 5000
 
     def __init__(self, session, name, url):
-        global SREF, streaml
+        global streaml
         Screen.__init__(self, session)
-        self.session = session
         global _session
+        self.session = session
         _session = session
         self.skinName = 'MoviePlayer'
         title = name
         streaml = False
-        self.allowPiP = False
+        # self.allowPiP = False
         self.service = None
         service = None
         self.url = url
-        self.pcip = 'None'
+        # self.pcip = 'None'
         self.name = decodeHtml(name)
         self.state = self.STATE_PLAYING
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         for x in InfoBarBase, \
                 InfoBarMenu, \
                 InfoBarSeek, \
@@ -1015,7 +1016,6 @@ class Playstream2(
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        SREF = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['MoviePlayerActions',
          'MovieSelectionActions',
          'MediaPlayerActions',
@@ -1186,6 +1186,7 @@ class Playstream2(
 
     def __evEOF(self):
         self.end = True
+
     def showVideoInfo(self):
         if self.shown:
             self.hideInfobar()
@@ -1200,7 +1201,7 @@ class Playstream2(
         if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(SREF)
+        self.session.nav.playService(self.srefInit)
         # if self.pcip != 'None':
             # url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
             # resp = urlopen(url2)
