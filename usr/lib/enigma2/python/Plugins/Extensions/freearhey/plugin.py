@@ -48,7 +48,7 @@ import os
 import re
 import six
 import sys
-
+from . import Utils
 PY3 = sys.version_info.major >= 3
 print('Py3: ',PY3)
 
@@ -62,10 +62,8 @@ if PY3:
 else:
     from urllib2 import Request
     from urllib2 import urlopen
-try:
-    from Plugins.Extensions.freearhey.Utils import *
-except:
-    from . import Utils
+
+
 
 try:
     import http.cookiejar
@@ -84,12 +82,13 @@ search = False
 host00='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11='aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
+host33='aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
 downloadm3u = '/media/hdd/movie/'
 skin_path = res_plugin_path + '/hd'
-if isFHD():
+if Utils.isFHD():
     skin_path = res_plugin_path + '/fhd'
 
-if DreamOS():
+if Utils.DreamOS():
     skin_path = skin_path + '/dreamOs'
 
 try:
@@ -102,7 +101,7 @@ except:
 class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if isFHD():
+        if Utils.isFHD():
             self.l.setItemHeight(60)
             textfont = int(34)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -119,12 +118,11 @@ def show_(name, link):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'sport' in name.lower():
+    elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -146,7 +144,7 @@ def FreeListEntry(name,png):
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
 
-    if isFHD():
+    if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
@@ -156,9 +154,11 @@ def FreeListEntry(name,png):
 
 Panel_list = [
  ('PLAYLISTS DIRECT'),
+ ('PLAYLISTS NSFW'), 
  ('PLAYLISTS BY CATEGORY'),
  ('PLAYLISTS BY LANGUAGE'),
  ('PLAYLISTS BY COUNTRY'),
+ ('PLAYLISTS BY REGION'), 
  ('MOVIE XXX')]
 
 class freearhey(Screen):
@@ -235,16 +235,19 @@ class freearhey(Screen):
     def keyNumberGlobalCB(self, idx):
         global namex, lnk
         namex = ''
-        lnk = b64decoder(host11)
+        lnk = Utils.b64decoder(host11)
         # if six.PY3:
             # url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
         # sel = self['menulist'].getCurrent()[0][0]
         if sel == ("PLAYLISTS DIRECT"):
                 namex = "Directy"
-                lnk = b64decoder(host22)
-                # self.session.open(xfreearhey)
+                lnk = Utils.b64decoder(host22)
                 self.session.open(selectplay, namex, lnk)
+        elif sel == ("PLAYLISTS NSFW"):
+                namex = "Nsfw"
+                lnk = Utils.b64decoder(host33)
+                self.session.open(selectplay, namex, lnk)                
         elif sel == ("PLAYLISTS BY CATEGORY"):
                 namex = "Category"
                 self.session.open(main2, namex, lnk)
@@ -254,10 +257,13 @@ class freearhey(Screen):
         elif sel == ("PLAYLISTS BY COUNTRY"):
                 namex = "Country"
                 self.session.open(main2, namex, lnk)
+        elif sel == ("PLAYLISTS BY REGION"):
+                namex = "Region"
+                self.session.open(main2, namex, lnk)               
         else:
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
-                lnk = b64decoder(host00)
+                lnk = Utils.b64decoder(host00)
                 # if six.PY3:
                     # url = six.ensure_str(lnk)
                 self.adultonly(namex, lnk)
@@ -300,7 +306,7 @@ class freearhey(Screen):
         # self.load_poster()
 
     def exit(self):
-        deletetmp()
+        Utils.deletetmp()
         self.close()
 
 class main2(Screen):
@@ -346,7 +352,7 @@ class main2(Screen):
          'red': self.close}, -1)
         # self.onLayoutFinish.append(self.updateMenuList)
         self.timer = eTimer()
-        if DreamOS():
+        if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.updateMenuList)
         else:
             self.timer.callback.append(self.updateMenuList)
@@ -367,7 +373,7 @@ class main2(Screen):
     def updateMenuList(self):
         self.menu_list = []
         items = []
-        if check(self.url):
+        if Utils.check(self.url):
             if sys.version_info.major == 3:
                  import urllib.request as urllib2
             elif sys.version_info.major == 2:
@@ -389,10 +395,14 @@ class main2(Screen):
             n1 = content.find("user-content-playlists-by-category", 0)
             n2 = content.find("user-content-playlists-by-language", n1)
             n3 = content.find("user-content-playlists-by-country", n2)
-            n4 = content.find("</table>", n3)
+            n4 = content.find("user-content-playlists-by-region", n3)            
+            
+            
+            n5 = content.find("</table>", n4)
             if "Category" in self.name:
                     content2 = content[n1:n2]
-                    regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
+                    #<tr><td>Auto</td><td align="right">14</td><td nowrap=""><code>https://iptv-org.github.io/iptv/categories/auto.m3u</code></td></tr>
+                    regexcat = '<tr><td>(.+?)</td.*?<code>(.+?)</code'
                     match = re.compile(regexcat,re.DOTALL).findall(content2)
                     pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
@@ -407,7 +417,8 @@ class main2(Screen):
                         items.append(item)
             elif "Language" in self.name:
                     content2 = content[n2:n3]
-                    regexcat = 'td align="left">(.+?)<.*?<code>(.+?)<'
+                    #<tr><td align="left">Albanian</td><td align="right">35</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/languages/sqi.m3u</code></td></tr>
+                    regexcat = 'align="left">(.+?)<.*?<code>(.+?)</code'
                     match = re.compile(regexcat,re.DOTALL).findall(content2)
                     pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
@@ -420,13 +431,13 @@ class main2(Screen):
                         name = name.replace('%20', ' ')
                         item = name + "###" + url
                         items.append(item)
+                        
             elif "Country" in self.name:
                     content2 = content[n3:n4]
-                    regexcat = 'alias="(.+?)".*?<code>(.+?)<'
-
+                    #<tr><td><g-emoji class="g-emoji" alias="afghanistan" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f1e6-1f1eb.png">🇦🇫</g-emoji> Afghanistan</td><td align="right">31</td><td nowrap=""><code>https://iptv-org.github.io/iptv/countries/af.m3u</code></td></tr>
+                    regexcat = 'alias="(.+?)".*?<code>(.+?)</code'
                     match = re.compile(regexcat,re.DOTALL).findall(content2)
                     pic = " "
-
                     item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
                     items.append(item)
                     for name, url in match:
@@ -437,6 +448,27 @@ class main2(Screen):
                         name = name.replace('%20', ' ')
                         item = name + "###" + url
                         items.append(item)
+                        
+            elif "Region" in self.name:
+                    content2 = content[n4:n5]
+                    #<tr><td align="left">Africa</td><td align="right">126</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/regions/afr.m3u</code></td></tr>
+                    #<tr><td align="left">Oceania</td><td align="right">69</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/regions/oce.m3u</code></td></tr>
+                    regexcat = 'align="left">(.+?)<.*?code>(.+?)</code'
+                    match = re.compile(regexcat,re.DOTALL).findall(content2)
+                    pic = " "
+                    item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
+                    items.append(item)
+                    for name, url in match:
+                        a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
+                        if any(s in str(name).lower() for s in a):
+                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
+                            continue
+                        name = name.replace('%20', ' ')
+                        item = name + "###" + url
+                        items.append(item)                        
+                        
+                        
+                        
             items.sort()
             for item in items:
                 name = item.split("###")[0]
@@ -512,7 +544,7 @@ class main2(Screen):
             self.convert_bouquet(url, name)
 
     def convert_bouquet(self, url, name):
-        if check(url):
+        if Utils.check(url):
             name = name.replace(' ','_').strip()
             name = name.lower()
             if sys.version_info.major == 3:
@@ -579,7 +611,7 @@ class main2(Screen):
                                 outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
                             outfile.close()
                 self.mbox = self.session.open(MessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), MessageBox.TYPE_INFO, timeout=7)
-                ReloadBouquets()
+                Utils.ReloadBouquets()
             except:
                 return
 
@@ -729,7 +761,7 @@ class selectplay(Screen):
     def updateMenuList(self):
         self.menu_list = []
         items = []
-        if check(self.url):
+        if Utils.check(self.url):
             try:
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
@@ -798,7 +830,7 @@ class selectplay(Screen):
     def updateMenuListx(self):
         self.menu_list = []
         items = []
-        if check(self.url):
+        if Utils.check(self.url):
             try:
                 if sys.version_info.major == 3:
                      import urllib.request as urllib2
@@ -874,7 +906,7 @@ class selectplay(Screen):
         url = self['menulist'].getCurrent()[0][1]
         print('name: ', name)
         print('url: ', url)
-        if check(url):
+        if Utils.check(url):
             self.play_that_shit(name, url)
         else:
             self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout = 5)
@@ -1031,7 +1063,7 @@ class Playstream2(
         service = None
         self.url = url
         # self.pcip = 'None'
-        self.name = decodeHtml(name)
+        self.name = Utils.decodeHtml(name)
         self.state = self.STATE_PLAYING
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         for x in InfoBarBase, \
@@ -1188,7 +1220,7 @@ class Playstream2(
         # if "youtube" in str(self.url):
             # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
             # return
-        if isStreamlinkAvailable():
+        if Utils.isStreamlinkAvailable():
             streamtypelist.append("5002") #ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
         if os.path.exists("/usr/bin/gstplayer"):
