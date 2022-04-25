@@ -141,7 +141,7 @@ def FreeListEntry(name,png):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'sport' in name.lower():
+    elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
@@ -177,6 +177,7 @@ class freearhey(Screen):
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
+        self["paypal"] = Label()
         # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
@@ -199,9 +200,17 @@ class freearhey(Screen):
          'red': self.exit}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         # self.onFirstExecBegin.append(self.updateMenuList)
-        # self.onLayoutFinish.append(self.__layoutFinished)
+        self.onLayoutFinish.append(self.layoutFinished)
 
-    # def __layoutFinished(self):
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
         # self.setTitle(self.setup_title)
 
     def updateMenuList(self):
@@ -315,6 +324,7 @@ class main2(Screen):
         self.url = lnk
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
+        self["paypal"] = Label()
         self['red'] = Label(_('Back'))
         self['green'] = Label(_('Export'))
         self['category'] = Label('')
@@ -341,9 +351,17 @@ class main2(Screen):
         else:
             self.timer.callback.append(self.updateMenuList)
         self.timer.start(100, True)
-        self.onLayoutFinish.append(self.__layoutFinished)
+        self.onLayoutFinish.append(self.layoutFinished)
 
-    def __layoutFinished(self):
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
         self.setTitle(self.setup_title)
 
     def updateMenuList(self):
@@ -585,6 +603,7 @@ class selectplay(Screen):
         self.currentList = 'menulist'
         self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
+        self["paypal"] = Label()
         self['red'] = Label(_('Exit'))
         # self['green'] = Label('')
         # if 'Directy' in self.name:
@@ -612,6 +631,18 @@ class selectplay(Screen):
             self.onLayoutFinish.append(self.updateMenuListx)
         else:
             self.onLayoutFinish.append(self.updateMenuList)
+        self.onLayoutFinish.append(self.layoutFinished)
+
+    def paypal2(self):
+        conthelp = "If you like what I do you\n"
+        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "scan the qr code and donate € 1.00"
+        return conthelp
+    
+    def layoutFinished(self):
+        paypal = self.paypal2()
+        self["paypal"].setText(paypal)    
+        # self.setTitle(self.setup_title)
 
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -1217,19 +1248,12 @@ class Playstream2(
     def leavePlayer(self):
         self.close()
 
-def checks():
-    from Plugins.Extensions.Filmon.Utils import checkInternet
-    checkInternet()
-    chekin= False
-    if checkInternet():
-        chekin = True
-    return chekin
-
 def main(session, **kwargs):
-    if checks:
+    from . import Utils
+    if Utils.checkInternet():
         try:
-            from Plugins.Extensions.freearhey.Update import upd_done
-            upd_done()
+            from . import Update
+            Update.upd_done()
         except:
             pass
         session.open(freearhey)
