@@ -1,5 +1,6 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
-#19.02.2021
+#01.05.2021
 #a common tips used from Lululla
 #
 import sys
@@ -32,6 +33,19 @@ else:
     from urllib2 import urlopen
     from urllib2 import Request
     from urllib2 import HTTPError, URLError
+
+if sys.version_info >= (2, 7, 9):
+    try:
+        import ssl
+        sslContext = ssl._create_unverified_context()
+    except:
+        sslContext = None
+        
+def ssl_urlopen(url):
+    if sslContext:
+        return urlopen(url, context=sslContext)
+    else:
+        return urlopen(url)
 
 def getDesktopSize():
     from enigma import getDesktop
@@ -134,6 +148,7 @@ def badcar(name):
         name = name.replace(i, '')
     return name
 
+
 def cleanTitle(x):
 	x = x.replace('~','')
 	x = x.replace('#','')
@@ -166,15 +181,46 @@ def getLanguage():
         pass
 
 def downloadFile(url, target):
+    import socket
     try:
-        response = urlopen(url)
-        with open(target, 'wb') as output:
-            output.write(response.read())
-        return True
+        from urllib.error import HTTPError, URLError
     except:
-        print("download error")
+        from urllib2 import HTTPError, URLError
+    try:
+        response = urlopen(url, None, 5)
+        with open(target, 'w') as output:
+            print('response: ', response)
+            output.write(response.read())
+        response.close()
+        return True
+    except HTTPError:
+        print("Http error")
         return False
-
+    except URLError:
+        print("Url error")
+        return False
+    except socket.timeout:
+        print("sochet error")
+        return False
+        
+def downloadFilest(url, target):
+    try:
+        req=Request(url)
+        req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        # context=ssl._create_unverified_context()
+        response=ssl_urlopen(req)
+        with open(target, 'w') as output:
+            if PY3:
+                output.write(response.read().decode('utf-8'))            
+            else:
+                output.write(response.read())
+            print('response: ', response)
+        return True
+    except HTTPError as e:
+        print('HTTP Error code: ',e.code)
+    except URLError as e:
+        print('URL Error: ',e.reason)
+        
 def getserviceinfo(sref):## this def returns the current playing service name and stream_url from give sref
     try:
         from ServiceReference import ServiceReference
@@ -230,17 +276,26 @@ def testWebConnection(host="www.google.com", port=80, timeout=3):
         print('error: ', str(e))
         return False
 
-def checkStr(txt):
-    # convert variable to type str both in Python 2 and 3
-    if PY3:
-        # Python 3
-        if type(txt) == type(bytes()):
-            txt = txt.decode('utf-8')
-    else:
-        #Python 2
-        if type(txt) == type(unicode()):
-            txt = txt.encode('utf-8')
-    return txt
+def checkStr(text, encoding="utf8"):
+	if PY3 == False:
+		if isinstance(text, unicode):
+			return text.encode(encoding)
+		else:
+			return text
+	else:
+		return text
+        
+# def checkStr(txt):
+    # # convert variable to type str both in Python 2 and 3
+    # if PY3:
+        # # Python 3
+        # if type(txt) == type(bytes()):
+            # txt = txt.decode('utf-8')
+    # else:
+        # #Python 2
+        # if type(txt) == type(unicode()):
+            # txt = txt.encode('utf-8')
+    # return txt
 
 # def checkStr(txt):
     #import six
@@ -374,7 +429,7 @@ def ReloadBouquets():
         print('bouquets reloaded...')
 
 def deletetmp():
-    os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz')
+    os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz;rm -f /tmp/*.m3u')
     return
 
 def del_jpg():
@@ -511,17 +566,8 @@ def isStreamlinkAvailable():
 
 #========================getUrl
 
-# if sys.version_info >= (2, 7, 9):
-    # try:
-        # import ssl
-        # sslContext = ssl._create_unverified_context()
-    # except:
-        # sslContext = None
-# def ssl_urlopen(url):
-    # if sslContext:
-        # return urlopen(url, context=sslContext)
-    # else:
-        # return urlopen(url)
+
+
 def AdultUrl(url):
         if sys.version_info.major == 3:
              import urllib.request as urllib2

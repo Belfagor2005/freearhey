@@ -110,16 +110,99 @@ class free2list(MenuList):
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
+
+
+
+
 def show_(name, link):
     res = [(name,link)]
-    if 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    if 'travel' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
     elif 'webcam' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'adult' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))   
+    elif 'weather' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))  
+    elif 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif 'adult' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'xxx' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'mtv' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'deluxe' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'djing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'fashion' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'kiss' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'sluhay' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'stingray' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'techno' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'viva' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'country' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'vevo' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'spor' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'boxing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'racing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'fight' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'golf' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'knock' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'harley' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'futbool' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'motor' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'nba' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'nfl' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'bull' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'poker' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'billiar' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'fite' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'relax' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'nature' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'escape' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'movie' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
+    elif 'pluto' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
+    elif 'tvplus' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
+    elif 'religious' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+    elif 'shop' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))          
+        
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
     if Utils.isFHD():
@@ -133,14 +216,92 @@ def show_(name, link):
 def FreeListEntry(name,png):
     res = [name]
     # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
-    if 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    if 'travel' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
     elif 'webcam' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'adult' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))   
+    elif 'weather' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))  
+    elif 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif 'adult' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'xxx' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'mtv' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'deluxe' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'djing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'fashion' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'kiss' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'sluhay' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'stingray' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'techno' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'viva' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'country' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'vevo' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'spor' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'boxing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'racing' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'fight' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'golf' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'knock' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'harley' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'futbool' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'motor' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'nba' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'nfl' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'bull' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'poker' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'billiar' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'fite' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'relax' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'nature' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'escape' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'movie' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
+    elif 'pluto' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
+    elif 'tvplus' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
+    elif 'religious' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+    elif 'shop' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))        
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
 
@@ -807,7 +968,7 @@ class selectplay(Screen):
 
 
                     item = name + "###" + url
-                    # print('HasBahCa Items sort: ', item)
+                    # print('freearhey Items sort: ', item)
                     items.append(item)
                 items.sort()
                 for item in items:
@@ -880,7 +1041,7 @@ class selectplay(Screen):
                     pic = " "
 
                     item = name + "###" + url
-                    # print('HasBahCa Items sort: ', item)
+                    # print('freearhey Items sort: ', item)
                     items.append(item)
                 items.sort()
                 for item in items:
