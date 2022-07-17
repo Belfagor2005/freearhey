@@ -1441,17 +1441,32 @@ class Playstream2(
     def leavePlayer(self):
         self.close()
 
+
 def main(session, **kwargs):
-    from . import Utils
-    if Utils.checkInternet():
-        try:
-            from . import Update
-            Update.upd_done()
-        except:
-            pass
-        session.open(freearhey)
-    else:
-        session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
+    try:
+        if intCheck():
+                from . import Update
+                Update.upd_done()
+                session.open(freearhey)
+        else:
+            from Screens.MessageBox import MessageBox
+            from Tools.Notifications import AddPopup
+            AddPopup(_("Sorry but No Internet :("),MessageBox.TYPE_INFO, 10, 'Sorry')  
+    except:
+        import traceback
+        traceback.pr
+
+# def main(session, **kwargs):
+    # from . import Utils
+    # if Utils.checkInternet():
+        # try:
+            # from . import Update
+            # Update.upd_done()
+        # except:
+            # pass
+        # session.open(freearhey)
+    # else:
+        # session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 
 def Plugins(**kwargs):
     icona = 'plugin.png'
