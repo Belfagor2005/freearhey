@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
-#05/03/2022
+#05/08/2022
 #######################################################################
 #	Enigma2 plugin Freearhey is coded by Lululla and Pcd			  #
 #	This is free software; you can redistribute it and/or modify it.  #
@@ -63,8 +63,6 @@ else:
 	from urllib2 import Request
 	from urllib2 import urlopen
 
-
-
 try:
 	import http.cookiejar
 	from http.client import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
@@ -109,9 +107,6 @@ class free2list(MenuList):
 			self.l.setItemHeight(60)
 			textfont = int(24)
 			self.l.setFont(0, gFont('Regular', textfont))
-
-
-
 
 
 def show_(name, link):
@@ -1437,14 +1432,12 @@ class Playstream2(
 		streaml = False
 		self.close()
 
-
 	def leavePlayer(self):
 		self.close()
 
-
 def main(session, **kwargs):
 	try:
-		if intCheck():
+		if Utils.zCheckInternet(0):
 				from . import Update
 				Update.upd_done()
 				session.open(freearhey)
@@ -1455,18 +1448,6 @@ def main(session, **kwargs):
 	except:
 		import traceback
 		traceback.pr
-
-# def main(session, **kwargs):
-	# from . import Utils
-	# if Utils.checkInternet():
-		# try:
-			# from . import Update
-			# Update.upd_done()
-		# except:
-			# pass
-		# session.open(freearhey)
-	# else:
-		# session.open(MessageBox, "No Internet", MessageBox.TYPE_INFO)
 
 def Plugins(**kwargs):
 	icona = 'plugin.png'
