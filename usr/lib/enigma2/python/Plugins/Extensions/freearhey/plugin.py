@@ -462,7 +462,7 @@ class freearhey(Screen):
 		# self.load_poster()
 
 	def exit(self):
-		Utils.deletetmp()
+		# Utils.deletetmp()
 		self.close()
 
 class main2(Screen):
@@ -1326,12 +1326,12 @@ class Playstream2(
 		if os.path.exists(TMDB):
 			from Plugins.Extensions.TMBD.plugin import TMBD
 			text_clear = self.name
-			text = charRemove(text_clear)
+			text = Utils.charRemove(text_clear)
 			self.session.open(TMBD, text, False)
 		elif os.path.exists(IMDb):
 			from Plugins.Extensions.IMDb.plugin import IMDB
 			text_clear = self.name
-			text = charRemove(text_clear)
+			text = Utils.charRemove(text_clear)
 			self.session.open(IMDB, text)
 		else:
 			# text_clear = self.name
@@ -1437,7 +1437,7 @@ class Playstream2(
 
 def main(session, **kwargs):
 	try:
-		if Utils.zCheckInternet(0):
+		if Utils.zCheckInternet(1):
 				from . import Update
 				Update.upd_done()
 				session.open(freearhey)
