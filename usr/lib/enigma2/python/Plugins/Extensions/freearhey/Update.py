@@ -1,16 +1,15 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
+#!/usr/bin/env python
 
-import os
-import sys
+import os, re, sys
 from twisted.web.client import downloadPage
 PY3 = sys.version_info.major >= 3
 print("Update.py")
 
-
-def upd_done():
-    print("In upd_done")
-    xfile = 'http://patbuweb.com/freearhey/freearhey.tar'
+def upd_done():        
+    from twisted.web.client import downloadPage
+    print( "In upd_done")
+    xfile ='http://patbuweb.com/freearhey/freearhey.tar'
     if PY3:
         xfile = b"http://patbuweb.com/freearhey/freearhey.tar"
         print("Update.py in PY3")
@@ -26,13 +25,12 @@ def upd_done():
     else:
         return
 
-
 def upd_last(fplug):
     import time
-    time.sleep(5)
-    if os.path.isfile('/tmp/freearhey.tar') and os.stat('/tmp/freearhey.tar').st_size > 1000:
+    time.sleep(5)        
+    if os.path.isfile('/tmp/freearhey.tar') and os.stat('/tmp/freearhey.tar').st_size > 1000 : 
         import os
         cmd = "tar -xvf /tmp/freearhey.tar -C /"
-        print("cmd A =", cmd)
+        print( "cmd A =", cmd)
         os.system(cmd)
     return
