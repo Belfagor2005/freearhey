@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# 01.09.2022
+# 20.09.2022
 # a common tips used from Lululla
 #
 import sys
@@ -9,6 +9,7 @@ import datetime
 import os
 import re
 import base64
+from random import choice
 
 # from sys import version_info
 # pythonFull = float(str(sys.version_info.major) + "." + str(sys.version_info.minor))
@@ -19,7 +20,10 @@ PY3 = sys.version_info.major >= 3
 if PY3:
     # Python 3
     PY3 = True
-    unicode = str; unichr = chr; long = int; xrange = range
+    unicode = str
+    unichr = chr
+    long = int
+    xrange = range
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
@@ -37,6 +41,7 @@ else:
     from urllib2 import Request
     from urllib2 import HTTPError, URLError
 
+
 if sys.version_info >= (2, 7, 9):
     try:
         import ssl
@@ -44,28 +49,34 @@ if sys.version_info >= (2, 7, 9):
     except:
         sslContext = None
 
+
 def ssl_urlopen(url):
     if sslContext:
         return urlopen(url, context=sslContext)
     else:
         return urlopen(url)
 
+
 def getDesktopSize():
     from enigma import getDesktop
     s = getDesktop(0).size()
     return (s.width(), s.height())
 
+
 def isUHD():
     desktopSize = getDesktopSize()
     return desktopSize[0] == 3840
+
 
 def isFHD():
     desktopSize = getDesktopSize()
     return desktopSize[0] == 1920
 
+
 def isHD():
     desktopSize = getDesktopSize()
     return desktopSize[0] >= 1280 and desktopSize[0] < 1920
+
 
 def DreamOS():
     DreamOS = False
@@ -73,9 +84,11 @@ def DreamOS():
         DreamOS = True
         return DreamOS
 
+
 def mySkin():
     currentSkin = config.skin.primary_skin.value.replace('/skin.xml', '')
     return currentSkin
+
 
 if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
     from Plugins.Extensions.MediaPlayer import *
@@ -83,13 +96,15 @@ if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
 else:
     MediaPlayerInstalled = False
 
+
 def listDir(what):
     f = None
     try:
-        f = listdir(what)
+        f = os.listdir(what)
     except:
         pass
     return f
+
 
 def purge(dir, pattern):
     for f in os.listdir(dir):
@@ -97,6 +112,7 @@ def purge(dir, pattern):
         if os.path.isfile(file_path):
             if re.search(pattern, f):
                 os.remove(file_path)
+
 
 def get_safe_filename(filename, fallback=''):
     """Convert filename to safe filename
@@ -112,6 +128,7 @@ def get_safe_filename(filename, fallback=''):
         name = fallback
     return six.ensure_str(name)
 
+
 def remove_line(filename, what):
     if os.path.isfile(filename):
         file_read = open(filename).readlines()
@@ -120,6 +137,7 @@ def remove_line(filename, what):
             if what not in line:
                 file_write.write(line)
         file_write.close()
+
 
 def badcar(name):
     name = name
@@ -151,24 +169,25 @@ def badcar(name):
 
 
 def cleanTitle(x):
-    x = x.replace('~','')
-    x = x.replace('#','')
-    x = x.replace('%','')
-    x = x.replace('&','')
-    x = x.replace('*','')
-    x = x.replace('{','')
-    x = x.replace('}','')
-    x = x.replace(':','')
-    x = x.replace('<','')
-    x = x.replace('>','')
-    x = x.replace('?','')
-    x = x.replace('/','')
-    x = x.replace('+','')
-    x = x.replace('|','')
-    x = x.replace('"','')
-    x = x.replace('\\','')
-    x = x.replace('--','-')
+    x = x.replace('~', '')
+    x = x.replace('#', '')
+    x = x.replace('%', '')
+    x = x.replace('&', '')
+    x = x.replace('*', '')
+    x = x.replace('{', '')
+    x = x.replace('}', '')
+    x = x.replace(':', '')
+    x = x.replace('<', '')
+    x = x.replace('>', '')
+    x = x.replace('?', '')
+    x = x.replace('/', '')
+    x = x.replace('+', '')
+    x = x.replace('|', '')
+    x = x.replace('"', '')
+    x = x.replace('\\', '')
+    x = x.replace('--', '-')
     return x
+
 
 def getLanguage():
     try:
@@ -180,6 +199,7 @@ def getLanguage():
         language = 'en'
         return language
         pass
+
 
 def downloadFile(url, target):
     import socket
@@ -204,12 +224,13 @@ def downloadFile(url, target):
         print("sochet error")
         return False
 
+
 def downloadFilest(url, target):
     try:
-        req=Request(url)
-        req.add_header('User-Agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        req = Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         # context=ssl._create_unverified_context()
-        response=ssl_urlopen(req)
+        response = ssl_urlopen(req)
         with open(target, 'w') as output:
             if PY3:
                 output.write(response.read().decode('utf-8'))
@@ -218,60 +239,67 @@ def downloadFilest(url, target):
             print('response: ', response)
         return True
     except HTTPError as e:
-        print('HTTP Error code: ',e.code)
+        print('HTTP Error code: ', e.code)
     except URLError as e:
-        print('URL Error: ',e.reason)
+        print('URL Error: ', e.reason)
 
-def getserviceinfo(sref):## this def returns the current playing service name and stream_url from give sref
+
+def getserviceinfo(sref):  # this def returns the current playing service name and stream_url from give sref
     try:
         from ServiceReference import ServiceReference
-        p=ServiceReference(sref)
-        servicename=str(p.getServiceName())
-        serviceurl=str(p.getPath())
+        p = ServiceReference(sref)
+        servicename = str(p.getServiceName())
+        serviceurl = str(p.getPath())
         return servicename, serviceurl
     except:
         return None,None
+
 
 def sortedDictKeys(adict):
     keys = list(adict.keys())
     keys.sort()
     return keys
 
+
 def daterange(start_date, end_date):
     for n in range((end_date - start_date).days + 1):
         yield end_date - datetime.timedelta(n)
 
+
 global CountConnOk
 CountConnOk = 0
-def zCheckInternet(opt=1,server=None,port=None): # opt=5 custom server and port.
-      global CountConnOk
-      sock = False
-      checklist = [("8.8.44.4",53),("8.8.88.8",53),("www.e2skin.blogspot.com",80),("www.e2skin.blogspot.com",443),("www.google.com",443)]
-      if opt < 5:
-          srv = checklist[opt]
-      else:
-          srv = (server,port)
-      try:
-         import socket
-         socket.setdefaulttimeout(0.5)
-         socket.socket(socket.AF_INET,socket.SOCK_STREAM).connect(srv)
-         sock = True
-         # print("[iSettingE2] - Internet OK")
-         CountConnOk = 0
-         print(_("Status Internet: %s:%s -> OK" % (srv[0],srv[1])))
-      except:
-         sock = False
-         # print("[iSettingE2] - Internet KO")
-         print(_("Status Internet: %s:%s -> KO" % (srv[0],srv[1])))
-         if CountConnOk == 0 and opt != 2 and opt != 3:
-              CountConnOk = 1
-              print(_("Restart Check 1 Internet."))
-              return zCheckInternet(0)
-         elif CountConnOk == 1 and opt != 2 and opt != 3:
-              CountConnOk = 2
-              print(_("Restart Check 2 Internet."))
-              return zCheckInternet(4)
-      return sock
+
+
+def zCheckInternet(opt=1, server=None, port=None):  # opt=5 custom server and port.
+    global CountConnOk
+    sock = False
+    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.github.com/iptv-org/iptv", 80), ("www.github.com/iptv-org/", 443), ("www.google.com", 443)]
+    if opt < 5:
+        srv = checklist[opt]
+    else:
+        srv = (server, port)
+    try:
+        import socket
+        socket.setdefaulttimeout(0.5)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(srv)
+        sock = True
+        # print("[iSettingE2] - Internet OK")
+        CountConnOk = 0
+        print(_("Status Internet: %s:%s -> OK" % (srv[0], srv[1])))
+    except:
+        sock = False
+        # print("[iSettingE2] - Internet KO")
+        print(_("Status Internet: %s:%s -> KO" % (srv[0], srv[1])))
+        if CountConnOk == 0 and opt != 2 and opt != 3:
+            CountConnOk = 1
+            print(_("Restart Check 1 Internet."))
+            return zCheckInternet(0)
+        elif CountConnOk == 1 and opt != 2 and opt != 3:
+            CountConnOk = 2
+            print(_("Restart Check 2 Internet."))
+            return zCheckInternet(4)
+    return sock
+
 
 def checkInternet():
     try:
@@ -281,6 +309,7 @@ def checkInternet():
         return True
     except:
         return False
+
 
 def check(url):
     import socket
@@ -299,6 +328,7 @@ def check(url):
     except socket.timeout:
         return False
 
+
 def testWebConnection(host="www.google.com", port=80, timeout=3):
     import socket
     try:
@@ -309,14 +339,16 @@ def testWebConnection(host="www.google.com", port=80, timeout=3):
         print('error: ', str(e))
         return False
 
+
 def checkStr(text, encoding="utf8"):
-    if PY3 == False:
+    if PY3 is False:
         if isinstance(text, unicode):
             return text.encode(encoding)
         else:
             return text
     else:
         return text
+
 
 # def checkStr(txt):
     # # convert variable to type str both in Python 2 and 3
@@ -340,6 +372,7 @@ def checkStr(text, encoding="utf8"):
             # txt = txt.encode('utf-8')
     # return txt
 
+
 def checkRedirect(url):
     # print("*** check redirect ***")
     try:
@@ -352,6 +385,7 @@ def checkRedirect(url):
         print("**** redirect url 2 *** %s" % url)
         return str(url)
 
+
 def freespace():
     try:
         diskSpace = os.statvfs('/')
@@ -363,6 +397,7 @@ def freespace():
         return spacestr
     except:
         return ''
+
 
 def b64encoder(source):
     import base64
@@ -401,6 +436,7 @@ def b64decoder(s):
             print('outp2 ', outp)
         return outp
 
+
 def MemClean():
     try:
         os.system("sync")
@@ -410,15 +446,17 @@ def MemClean():
     except:
         pass
 
+
 def __createdir(list):
     dir = ''
     for line in list[1:].split('/'):
         dir += '/' + line
         if not os.path.exists(dir):
             try:
-                mkdir(dir)
+                os.mkdir(dir)
             except:
                 print('Mkdir Failed', dir)
+
 
 try:
     from Plugins.Extensions.tmdb import tmdb
@@ -427,6 +465,7 @@ except Exception as e:
     print('error: ', str(e))
     is_tmdb = False
 
+
 try:
     from Plugins.Extensions.IMDb.plugin import main as imdb
     is_imdb = True
@@ -434,17 +473,20 @@ except Exception as e:
     print('error: ', str(e))
     is_imdb = False
 
-def substr(data,start,end):
+
+def substr(data, start, end):
     i1 = data.find(start)
-    i2 = data.find(end,i1)
+    i2 = data.find(end, i1)
     return data[i1:i2]
+
 
 def uniq(inlist):
     uniques = []
     for item in inlist:
-      if item not in uniques:
-        uniques.append(item)
+        if item not in uniques:
+            uniques.append(item)
     return uniques
+
 
 def ReloadBouquets():
     # global set
@@ -461,9 +503,11 @@ def ReloadBouquets():
         os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
         print('bouquets reloaded...')
 
+
 def deletetmp():
     os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz;rm -f /tmp/*.m3u')
     return
+
 
 def del_jpg():
     import glob
@@ -474,6 +518,7 @@ def del_jpg():
         except OSError:
             pass
 
+
 def OnclearMem():
     try:
         os.system("sync")
@@ -483,16 +528,17 @@ def OnclearMem():
     except:
         pass
 
+
 def findSoftCamKey():
     paths = ["/usr/keys",
-           "/etc/tuxbox/config/oscam-emu",
-           "/etc/tuxbox/config/oscam-trunk",
-           "/etc/tuxbox/config/oscam",
-           "/etc/tuxbox/config/ncam",
-           "/etc/tuxbox/config/gcam",
-           "/etc/tuxbox/config",
-           "/etc",
-           "/var/keys"]
+             "/etc/tuxbox/config/oscam-emu",
+             "/etc/tuxbox/config/oscam-trunk",
+             "/etc/tuxbox/config/oscam",
+             "/etc/tuxbox/config/ncam",
+             "/etc/tuxbox/config/gcam",
+             "/etc/tuxbox/config",
+             "/etc",
+             "/var/keys"]
     from os import path as os_path
     if os_path.exists("/tmp/.oscam/oscam.version"):
         data = open("/tmp/.oscam/oscam.version", "r").readlines()
@@ -501,8 +547,8 @@ def findSoftCamKey():
     elif os_path.exists("/tmp/.gcam/gcam.version"):
         data = open("/tmp/.gcam/gcam.version", "r").readlines()
         for line in data:
-              if "configdir:" in line.lower():
-                    paths.insert(0, line.split(":")[1].strip())
+            if "configdir:" in line.lower():
+                paths.insert(0, line.split(":")[1].strip())
     for path in paths:
         softcamkey = os_path.join(path, "SoftCam.Key")
         print("[key] the %s exists %d" % (softcamkey, os_path.exists(softcamkey)))
@@ -512,11 +558,12 @@ def findSoftCamKey():
             return "/usr/keys/SoftCam.Key"
     return "/usr/keys/SoftCam.Key"
 
+
 def web_info(message):
     try:
         try:
             from urllib import quote_plus
-        except :
+        except:
             from urllib.parse import quote_plus
         message = quote_plus(message)
         cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
@@ -525,6 +572,7 @@ def web_info(message):
     except Exception as e:
         print('error: ', str(e))
         print("web_info ERROR")
+
 
 def trace_error():
     import traceback
@@ -535,9 +583,11 @@ def trace_error():
         print('error: ', str(e))
         pass
 
-def log(label,data):
-    data=str(data)
-    open("/tmp/my__debug.log","a").write("\n"+label+":>"+data)
+
+def log(label, data):
+    data = str(data)
+    open("/tmp/my__debug.log", "a").write("\n" + label + ":>" + data)
+
 
 def ConverDate(data):
     year = data[:2]
@@ -545,15 +595,18 @@ def ConverDate(data):
     day = data[-2:]
     return day + '-' + month + '-20' + year
 
+
 def ConverDateBack(data):
     year = data[-2:]
     month = data[-7:][:2]
     day = data[:2]
     return year + month + day
 
+
 def isExtEplayer3Available():
     from enigma import eEnv
     return os.path.isfile(eEnv.resolve('$bindir/exteplayer3'))
+
 
 def isStreamlinkAvailable():
     from enigma import eEnv
@@ -597,29 +650,26 @@ def isStreamlinkAvailable():
 # WHERE_SOFTWAREMANAGER = 14
 # WHERE_CHANNEL_CONTEXT_MENU = 15
 
-#========================getUrl
 
 def AdultUrl(url):
-        import sys
-        if sys.version_info.major == 3:
-             import urllib.request as urllib2
-        elif sys.version_info.major == 2:
-             import urllib2
-        req = urllib2.Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
-        r = urllib2.urlopen(req, None, 15)
-        link = r.read()
-        r.close()
-        tlink = link
-        if str(type(tlink)).find('bytes') != -1:
-            try:
-                tlink = tlink.decode("utf-8")
-            except Exception as e:
-                print('error: ', str(e))
-        return tlink
+    import sys
+    if sys.version_info.major == 3:
+        import urllib.request as urllib2
+    elif sys.version_info.major == 2:
+        import urllib2
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+    r = urllib2.urlopen(req, None, 15)
+    link = r.read()
+    r.close()
+    tlink = link
+    if str(type(tlink)).find('bytes') != -1:
+        try:
+            tlink = tlink.decode("utf-8")
+        except Exception as e:
+            print('error: ', str(e))
+    return tlink
 
-
-from random import choice
 
 std_headers = {
         'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.6) Gecko/20100627 Firefox/3.6.6',
@@ -627,6 +677,7 @@ std_headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-us,en;q=0.5',
 }
+
 
 ListAgent = [
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
@@ -685,15 +736,17 @@ ListAgent = [
           'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
           ]
 
+
 def RequestAgent():
     RandomAgent = choice(ListAgent)
     return RandomAgent
 
+
 def ReadUrl2(url):
     if sys.version_info.major == 3:
-         import urllib.request as urllib2
+        import urllib.request as urllib2
     elif sys.version_info.major == 2:
-         import urllib2
+        import urllib2
     req = urllib2.Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
     r = urllib2.urlopen(req, None, 15)
@@ -706,6 +759,7 @@ def ReadUrl2(url):
         except Exception as e:
             print('error: ', str(e))
     return content
+
 
 def ReadUrl(url):
     if sys.version_info.major == 3:
@@ -725,10 +779,10 @@ def ReadUrl(url):
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
-          r = urllib2.urlopen(req,None,TIMEOUT_URL,context=CONTEXT)
+            r = urllib2.urlopen(req, None, TIMEOUT_URL, context=CONTEXT)
         except Exception as e:
-          r = urllib2.urlopen(req,None,TIMEOUT_URL)
-          print("CreateLog Codifica ReadUrl: %s." % str(e))
+            r = urllib2.urlopen(req, None, TIMEOUT_URL)
+            print("CreateLog Codifica ReadUrl: %s." % str(e))
         link = r.read()
         r.close()
 
@@ -770,218 +824,218 @@ def ReadUrl(url):
     return link
 
 
-
 if PY3:
     def getUrl(url):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         try:
-               response = urlopen(req)
-               link=response.read().decode(errors='ignore')
-               response.close()
-               return link
+            response = urlopen(req)
+            link = response.read().decode(errors='ignore')
+            response.close()
+            return link
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               link=response.read().decode(errors='ignore')
-               response.close()
-               return link
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read().decode(errors='ignore')
+            response.close()
+            return link
 
     def getUrl2(url, referer):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         req.add_header('Referer', referer)
         try:
-               response = urlopen(req)
-               link=response.read().decode()
-               response.close()
-               return link
+            response = urlopen(req)
+            link = response.read().decode()
+            response.close()
+            return link
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               link=response.read().decode()
-               response.close()
-               return link
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read().decode()
+            response.close()
+            return link
 
     def getUrlresp(url):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         try:
-               response = urlopen(req)
-               return response
+            response = urlopen(req)
+            return response
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               return response
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            return response
 else:
     def getUrl(url):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         try:
-               response = urlopen(req)
-               link=response.read()
-               response.close()
-               return link
+            response = urlopen(req)
+            link = response.read()
+            response.close()
+            return link
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               link=response.read()
-               response.close()
-               return link
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read()
+            response.close()
+            return link
 
     def getUrl2(url, referer):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         req.add_header('Referer', referer)
         try:
-               response = urlopen(req)
-               link=response.read()
-               response.close()
-               return link
+            response = urlopen(req)
+            link = response.read()
+            response.close()
+            return link
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               link=response.read()
-               response.close()
-               return link
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            link = response.read()
+            response.close()
+            return link
 
     def getUrlresp(url):
         req = Request(url)
-        req.add_header('User-Agent',RequestAgent())
+        req.add_header('User-Agent', RequestAgent())
         try:
-               response = urlopen(req)
-               return response
+            response = urlopen(req)
+            return response
         except:
-               import ssl
-               gcontext = ssl._create_unverified_context()
-               response = urlopen(req, context=gcontext)
-               return response
+            import ssl
+            gcontext = ssl._create_unverified_context()
+            response = urlopen(req, context=gcontext)
+            return response
 
-#======================================end getUrl
+
 def decodeUrl(text):
-    text = text.replace('%20',' ')
-    text = text.replace('%21','!')
-    text = text.replace('%22','"')
-    text = text.replace('%23','&')
-    text = text.replace('%24','$')
-    text = text.replace('%25','%')
-    text = text.replace('%26','&')
-    text = text.replace('%2B','+')
-    text = text.replace('%2F','/')
-    text = text.replace('%3A',':')
-    text = text.replace('%3B',';')
-    text = text.replace('%3D','=')
-    text = text.replace('&#x3D;','=')
-    text = text.replace('%3F','?')
-    text = text.replace('%40','@')
+    text = text.replace('%20', ' ')
+    text = text.replace('%21', '!')
+    text = text.replace('%22', '"')
+    text = text.replace('%23', '&')
+    text = text.replace('%24', '$')
+    text = text.replace('%25', '%')
+    text = text.replace('%26', '&')
+    text = text.replace('%2B', '+')
+    text = text.replace('%2F', '/')
+    text = text.replace('%3A', ':')
+    text = text.replace('%3B', ';')
+    text = text.replace('%3D', '=')
+    text = text.replace('&#x3D;', '=')
+    text = text.replace('%3F', '?')
+    text = text.replace('%40', '@')
     return text
 
+
 def decodeHtml(text):
-    text = text.replace('&auml;','ä')
-    text = text.replace('\u00e4','ä')
-    text = text.replace('&#228;','ä')
+    text = text.replace('&auml;', 'ä')
+    text = text.replace('\u00e4', 'ä')
+    text = text.replace('&#228;', 'ä')
 
-    text = text.replace('&Auml;','Ä')
-    text = text.replace('\u00c4','Ä')
-    text = text.replace('&#196;','Ä')
+    text = text.replace('&Auml;', 'Ä')
+    text = text.replace('\u00c4', 'Ä')
+    text = text.replace('&#196;', 'Ä')
 
-    text = text.replace('&ouml;','ö')
-    text = text.replace('\u00f6','ö')
-    text = text.replace('&#246;','ö')
+    text = text.replace('&ouml;', 'ö')
+    text = text.replace('\u00f6', 'ö')
+    text = text.replace('&#246;', 'ö')
 
-    text = text.replace('&ouml;','Ö')
-    text = text.replace('&Ouml;','Ö')
-    text = text.replace('\u00d6','Ö')
-    text = text.replace('&#214;','Ö')
+    text = text.replace('&ouml;', 'Ö')
+    text = text.replace('&Ouml;', 'Ö')
+    text = text.replace('\u00d6', 'Ö')
+    text = text.replace('&#214;', 'Ö')
 
-    text = text.replace('&uuml;','ü')
-    text = text.replace('\u00fc','ü')
-    text = text.replace('&#252;','ü')
+    text = text.replace('&uuml;', 'ü')
+    text = text.replace('\u00fc', 'ü')
+    text = text.replace('&#252;', 'ü')
 
-    text = text.replace('&Uuml;','Ü')
-    text = text.replace('\u00dc','Ü')
-    text = text.replace('&#220;','Ü')
+    text = text.replace('&Uuml;', 'Ü')
+    text = text.replace('\u00dc', 'Ü')
+    text = text.replace('&#220;', 'Ü')
 
-    text = text.replace('&szlig;','ß')
-    text = text.replace('\u00df','ß')
-    text = text.replace('&#223;','ß')
+    text = text.replace('&szlig;', 'ß')
+    text = text.replace('\u00df', 'ß')
+    text = text.replace('&#223;', 'ß')
 
-    text = text.replace('&amp;','&')
-    text = text.replace('&quot;','\"')
-    text = text.replace('&gt;','>')
-    text = text.replace('&apos;',"'")
-    text = text.replace('&acute;','\'')
-    text = text.replace('&ndash;','-')
-    text = text.replace('&bdquo;','"')
-    text = text.replace('&rdquo;','"')
-    text = text.replace('&ldquo;','"')
-    text = text.replace('&lsquo;','\'')
-    text = text.replace('&rsquo;','\'')
-    text = text.replace('&#034;','"')
-    text = text.replace('&#34;','"')
-    text = text.replace('&#038;','&')
-    text = text.replace('&#039;','\'')
-    text = text.replace('&#39;','\'')
-    text = text.replace('&#160;',' ')
-    text = text.replace('\u00a0',' ')
-    text = text.replace('\u00b4','\'')
-    text = text.replace('\u003d','=')
-    text = text.replace('\u0026','&')
-    text = text.replace('&#174;','')
-    text = text.replace('&#225;','a')
-    text = text.replace('&#233;','e')
-    text = text.replace('&#243;','o')
-    text = text.replace('&#8211;',"-")
-    text = text.replace('&#8212;',"—")
-    text = text.replace('&mdash;','—')
-    text = text.replace('\u2013',"–")
-    text = text.replace('&#8216;',"'")
-    text = text.replace('&#8217;',"'")
-    text = text.replace('&#8220;',"'")
-    text = text.replace('&#8221;','"')
-    text = text.replace('&#8222;',',')
-    text = text.replace('\u014d','ō')
-    text = text.replace('\u016b','ū')
-    text = text.replace('\u201a','\"')
-    text = text.replace('\u2018','\"')
-    text = text.replace('\u201e','\"')
-    text = text.replace('\u201c','\"')
-    text = text.replace('\u201d','\'')
-    text = text.replace('\u2019s','’')
-    text = text.replace('\u00e0','à')
-    text = text.replace('\u00e7','ç')
-    text = text.replace('\u00e8','é')
-    text = text.replace('\u00e9','é')
-    text = text.replace('\u00c1','Á')
-    text = text.replace('\u00c6','Æ')
-    text = text.replace('\u00e1','á')
+    text = text.replace('&amp;', '&')
+    text = text.replace('&quot;', '\"')
+    text = text.replace('&gt;', '>')
+    text = text.replace('&apos;', "'")
+    text = text.replace('&acute;', '\'')
+    text = text.replace('&ndash;', '-')
+    text = text.replace('&bdquo;', '"')
+    text = text.replace('&rdquo;', '"')
+    text = text.replace('&ldquo;', '"')
+    text = text.replace('&lsquo;', '\'')
+    text = text.replace('&rsquo;', '\'')
+    text = text.replace('&#034;', '"')
+    text = text.replace('&#34;', '"')
+    text = text.replace('&#038;', '&')
+    text = text.replace('&#039;', '\'')
+    text = text.replace('&#39;', '\'')
+    text = text.replace('&#160;', ' ')
+    text = text.replace('\u00a0', ' ')
+    text = text.replace('\u00b4', '\'')
+    text = text.replace('\u003d', '=')
+    text = text.replace('\u0026', '&')
+    text = text.replace('&#174;', '')
+    text = text.replace('&#225;', 'a')
+    text = text.replace('&#233;', 'e')
+    text = text.replace('&#243;', 'o')
+    text = text.replace('&#8211;', "-")
+    text = text.replace('&#8212;', "—")
+    text = text.replace('&mdash;', '—')
+    text = text.replace('\u2013', "–")
+    text = text.replace('&#8216;', "'")
+    text = text.replace('&#8217;', "'")
+    text = text.replace('&#8220;', "'")
+    text = text.replace('&#8221;', '"')
+    text = text.replace('&#8222;', ',')
+    text = text.replace('\u014d',  'ō')
+    text = text.replace('\u016b', 'ū')
+    text = text.replace('\u201a', '\"')
+    text = text.replace('\u2018', '\"')
+    text = text.replace('\u201e', '\"')
+    text = text.replace('\u201c', '\"')
+    text = text.replace('\u201d', '\'')
+    text = text.replace('\u2019s', '’')
+    text = text.replace('\u00e0', 'à')
+    text = text.replace('\u00e7', 'ç')
+    text = text.replace('\u00e8', 'é')
+    text = text.replace('\u00e9', 'é')
+    text = text.replace('\u00c1', 'Á')
+    text = text.replace('\u00c6', 'Æ')
+    text = text.replace('\u00e1', 'á')
 
-    text = text.replace('&#xC4;','Ä')
-    text = text.replace('&#xD6;','Ö')
-    text = text.replace('&#xDC;','Ü')
-    text = text.replace('&#xE4;','ä')
-    text = text.replace('&#xF6;','ö')
-    text = text.replace('&#xFC;','ü')
-    text = text.replace('&#xDF;','ß')
-    text = text.replace('&#xE9;','é')
-    text = text.replace('&#xB7;','·')
-    text = text.replace("&#x27;","'")
-    text = text.replace("&#x26;","&")
-    text = text.replace("&#xFB;","û")
-    text = text.replace("&#xF8;","ø")
-    text = text.replace("&#x21;","!")
-    text = text.replace("&#x3f;","?")
+    text = text.replace('&#xC4;', 'Ä')
+    text = text.replace('&#xD6;', 'Ö')
+    text = text.replace('&#xDC;', 'Ü')
+    text = text.replace('&#xE4;', 'ä')
+    text = text.replace('&#xF6;', 'ö')
+    text = text.replace('&#xFC;', 'ü')
+    text = text.replace('&#xDF;', 'ß')
+    text = text.replace('&#xE9;', 'é')
+    text = text.replace('&#xB7;', '·')
+    text = text.replace("&#x27;", "'")
+    text = text.replace("&#x26;", "&")
+    text = text.replace("&#xFB;", "û")
+    text = text.replace("&#xF8;", "ø")
+    text = text.replace("&#x21;", "!")
+    text = text.replace("&#x3f;", "?")
 
-    text = text.replace('&#8230;','...')
-    text = text.replace('\u2026','...')
-    text = text.replace('&hellip;','...')
+    text = text.replace('&#8230;', '...')
+    text = text.replace('\u2026', '...')
+    text = text.replace('&hellip;', '...')
 
-    text = text.replace('&#8234;','')
+    text = text.replace('&#8234;', '')
     return text
 
 
@@ -1053,6 +1107,7 @@ conversion = {
     str("\xd1\x8f"): "ja",
     str("\xd0\xaf"): "JA"}
 
+
 def cyr2lat(text):
     i = 0
     text = text.strip(" \t\n\r")
@@ -1070,102 +1125,98 @@ def cyr2lat(text):
         retval += bukva_translit
     return retval
 
+
 def charRemove(text):
     char = ["1080p",
-             # "2018",
-             # "2019",
-             # "2020",
-             # "2021",
-             # "2022"
-             "PF1",
-             "PF2",
-             "PF3",
-             "PF4",
-             "PF5",
-             "PF6",
-             "PF7",
-             "PF8",
-             "PF9",
-             "PF10",
-             "PF11",
-             "PF12",
-             "PF13",
-             "PF14",
-             "PF15",
-             "PF16",
-             "PF17",
-             "PF18",
-             "PF19",
-             "PF20",
-             "PF21",
-             "PF22",
-             "PF23",
-             "PF24",
-             "PF25",
-             "PF26",
-             "PF27",
-             "PF28",
-             "PF29",
-             "PF30"
-             "480p",
-             "4K",
-             "720p",
-             "ANIMAZIONE",
-             # "APR",
-             # "AVVENTURA",
-             "BIOGRAFICO",
-             "BDRip",
-             "BluRay",
-             "CINEMA",
-             # "COMMEDIA",
-             "DOCUMENTARIO",
-             "DRAMMATICO",
-             "FANTASCIENZA",
-             "FANTASY",
-             # "FEB",
-             # "GEN",
-             # "GIU",
-             "HDCAM",
-             "HDTC",
-             "HDTS",
-             "LD",
-             "MAFIA",
-             # "MAG",
-             "MARVEL",
-             "MD",
-             # "ORROR",
-             "NEW_AUDIO",
-             "POLIZ",
-             "R3",
-             "R6",
-             "SD",
-             "SENTIMENTALE",
-             "TC",
-             "TEEN",
-             "TELECINE",
-             "TELESYNC",
-             "THRILLER",
-             "Uncensored",
-             "V2",
-             "WEBDL",
-             "WEBRip",
-             "WEB",
-             "WESTERN",
-             "-",
-             "_",
-             ".",
-             "+",
-             "[",
-             "]"
-             ]
+            "PF1",
+            "PF2",
+            "PF3",
+            "PF4",
+            "PF5",
+            "PF6",
+            "PF7",
+            "PF8",
+            "PF9",
+            "PF10",
+            "PF11",
+            "PF12",
+            "PF13",
+            "PF14",
+            "PF15",
+            "PF16",
+            "PF17",
+            "PF18",
+            "PF19",
+            "PF20",
+            "PF21",
+            "PF22",
+            "PF23",
+            "PF24",
+            "PF25",
+            "PF26",
+            "PF27",
+            "PF28",
+            "PF29",
+            "PF30"
+            "480p",
+            "4K",
+            "720p",
+            "ANIMAZIONE",
+            # "APR",
+            # "AVVENTURA",
+            "BIOGRAFICO",
+            "BDRip",
+            "BluRay",
+            "CINEMA",
+            # "COMMEDIA",
+            "DOCUMENTARIO",
+            "DRAMMATICO",
+            "FANTASCIENZA",
+            "FANTASY",
+            # "FEB",
+            # "GEN",
+            # "GIU",
+            "HDCAM",
+            "HDTC",
+            "HDTS",
+            "LD",
+            "MAFIA",
+            # "MAG",
+            "MARVEL",
+            "MD",
+            # "ORROR",
+            "NEW_AUDIO",
+            "POLIZ",
+            "R3",
+            "R6",
+            "SD",
+            "SENTIMENTALE",
+            "TC",
+            "TEEN",
+            "TELECINE",
+            "TELESYNC",
+            "THRILLER",
+            "Uncensored",
+            "V2",
+            "WEBDL",
+            "WEBRip",
+            "WEB",
+            "WESTERN",
+            "-",
+            "_",
+            ".",
+            "+",
+            "[",
+            "]", ]
 
-    myreplace = text#.lower()
+    myreplace = text  #.lower()
     for ch in char:  #.lower():
-        # ch= ch #.lower()
+        # ch = ch  #.lower()
         if text == ch:
             myreplace = text.replace(ch, "").replace("  ", " ").replace("   ", " ").strip()
-    print('myreplace: ',myreplace)
+    print('myreplace: ', myreplace)
     return myreplace
+
 
 def clean_html(html):
     """Clean an HTML snippet into a readable string"""
@@ -1183,57 +1234,57 @@ def clean_html(html):
     # Strip html tags
     html = re.sub('<.*?>', '', html)
     # Replace html entities
-    html = saxutils.unescape(html)  #and for py3 ?
+    html = saxutils.unescape(html)  # and for py3 ?
     if strType == 'utf-8':
         html = html.encode("utf-8")
     return html.strip()
-#######################################
+
 
 def addstreamboq(bouquetname=None):
-           boqfile="/etc/enigma2/bouquets.tv"
-           if not os.path.exists(boqfile):
-              pass
-           else:
-              fp=open(boqfile,"r")
-              lines=fp.readlines()
-              fp.close()
-              add=True
-              for line in lines:
-                 if "userbouquet."+bouquetname+".tv" in line :
-                    add=False
-                    break
-           if add==True:
-              fp=open(boqfile,"a")
-              fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n'% bouquetname)
-              fp.close()
-              add=True
+    boqfile = "/etc/enigma2/bouquets.tv"
+    if not os.path.exists(boqfile):
+        pass
+    else:
+        fp = open(boqfile, "r")
+        lines = fp.readlines()
+        fp.close()
+        add = True
+        for line in lines:
+            if "userbouquet." + bouquetname+".tv" in line:
+                add = False
+                break
+            if add is True:
+                fp = open(boqfile, "a")
+                fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' % bouquetname)
+                fp.close()
+                add = True
 
-def stream2bouquet(url=None,name=None,bouquetname=None):
-          error='none'
-          bouquetname='XBMCAddons'
-          fileName ="/etc/enigma2/userbouquet.%s.tv" % bouquetname
-          out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
+def stream2bouquet(url=None, name=None, bouquetname=None):
+    error = 'none'
+    bouquetname = 'XBMCAddons'
+    fileName = "/etc/enigma2/userbouquet.%s.tv" % bouquetname
+    out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
 
-          try:
-              addstreamboq(bouquetname)
-              if not os.path.exists(fileName):
-                 fp = open(fileName, 'w')
-                 fp.write("#NAME %s\n"%bouquetname)
-                 fp.close()
-                 fp = open(fileName, 'a')
-                 fp.write(out)
-              else:
-                 fp=open(fileName,'r')
-                 lines=fp.readlines()
-                 fp.close()
-                 for line in lines:
-                     if out in line:
-                        error=(_('Stream already added to bouquet'))
-                        return error
-                 fp = open(fileName, 'a')
-                 fp.write(out)
-              fp.write("")
-              fp.close()
-          except:
-             error=(_('Adding to bouquet failed'))
-          return error
+    try:
+        addstreamboq(bouquetname)
+        if not os.path.exists(fileName):
+            fp = open(fileName, 'w')
+            fp.write("#NAME %s\n" % bouquetname)
+            fp.close()
+            fp = open(fileName, 'a')
+            fp.write(out)
+        else:
+            fp = open(fileName, 'r')
+            lines = fp.readlines()
+            fp.close()
+            for line in lines:
+                if out in line:
+                    error = (_('Stream already added to bouquet'))
+                    return error
+                fp = open(fileName, 'a')
+                fp.write(out)
+            fp.write("")
+            fp.close()
+    except:
+        error = (_('Adding to bouquet failed'))
+    return error
