@@ -10,7 +10,6 @@
 from __future__ import print_function
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
-from Components.config import *
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
@@ -19,23 +18,19 @@ from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBar import InfoBar
 from Screens.InfoBar import MoviePlayer
-from Screens.InfoBarGenerics import InfoBarShowHide, InfoBarSubtitleSupport, InfoBarSummarySupport, \
-     InfoBarNumberZap, InfoBarMenu, InfoBarEPG, InfoBarSeek, InfoBarMoviePlayerSummarySupport, \
-     InfoBarAudioSelection, InfoBarNotifications, InfoBarServiceNotifications
+from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.BoundFunction import boundFunction
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Screens.VirtualKeyBoard import VirtualKeyBoard
-from Tools.LoadPixmap import LoadPixmap
 from enigma import RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad
 from enigma import iServiceInformation
-from enigma import eTimer, eListbox
+from enigma import eTimer
 from enigma import eServiceReference
 from enigma import loadPNG, gFont
 from enigma import iPlayableService
@@ -56,11 +51,6 @@ if PY3:
 else:
     from urllib2 import Request
     from urllib2 import urlopen
-
-try:
-    from http.client import HTTPConnection, CannotSendRequest, HTTPException
-except:
-    from httplib import HTTPConnection, CannotSendRequest, HTTPException
 
 global skin_path, search, downloadm3u
 currversion = '2.7'
@@ -599,7 +589,6 @@ class main2(Screen):
                     # regexcat = 'alias="(.+?)".*?<code>(.+?)</code'
                     regexcat = '<tr><td>      (.+?)</td><td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
                     items.append(item)
                     for name, url in match:
@@ -1233,11 +1222,9 @@ class Playstream2(
         self.session = session
         _session = session
         self.skinName = 'MoviePlayer'
-        title = name
         streaml = False
         # self.allowPiP = False
         self.service = None
-        service = None
         self.url = url
         # self.pcip = 'None'
         self.name = Utils.decodeHtml(name)
@@ -1317,11 +1304,13 @@ class Playstream2(
         self.setAspect(temp)
 
     def showinfo(self):
-        # debug = True
+        sref = self.srefInit
+        p = ServiceReference(sref)
+        servicename = str(p.getServiceName())
+        serviceurl = str(p.getPath())
         sTitle = ''
         sServiceref = ''
         try:
-            servicename, serviceurl = getserviceinfo(sref)
             if servicename is not None:
                 sTitle = servicename
             else:

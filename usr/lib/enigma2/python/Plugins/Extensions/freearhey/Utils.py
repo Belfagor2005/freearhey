@@ -86,6 +86,7 @@ def DreamOS():
 
 
 def mySkin():
+    from Components.config import config
     currentSkin = config.skin.primary_skin.value.replace('/skin.xml', '')
     return currentSkin
 
@@ -252,7 +253,7 @@ def getserviceinfo(sref):  # this def returns the current playing service name a
         serviceurl = str(p.getPath())
         return servicename, serviceurl
     except:
-        return None,None
+        return None, None
 
 
 def sortedDictKeys(adict):
@@ -273,7 +274,7 @@ CountConnOk = 0
 def zCheckInternet(opt=1, server=None, port=None):  # opt=5 custom server and port.
     global CountConnOk
     sock = False
-    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.github.com/iptv-org/iptv", 80), ("www.github.com/iptv-org/", 443), ("www.google.com", 443)]
+    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
     if opt < 5:
         srv = checklist[opt]
     else:
@@ -1258,6 +1259,7 @@ def addstreamboq(bouquetname=None):
                 fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' % bouquetname)
                 fp.close()
                 add = True
+
 
 def stream2bouquet(url=None, name=None, bouquetname=None):
     error = 'none'
