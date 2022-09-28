@@ -16,7 +16,6 @@ from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
-from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
@@ -29,7 +28,6 @@ from enigma import RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad
-from enigma import iServiceInformation
 from enigma import eTimer
 from enigma import eServiceReference
 from enigma import loadPNG, gFont
@@ -41,6 +39,7 @@ from . import Utils
 PY3 = sys.version_info.major >= 3
 print('Py3: ', PY3)
 
+
 if PY3:
     from urllib.request import urlopen
     from urllib.request import Request
@@ -51,6 +50,7 @@ if PY3:
 else:
     from urllib2 import Request
     from urllib2 import urlopen
+
 
 global skin_path, search, downloadm3u
 currversion = '2.7'
@@ -194,7 +194,6 @@ def show_(name, link):
 
 def FreeListEntry(name, png):
     res = [name]
-    # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
     if 'travel' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
     elif 'webcam' in name.lower():
@@ -320,7 +319,6 @@ class freearhey(Screen):
         self['name'] = Label('')
         self['text'] = Label('')
         self["paypal"] = Label()
-        # self['poster'] = Pixmap()
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
@@ -328,20 +326,19 @@ class freearhey(Screen):
         self.loading_ok = False
         self.count = 0
         self.loading = 0
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'DirectionActions',
                                      'MovieSelectionActions'], {'up': self.up,
-                                     'down': self.down,
-                                     'left': self.left,
-                                     'right': self.right,
-                                     'ok': self.ok,
-                                     'green': self.ok,
-                                     'cancel': self.exit,
-                                     'red': self.exit}, -1)
+                                                                'down': self.down,
+                                                                'left': self.left,
+                                                                'right': self.right,
+                                                                'ok': self.ok,
+                                                                'green': self.ok,
+                                                                'cancel': self.exit,
+                                                                'red': self.exit}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
-        # self.onFirstExecBegin.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
     def paypal2(self):
@@ -353,7 +350,6 @@ class freearhey(Screen):
     def layoutFinished(self):
         paypal = self.paypal2()
         self["paypal"].setText(paypal)
-        # self.setTitle(self.setup_title)
 
     def updateMenuList(self):
         self.menu_list = []
@@ -378,10 +374,7 @@ class freearhey(Screen):
         global namex, lnk
         namex = ''
         lnk = Utils.b64decoder(host11)
-        # if six.PY3:
-            # url = six.ensure_str(lnk)
         sel = self.menu_list[idx]
-        # sel = self['menulist'].getCurrent()[0][0]
         if sel == ("PLAYLISTS DIRECT"):
             namex = "Directy"
             lnk = Utils.b64decoder(host22)
@@ -406,8 +399,6 @@ class freearhey(Screen):
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
                 lnk = Utils.b64decoder(host00)
-                # if six.PY3:
-                    # url = six.ensure_str(lnk)
                 self.adultonly(namex, lnk)
 
     def adultonly(self, namex, lnk):
@@ -424,31 +415,26 @@ class freearhey(Screen):
         auswahl = self['menulist'].getCurrent()[0]  # [0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0]  # [0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0]  # [0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0]  # [0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def exit(self):
-        # Utils.deletetmp()
         self.close()
 
 
@@ -471,7 +457,7 @@ class main2(Screen):
         self.loading = 0
         self.name = namex
         self.url = lnk
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
         self['red'] = Label(_('Back'))
@@ -481,19 +467,17 @@ class main2(Screen):
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['text'] = Label('')
-        # self['poster'] = Pixmap()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'DirectionActions',
                                      'MovieSelectionActions'], {'up': self.up,
-                                     'down': self.down,
-                                     'left': self.left,
-                                     'right': self.right,
-                                     'ok': self.ok,
-                                     'green': self.message2,
-                                     'cancel': self.close,
-                                     'red': self.close}, -1)
-        # self.onLayoutFinish.append(self.updateMenuList)
+                                                                'down': self.down,
+                                                                'left': self.left,
+                                                                'right': self.right,
+                                                                'ok': self.ok,
+                                                                'green': self.message2,
+                                                                'cancel': self.close,
+                                                                'red': self.close}, -1)
         self.timer = eTimer()
         if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.updateMenuList)
@@ -533,9 +517,6 @@ class main2(Screen):
                         content = content.decode("utf-8")
                     except Exception as e:
                         print("Error: %s." % str(e))
-                # content = ReadUrl(self.url)
-                # if six.PY3:
-                    # content = six.ensure_str(content)
                 n1 = content.find('left">Category', 0)
                 n2 = content.find('left">Language', n1)
                 n3 = content.find('left">Country', n2)
@@ -543,10 +524,8 @@ class main2(Screen):
                 n5 = content.find("</tbody>", n4)
                 if "Category" in self.name:
                     content2 = content[n1:n2]
-                    # <tr><td>Auto</td><td align="right">12</td><td nowrap=""><code>https://iptv-org.github.io/iptv/categories/auto.m3u</code></td></tr>
                     regexcat = '<tr><td>(.+?)<.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
                     items.append(item)
                     for name, url in match:
@@ -554,7 +533,6 @@ class main2(Screen):
                             continue
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
-                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
                         item = name + "###" + url
@@ -566,7 +544,6 @@ class main2(Screen):
                     # <tr><td align="left">Albanian</td><td align="right">38</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/languages/sqi.m3u</code></td></tr>
                     regexcat = 'align="left">(.+?)</td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    pic = " "
                     item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
                     items.append(item)
                     for name, url in match:
@@ -574,7 +551,6 @@ class main2(Screen):
                             continue
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
-                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
                             continue
                         name = name.replace('%20', ' ')  # .replace('<g-emoji class="g-emoji" alias="','').replace('      ', '').replace('%20', ' ')
                         item = name + "###" + url
@@ -584,9 +560,6 @@ class main2(Screen):
                 elif "Country" in self.name:
                     content2 = content[n3:n4]
                     print('content2: ', content2)
-                    # <tr><td><g-emoji class="g-emoji" alias="afghanistan" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f1e6-1f1eb.png">🇦🇫</g-emoji> Afghanistan</td><td align="right">70</td><td nowrap=""><code>https://iptv-org.github.io/iptv/countries/af.m3u</code></td></tr>
-                    # <tr><td>      Buenos Aires</td><td align="right">12</td><td nowrap=""><code>https://iptv-org.github.io/iptv/subdivisions/ar-b.m3u</code></td></tr>
-                    # regexcat = 'alias="(.+?)".*?<code>(.+?)</code'
                     regexcat = '<tr><td>      (.+?)</td><td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
@@ -596,7 +569,6 @@ class main2(Screen):
                             continue
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
-                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
                         item = name + "###" + url
@@ -611,7 +583,6 @@ class main2(Screen):
                             continue
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
-                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
                         item = name + "###" + url
@@ -630,7 +601,6 @@ class main2(Screen):
                             continue
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
-                        # if ("xxx" or "adult" or "Adult" or "Xxx" or "XXX") in name.lower():
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
                         item = name + "###" + url
@@ -640,17 +610,6 @@ class main2(Screen):
                 for item in items:
                     name = item.split("###")[0]
                     url = item.split("###")[1]
-                # match = re.compile(regexcat, re.DOTALL).findall(content2)
-                # pic = " "
-                # for name, url in match:
-                    # if "xxx" in name.lower():
-                        # continue
-                    # if "adult" in name.lower():
-                        # continue
-                    # if "XXX" in name.lower():
-                        # continue
-                    # if "Adult" in name.lower():
-                        # continue
                     name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                     self['menulist'].l.setList(self.menu_list)
@@ -678,25 +637,21 @@ class main2(Screen):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def message2(self):
         name = self['menulist'].l.getCurrentSelection()[0][0]
@@ -709,7 +664,6 @@ class main2(Screen):
             name = self['menulist'].l.getCurrentSelection()[0][0]
             url = self['menulist'].getCurrent()[0][1]
             url = str(url)
-            # print('url convert: ', url)
             self.convert_bouquet(url, name)
 
     def convert_bouquet(self, url, name):
@@ -731,9 +685,6 @@ class main2(Screen):
                     content = content.decode("utf-8")
                 except Exception as e:
                     print("Error: %s." % str(e))
-            # content = ReadUrl(url)
-            # if six.PY3:
-                # content = six.ensure_str(content)
             if os.path.exists(downloadm3u):
                 xxxname = downloadm3u + name + '.m3u'
             else:
@@ -749,8 +700,6 @@ class main2(Screen):
                 bouquet = 'bouquets.tv'
                 desk_tmp = ''
                 in_bouquets = 0
-                # if os.path.isfile('/etc/enigma2/%s' % bqtname):
-                    # os.remove('/etc/enigma2/%s' % bqtname)
                 with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
                     outfile.write('#NAME %s\r\n' % name.capitalize())
                     for line in open(xxxname):
@@ -803,30 +752,27 @@ class selectplay(Screen):
         self.picload = ePicLoad()
         self.picfile = ''
         self.currentList = 'menulist'
-        self.oldService = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
         self['red'] = Label(_('Exit'))
-        # self['green'] = Label('')
-        # if 'Directy' in self.name:
         self['green'] = Label(_('Search'))
         self['title'] = Label("Thank's Freearhey")
         self['category'] = Label('')
         self['category'].setText(namex)
         self['name'] = Label('')
         self['text'] = Label('')
-        # self['poster'] = Pixmap()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'DirectionActions',
                                      'MovieSelectionActions'], {'up': self.up,
-                                     'down': self.down,
-                                     'left': self.left,
-                                     'right': self.right,
-                                     'ok': self.ok,
-                                     'green': self.search_text,
-                                     'cancel': self.returnback,
-                                     'red': self.returnback}, -1)
+                                                                'down': self.down,
+                                                                'left': self.left,
+                                                                'right': self.right,
+                                                                'ok': self.ok,
+                                                                'green': self.search_text,
+                                                                'cancel': self.returnback,
+                                                                'red': self.returnback}, -1)
 
         if self.name == 'moviexxx':
             self.onLayoutFinish.append(self.updateMenuListx)
@@ -843,7 +789,6 @@ class selectplay(Screen):
     def layoutFinished(self):
         paypal = self.paypal2()
         self["paypal"].setText(paypal)
-        # self.setTitle(self.setup_title)
 
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -857,7 +802,6 @@ class selectplay(Screen):
                 self.menu_list = []
                 print('callback: ', result)
                 if result is not None and len(result):
-                    # content = ReadUrl(self.url)
                     if sys.version_info.major == 3:
                         import urllib.request as urllib2
                     elif sys.version_info.major == 2:
@@ -873,14 +817,9 @@ class selectplay(Screen):
                             content = content.decode("utf-8")
                         except Exception as e:
                             print("Error: %s." % str(e))
-                    # if six.PY3:
-                        # content = content.decode("utf-8")
-                    # if six.PY3:
-                        # content = six.ensure_str(self.url)
                     print("In showContent content =", content)
                     # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
                     regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
-                    # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                     match = re.compile(regexcat, re.DOTALL).findall(content)
                     print("In showContent match =", match)
                     for country, name, url in match:
@@ -892,12 +831,8 @@ class selectplay(Screen):
                             url = url.replace('\r', '')
                             name = name.replace('\r', '')
                             name = country + ' | ' + name
-                            # print("In showContent name =", name)
-                            # print("In showContent url =", url)
                             self.menu_list.append(show_(name, url))
                         self['menulist'].l.setList(self.menu_list)
-                        # self['menulist'].l.setItemHeight(40)
-                        # self['menulist'].moveToIndex(0)
                     auswahl = self['menulist'].getCurrent()[0][0]
                     self['name'].setText(str(auswahl))
                     self['text'].setText('')
@@ -915,12 +850,10 @@ class selectplay(Screen):
         if search is True:
             search = False
             del self.menu_list
-            print('sono di la')
             self.updateMenuList()
         else:
             search = False
             del self.menu_list
-            print('sono di qua')
             self.close()
 
     def resetSearch(self):
@@ -949,21 +882,9 @@ class selectplay(Screen):
                         content = content.decode("utf-8")
                     except Exception as e:
                         print("Error: %s." % str(e))
-                # content = ReadUrl(self.url)
-                # if six.PY3:
-                    # content = content.decode("utf-8")
-                # if six.PY3:
-                    # content = six.ensure_str(self.url)
-                # print("content A =", content)
-                # #EXTINF:-1 tvg-id="" tvg-country="" tvg-language="" tvg-logo="" group-title="",21 Macedonia
-                # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-
-                # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
-                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
                 print("In showContent match =", match)
-                # n1 = 0
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
@@ -975,7 +896,6 @@ class selectplay(Screen):
                     print("In showContent name =", name)
                     print("In showContent url =", url)
                     item = name + "###" + url
-                    # print('freearhey Items sort: ', item)
                     items.append(item)
                 items.sort()
                 for item in items:
@@ -1015,28 +935,14 @@ class selectplay(Screen):
                         content = content.decode("utf-8")
                     except Exception as e:
                         print("Error: %s." % str(e))
-
-                # content = ReadUrl(self.url)
-                # if six.PY3:
-                    # content = six.ensure_str(content)
-                # if six.PY3:
-                    # content = content.decode("utf-8")
                 print("content A =", content)
-                # regexcat = 'EXTINF.*?,(.+?)\\n(.+?)\\n'
-
-                # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
-                # regexcat = '#EXTINF.*?,(.+?)\\n(.+?)\\n'
-
                 match = re.compile(regexcat, re.DOTALL).findall(content)
                 print("In showContent match =", match)
                 # n1 = 0
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
-                    # n1 = n1+1
-                    # if n1 > 50:
-                        # break
                     url = url.replace(" ", "")
                     url = url.replace("\\n", "")
                     url = url.replace('\r', '')
@@ -1045,7 +951,6 @@ class selectplay(Screen):
                     print("In showContent name =", name)
                     print("In showContent url =", url)
                     item = name + "###" + url
-                    # print('freearhey Items sort: ', item)
                     items.append(item)
                 items.sort()
                 for item in items:
@@ -1054,9 +959,6 @@ class selectplay(Screen):
                     name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
-                # self['menulist'].l.setItemHeight(40)
-                # self['menulist'].moveToIndex(0)
-                # if n1 == 0: return
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
                 self['text'].setText('')
@@ -1086,25 +988,21 @@ class selectplay(Screen):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-        # self.load_poster()
 
 
 class TvInfoBarShowHide():
@@ -1199,15 +1097,15 @@ class TvInfoBarShowHide():
 
 
 class Playstream2(
-    InfoBarBase,
-    InfoBarMenu,
-    InfoBarSeek,
-    InfoBarAudioSelection,
-    InfoBarSubtitleSupport,
-    InfoBarNotifications,
-    TvInfoBarShowHide,
-    Screen
-):
+                  InfoBarBase,
+                  InfoBarMenu,
+                  InfoBarSeek,
+                  InfoBarAudioSelection,
+                  InfoBarSubtitleSupport,
+                  InfoBarNotifications,
+                  TvInfoBarShowHide,
+                  Screen
+                  ):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -1223,10 +1121,8 @@ class Playstream2(
         _session = session
         self.skinName = 'MoviePlayer'
         streaml = False
-        # self.allowPiP = False
         self.service = None
         self.url = url
-        # self.pcip = 'None'
         self.name = Utils.decodeHtml(name)
         self.state = self.STATE_PLAYING
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -1253,14 +1149,13 @@ class Playstream2(
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
-                                     'epg': self.showIMDB,
-                                     'info': self.showinfo,
-                                     # 'info': self.cicleStreamType,
-                                     'tv': self.cicleStreamType,
-                                     'stop': self.leavePlayer,
-                                     'cancel': self.cancel,
-                                     'back': self.cancel}, -1)
-        # self.onLayoutFinish.append(self.cicleStreamType)
+                                                             'epg': self.showIMDB,
+                                                             'info': self.showIMDB,
+                                                             # 'info': self.cicleStreamType,
+                                                             'tv': self.cicleStreamType,
+                                                             'stop': self.leavePlayer,
+                                                             'cancel': self.cancel,
+                                                             'back': self.cancel}, -1)
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
@@ -1303,50 +1198,27 @@ class Playstream2(
         self.new_aspect = temp
         self.setAspect(temp)
 
-    def showinfo(self):
-        sref = self.srefInit
-        p = ServiceReference(sref)
-        servicename = str(p.getServiceName())
-        serviceurl = str(p.getPath())
-        sTitle = ''
-        sServiceref = ''
-        try:
-            if servicename is not None:
-                sTitle = servicename
-            else:
-                sTitle = ''
-            if serviceurl is not None:
-                sServiceref = serviceurl
-            else:
-                sServiceref = ''
-            currPlay = self.session.nav.getCurrentService()
-            sTagCodec = currPlay.info().getInfoString(iServiceInformation.sTagCodec)
-            sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
-            sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
-            message = 'stitle:' + str(sTitle) + '\n' + 'sServiceref:' + str(sServiceref) + '\n' + 'sTagCodec:' + str(sTagCodec) + '\n' + 'sTagVideoCodec: ' + str(sTagVideoCodec) + '\n' + 'sTagAudioCodec :' + str(sTagAudioCodec)
-            self.mbox = self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
-        except:
-            pass
-
-        return
-
     def showIMDB(self):
-        TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
-        IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
-        if os.path.exists(TMDB):
-            from Plugins.Extensions.TMBD.plugin import TMBD
-            text_clear = self.name
-            text = Utils.charRemove(text_clear)
-            self.session.open(TMBD, text, False)
-        elif os.path.exists(IMDb):
-            from Plugins.Extensions.IMDb.plugin import IMDB
-            text_clear = self.name
-            text = Utils.charRemove(text_clear)
-            self.session.open(IMDB, text)
+        text_clear = self.name
+        if Utils.is_tmdb:
+            try:
+                from Plugins.Extensions.TMBD.plugin import TMBD
+                text = Utils.badcar(text_clear)
+                text = Utils.charRemove(text_clear)
+                _session.open(TMBD.tmdbScreen, text, 0)
+            except Exception as ex:
+                print("[XCF] Tmdb: ", str(ex))
+        elif Utils.is_imdb:
+            try:
+                from Plugins.Extensions.IMDb.plugin import main as imdb
+                text = Utils.badcar(text_clear)
+                text = Utils.charRemove(text_clear)
+                imdb(_session, text)
+                # _session.open(imdb, text)
+            except Exception as ex:
+                print("[XCF] imdb: ", str(ex))
         else:
-            # text_clear = self.name
-            # self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
-            self.showinfo()
+            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
 
     def slinkPlay(self, url):
         name = self.name
@@ -1383,9 +1255,6 @@ class Playstream2(
                 self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
-        # if "youtube" in str(self.url):
-            # self.mbox = self.session.open(MessageBox, _('For Stream Youtube coming soon!'), MessageBox.TYPE_INFO, timeout=5)
-            # return
         if Utils.isStreamlinkAvailable():
             streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
             streaml = True
@@ -1432,9 +1301,6 @@ class Playstream2(
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
         self.session.nav.playService(self.srefInit)
-        # if self.pcip != 'None':
-            # url2 = 'http://' + self.pcip + ':8080/requests/status.xml?command=pl_stop'
-            # resp = urlopen(url2)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
