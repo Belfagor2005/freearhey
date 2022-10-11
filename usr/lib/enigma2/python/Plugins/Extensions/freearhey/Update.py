@@ -3,12 +3,12 @@
 
 import os
 import sys
-from twisted.web.client import downloadPage
 PY3 = sys.version_info.major >= 3
 print("Update.py")
 
 
 def upd_done():
+    from twisted.web.client import downloadPage
     print("In upd_done")
     xfile = 'http://patbuweb.com/freearhey/freearhey.tar'
     if PY3:
@@ -28,10 +28,10 @@ def upd_done():
 
 
 def upd_last(fplug):
+    import os
     import time
     time.sleep(5)
     if os.path.isfile('/tmp/freearhey.tar') and os.stat('/tmp/freearhey.tar').st_size > 1000:
-        import os
         cmd = "tar -xvf /tmp/freearhey.tar -C /"
         print("cmd A =", cmd)
         os.system(cmd)
