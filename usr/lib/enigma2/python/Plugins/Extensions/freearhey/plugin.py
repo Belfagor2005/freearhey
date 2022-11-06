@@ -59,6 +59,7 @@ desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currver
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
 res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
 search = False
+_firstStartfh = True
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
@@ -93,8 +94,7 @@ class free2list(MenuList):
             self.l.setFont(0, gFont('Regular', textfont))
 
 
-def show_(name, link):
-    res = [(name, link)]
+def pngassign(name):
     if 'travel' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
     elif 'webcam' in name.lower():
@@ -117,6 +117,8 @@ def show_(name, link):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'deluxe' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif 'family' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
     elif 'djing' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'fashion' in name.lower():
@@ -183,6 +185,12 @@ def show_(name, link):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+    return png
+
+
+def show_(name, link):
+    res = [(name, link)]
+    png = pngassign(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -194,95 +202,7 @@ def show_(name, link):
 
 def FreeListEntry(name, png):
     res = [name]
-    if 'travel' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
-    elif 'webcam' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
-    elif 'music' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'spor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'adult' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif 'weather' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
-    elif 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
-    elif 'adult' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif 'xxx' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif 'mtv' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'deluxe' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'djing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'fashion' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'kiss' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'sluhay' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'stingray' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'techno' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'viva' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'country' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'vevo' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'spor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'boxing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'racing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'fight' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'golf' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'knock' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'harley' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'futbool' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'motor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'nba' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'nfl' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'bull' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'poker' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'billiar' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'fite' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'relax' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
-    elif 'nature' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
-    elif 'escape' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
-    elif 'movie' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
-    elif 'pluto' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
-    elif 'tvplus' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
-    elif 'religious' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
-    elif 'shop' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
-    else:
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-
+    png = pngassign(name)
     if Utils.isFHD():
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
@@ -290,6 +210,31 @@ def FreeListEntry(name, png):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
+
+def returnIMDB(text_clear):
+    TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+    IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    if TMDB:
+        try:
+            from Plugins.Extensions.TMBD.plugin import TMBD
+            text = decodeHtml(text_clear)
+            _session.open(TMBD.tmdbScreen, text, 0)
+        except Exception as ex:
+            print("[XCF] Tmdb: ", str(ex))
+        return True
+    elif IMDb:
+        try:
+            from Plugins.Extensions.IMDb.plugin import main as imdb
+            text = decodeHtml(text_clear)
+            imdb(_session, text)
+        except Exception as ex:
+            print("[XCF] imdb: ", str(ex))
+        return True
+    else:
+        text_clear = decodeHtml(text_clear)
+        _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        return True
+    return
 
 
 Panel_list = [
@@ -310,6 +255,8 @@ class freearhey(Screen):
             self.skin = f.read()
         f.close()
         Screen.__init__(self, session)
+        global _session
+        _session = session
         self.setTitle("Thank's Freearhey")
         self['menulist'] = free2list([])
         self['red'] = Label(_('Exit'))
@@ -1200,25 +1147,8 @@ class Playstream2(
 
     def showIMDB(self):
         text_clear = self.name
-        if Utils.is_tmdb:
-            try:
-                from Plugins.Extensions.TMBD.plugin import TMBD
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                _session.open(TMBD.tmdbScreen, text, 0)
-            except Exception as ex:
-                print("[XCF] Tmdb: ", str(ex))
-        elif Utils.is_imdb:
-            try:
-                from Plugins.Extensions.IMDb.plugin import main as imdb
-                text = Utils.badcar(text_clear)
-                text = Utils.charRemove(text_clear)
-                imdb(_session, text)
-                # _session.open(imdb, text)
-            except Exception as ex:
-                print("[XCF] imdb: ", str(ex))
-        else:
-            self.session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        if returnIMDB(text_clear):
+            print('show imdb/tmdb')
 
     def slinkPlay(self, url):
         name = self.name
@@ -1313,27 +1243,49 @@ class Playstream2(
         self.close()
 
 
+class AutoStartTimerFh:
+
+    def __init__(self, session):
+        self.session = session
+        global _firstStartfh
+        print("*** running AutoStartTimerFh ***")
+        if _firstStartfh:
+            self.runUpdate()
+
+    def runUpdate(self):
+        print("*** running update ***")
+        try:
+            from . import Update
+            Update.upd_done()
+            _firstStartfh = False
+        except Exception as e:
+            print('error Fxy', str(e))
+
+
+def autostart(reason, session=None, **kwargs):
+    print("*** running autostart ***")
+    global autoStartTimerFh
+    global _firstStartfh
+    if reason == 0:
+        if session is not None:
+            _firstStartfh = True
+            autoStartTimerFh = AutoStartTimerFh(session)
+    return
+
+
 def main(session, **kwargs):
     try:
-        if Utils.zCheckInternet(0):
-            try:
-                from . import Update
-                Update.upd_done()
-            except Exception as e:
-                print('error ', str(e))
-            session.open(freearhey)
-        else:
-            from Screens.MessageBox import MessageBox
-            from Tools.Notifications import AddPopup
-            AddPopup(_("Sorry but No Internet :("), MessageBox.TYPE_INFO, 10, 'Sorry')
+        session.open(freearhey)
     except:
         import traceback
         traceback.print_exc
 
 
 def Plugins(**kwargs):
-    icona = 'plugin.png'
-    extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], icon=icona, fnc=main)
-    result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=icona, fnc=main)]
-    result.append(extDescriptor)
+    ico_path = 'plugin.png'
+    # extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], icon=ico_path, fnc=main)
+    result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
+              PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    # result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_PLUGINMENU], icon=ico_path, fnc=main)]
+    # result.append(extDescriptor)
     return result
