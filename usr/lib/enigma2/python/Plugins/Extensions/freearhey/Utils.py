@@ -274,7 +274,7 @@ CountConnOk = 0
 def zCheckInternet(opt=1, server=None, port=None):  # opt=5 custom server and port.
     global CountConnOk
     sock = False
-    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
+    checklist = [("8.8.4.4", 53), ("8.8.8.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
     if opt < 5:
         srv = checklist[opt]
     else:

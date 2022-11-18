@@ -211,13 +211,14 @@ def FreeListEntry(name, png):
         res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
+
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
     if TMDB:
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as ex:
             print("[XCF] Tmdb: ", str(ex))
@@ -225,13 +226,13 @@ def returnIMDB(text_clear):
     elif IMDb:
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = decodeHtml(text_clear)
+            text = Utils.decodeHtml(text_clear)
             imdb(_session, text)
         except Exception as ex:
             print("[XCF] imdb: ", str(ex))
         return True
     else:
-        text_clear = decodeHtml(text_clear)
+        text_clear = Utils.decodeHtml(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
