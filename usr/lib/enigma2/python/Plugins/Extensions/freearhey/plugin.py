@@ -277,15 +277,14 @@ class freearhey(Screen):
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'DirectionActions',
-                                     'MovieSelectionActions'], {'up': self.up,
-                                                                'down': self.down,
-                                                                'left': self.left,
-                                                                'right': self.right,
-                                                                'ok': self.ok,
-                                                                'green': self.ok,
-                                                                'cancel': self.exit,
-                                                                'red': self.exit}, -1)
+                                     'DirectionActions'], {'up': self.up,
+                                                           'down': self.down,
+                                                           'left': self.left,
+                                                           'right': self.right,
+                                                           'ok': self.ok,
+                                                           'green': self.ok,
+                                                           'cancel': self.exit,
+                                                           'red': self.exit}, -1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
@@ -417,15 +416,14 @@ class main2(Screen):
         self['text'] = Label('')
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'DirectionActions',
-                                     'MovieSelectionActions'], {'up': self.up,
-                                                                'down': self.down,
-                                                                'left': self.left,
-                                                                'right': self.right,
-                                                                'ok': self.ok,
-                                                                'green': self.message2,
-                                                                'cancel': self.close,
-                                                                'red': self.close}, -1)
+                                     'DirectionActions'], {'up': self.up,
+                                                           'down': self.down,
+                                                           'left': self.left,
+                                                           'right': self.right,
+                                                           'ok': self.ok,
+                                                           'green': self.message2,
+                                                           'cancel': self.close,
+                                                           'red': self.close}, -1)
         self.timer = eTimer()
         if Utils.DreamOS():
             self.timer_conn = self.timer.timeout.connect(self.updateMenuList)
@@ -712,15 +710,14 @@ class selectplay(Screen):
         self['text'] = Label('')
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'DirectionActions',
-                                     'MovieSelectionActions'], {'up': self.up,
-                                                                'down': self.down,
-                                                                'left': self.left,
-                                                                'right': self.right,
-                                                                'ok': self.ok,
-                                                                'green': self.search_text,
-                                                                'cancel': self.returnback,
-                                                                'red': self.returnback}, -1)
+                                     'DirectionActions'], {'up': self.up,
+                                                           'down': self.down,
+                                                           'left': self.left,
+                                                           'right': self.right,
+                                                           'ok': self.ok,
+                                                           'green': self.search_text,
+                                                           'cancel': self.returnback,
+                                                           'red': self.returnback}, -1)
 
         if self.name == 'moviexxx':
             self.onLayoutFinish.append(self.updateMenuListx)
@@ -1092,7 +1089,6 @@ class Playstream2(
                                      'MediaPlayerActions',
                                      'EPGSelectActions',
                                      'MediaPlayerSeekActions',
-                                     'SetupActions',
                                      'ColorActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
