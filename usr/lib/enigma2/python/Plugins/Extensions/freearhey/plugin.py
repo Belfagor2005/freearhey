@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 22/09/2022
+# 02/12/2022
 # ######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
 #   This is free software; you can redistribute it and/or modify it.   #
@@ -59,8 +59,8 @@ name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
 res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
-search = False
 _firstStartfh = True
+search = False
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
@@ -193,10 +193,10 @@ def show_(name, link):
     res = [(name, link)]
     png = pngassign(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
@@ -205,10 +205,10 @@ def FreeListEntry(name, png):
     res = [name]
     png = pngassign(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(50, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
@@ -261,12 +261,11 @@ class freearhey(Screen):
         _session = session
         self.setTitle("Thank's Freearhey")
         self['menulist'] = free2list([])
-        self['red'] = Label(_('Exit'))
-        self['green'] = Label('Select')
+        self['key_red'] = Label(_('Exit'))
+        self['key_green'] = Label('Select')
         self['category'] = Label("Plugins Channels Free by Lululla")
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
-        self['text'] = Label('')
         self["paypal"] = Label()
         self.picload = ePicLoad()
         self.picfile = ''
@@ -409,13 +408,12 @@ class main2(Screen):
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
-        self['red'] = Label(_('Back'))
-        self['green'] = Label(_('Export'))
+        self['key_red'] = Label(_('Back'))
+        self['key_green'] = Label(_('Export'))
         self['category'] = Label('')
         self['category'].setText(namex)
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
-        self['text'] = Label('')
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'ButtonSetupActions',
@@ -568,7 +566,6 @@ class main2(Screen):
                 print('auswahl: ', auswahl)
 
                 self['name'].setText(str(auswahl))
-                self['text'].setText('')
             except Exception as e:
                 print('error ', str(e))
         else:
@@ -704,13 +701,12 @@ class selectplay(Screen):
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
-        self['red'] = Label(_('Exit'))
-        self['green'] = Label(_('Search'))
+        self['key_red'] = Label(_('Exit'))
+        self['key_green'] = Label(_('Search'))
         self['title'] = Label("Thank's Freearhey")
         self['category'] = Label('')
         self['category'].setText(namex)
         self['name'] = Label('')
-        self['text'] = Label('')
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
                                      'ButtonSetupActions',
@@ -784,7 +780,6 @@ class selectplay(Screen):
                         self['menulist'].l.setList(self.menu_list)
                     auswahl = self['menulist'].getCurrent()[0][0]
                     self['name'].setText(str(auswahl))
-                    self['text'].setText('')
             except Exception as e:
                 print('error ', str(e))
             else:
@@ -857,7 +852,6 @@ class selectplay(Screen):
                 # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
-                self['text'].setText('')
             except Exception as e:
                 print('exception error II ', str(e))
         else:
@@ -910,8 +904,6 @@ class selectplay(Screen):
                 self['menulist'].l.setList(self.menu_list)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
-                self['text'].setText('')
-
             except Exception as e:
                 print('exception error ', str(e))
         else:
@@ -1101,6 +1093,8 @@ class Playstream2(
                                                              'epg': self.showIMDB,
                                                              'info': self.showIMDB,
                                                              # 'info': self.cicleStreamType,
+                                                             'exit': self.cancel,
+                                                             'leavePlayer': self.cancel,
                                                              'tv': self.cicleStreamType,
                                                              'stop': self.leavePlayer,
                                                              'cancel': self.cancel,
