@@ -1,0 +1,14 @@
+#!/bin/sh
+echo "***********************************"
+echo "***********************************"
+echo "  Please E2 Restart Is Required ..."
+echo "***********************************"
+echo "         .. freearhey..            "
+echo "***********************************"
+echo "*         by Lululla              *"
+echo "***********************************"
+echo "***********************************"
+echo "*     Installed Successfully      *"
+echo "*     Please Restart E2 Now       *"
+echo "***********************************"
+exit 0

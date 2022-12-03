@@ -8,29 +8,32 @@
 #   But no delete this message & support on forum linuxsat-support     #
 # ######################################################################
 from __future__ import print_function
+from . import _
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
+from Components.MultiContent import MultiContentEntryText
+from Components.MultiContent import MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection, InfoBarNotifications
+from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
+from Screens.InfoBarGenerics import InfoBarNotifications
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+from Tools.Directories import SCOPE_PLUGINS
+from Tools.Directories import resolveFilename
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from enigma import RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
-from enigma import ePicLoad
-from enigma import eTimer
+from enigma import ePicLoad, loadPNG, gFont
 from enigma import eServiceReference
-from enigma import loadPNG, gFont
+from enigma import eTimer
 from enigma import iPlayableService
 import os
 import re
@@ -43,18 +46,20 @@ print('Py3: ', PY3)
 
 if PY3:
     from urllib.request import urlopen
-    from urllib.request import Request
     unicode = str
     unichr = chr
     long = int
     PY3 = True
 else:
-    from urllib2 import Request
     from urllib2 import urlopen
 
+if sys.version_info.major == 3:
+    import urllib.request as urllib2
+elif sys.version_info.major == 2:
+    import urllib2
 
 global skin_path, search, downloadm3u
-currversion = '2.7'
+currversion = '2.8'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
@@ -449,10 +454,6 @@ class main2(Screen):
         items = []
         if Utils.check(self.url):
             try:
-                if sys.version_info.major == 3:
-                    import urllib.request as urllib2
-                elif sys.version_info.major == 2:
-                    import urllib2
                 req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
@@ -470,11 +471,11 @@ class main2(Screen):
                 n4 = content.find('left">Region', n3)
                 n5 = content.find("</tbody>", n4)
                 if "Category" in self.name:
+                    item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
+                    items.append(item)
                     content2 = content[n1:n2]
                     regexcat = '<tr><td>(.+?)<.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
-                    items.append(item)
                     for name, url in match:
                         if 'Channels' in name:
                             continue
@@ -486,13 +487,13 @@ class main2(Screen):
                         if item not in items:
                             items.append(item)
                 elif "Language" in self.name:
+                    item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
+                    items.append(item)
                     content2 = content[n2:n3]
                     print('content2: ', content2)
                     # <tr><td align="left">Albanian</td><td align="right">38</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/languages/sqi.m3u</code></td></tr>
                     regexcat = 'align="left">(.+?)</td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
-                    items.append(item)
                     for name, url in match:
                         if 'Channels' in name:
                             continue
@@ -505,12 +506,12 @@ class main2(Screen):
                             items.append(item)
 
                 elif "Country" in self.name:
+                    item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
+                    items.append(item)
                     content2 = content[n3:n4]
                     print('content2: ', content2)
                     regexcat = '<tr><td>      (.+?)</td><td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
-                    items.append(item)
                     for name, url in match:
                         if 'Channels' in name:
                             continue
@@ -521,7 +522,6 @@ class main2(Screen):
                         item = name + "###" + url
                         if item not in items:
                             items.append(item)
-
                     regexcat = 'emoji> (.+?)</td>.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     items.append(item)
@@ -535,14 +535,13 @@ class main2(Screen):
                         item = name + "###" + url
                         if item not in items:
                             items.append(item)
-
                 elif "Region" in self.name:
+                    item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
+                    items.append(item)
                     content2 = content[n4:n5]
                     # <tr><td align="left">Africa</td><td align="right">135</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/regions/afr.m3u</code></td></tr>
                     regexcat = 'align="left">(.+?)<.*?code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
-                    items.append(item)
                     for name, url in match:
                         if 'Channels' in name:
                             continue
@@ -564,7 +563,6 @@ class main2(Screen):
                     # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 print('auswahl: ', auswahl)
-
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
@@ -616,10 +614,6 @@ class main2(Screen):
         if Utils.check(url):
             name = name.replace(' ', '_').strip()
             name = name.lower()
-            if sys.version_info.major == 3:
-                import urllib.request as urllib2
-            elif sys.version_info.major == 2:
-                import urllib2
             req = urllib2.Request(url)
             req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
             r = urlopen(req, None, 15)
@@ -738,7 +732,7 @@ class selectplay(Screen):
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
         print('Search go movie: ', search)
-        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search..."), text='')
+        self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search"), text='')
 
     def filterChannels(self, result):
         global search
@@ -747,10 +741,6 @@ class selectplay(Screen):
                 self.menu_list = []
                 print('callback: ', result)
                 if result is not None and len(result):
-                    if sys.version_info.major == 3:
-                        import urllib.request as urllib2
-                    elif sys.version_info.major == 2:
-                        import urllib2
                     req = urllib2.Request(self.url)
                     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                     r = urlopen(req, None, 15)
@@ -811,10 +801,6 @@ class selectplay(Screen):
         items = []
         if Utils.check(self.url):
             try:
-                if sys.version_info.major == 3:
-                    import urllib.request as urllib2
-                elif sys.version_info.major == 2:
-                    import urllib2
                 req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
@@ -863,10 +849,6 @@ class selectplay(Screen):
         items = []
         if Utils.check(self.url):
             try:
-                if sys.version_info.major == 3:
-                    import urllib.request as urllib2
-                elif sys.version_info.major == 2:
-                    import urllib2
                 req = urllib2.Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
@@ -956,8 +938,10 @@ class TvInfoBarShowHide():
     skipToggleShow = False
 
     def __init__(self):
-        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.toggleShow, "hide": self.hide}, 0)
-        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={iPlayableService.evStart: self.serviceStarted})
+        self["ShowHideActions"] = ActionMap(["InfobarShowHideActions"], {"toggleShow": self.OkPressed, "hide": self.hide}, 1)
+        self.__event_tracker = ServiceEventTracker(screen=self, eventmap={
+            iPlayableService.evStart: self.serviceStarted,
+        })
         self.__state = self.STATE_SHOWN
         self.__locked = 0
         self.hideTimer = eTimer()
@@ -972,26 +956,17 @@ class TvInfoBarShowHide():
     def OkPressed(self):
         self.toggleShow()
 
-    def toggleShow(self):
-        if self.skipToggleShow:
-            self.skipToggleShow = False
-            return
+    def __onShow(self):
+        self.__state = self.STATE_SHOWN
+        self.startHideTimer()
 
-        if self.__state == self.STATE_HIDDEN:
-            self.show()
-            self.hideTimer.stop()
-        else:
-            self.hide()
-            self.startHideTimer()
+    def __onHide(self):
+        self.__state = self.STATE_HIDDEN
 
     def serviceStarted(self):
         if self.execing:
             if config.usage.show_infobar_on_zap.value:
                 self.doShow()
-
-    def __onShow(self):
-        self.__state = self.STATE_SHOWN
-        self.startHideTimer()
 
     def startHideTimer(self):
         if self.__state == self.STATE_SHOWN and not self.__locked:
@@ -999,9 +974,6 @@ class TvInfoBarShowHide():
             idx = config.usage.infobar_timeout.index
             if idx:
                 self.hideTimer.start(idx * 1500, True)
-
-    def __onHide(self):
-        self.__state = self.STATE_HIDDEN
 
     def doShow(self):
         self.hideTimer.stop()
@@ -1012,6 +984,17 @@ class TvInfoBarShowHide():
         self.hideTimer.stop()
         if self.__state == self.STATE_SHOWN:
             self.hide()
+
+    def toggleShow(self):
+        if self.skipToggleShow:
+            self.skipToggleShow = False
+            return
+        if self.__state == self.STATE_HIDDEN:
+            self.show()
+            self.hideTimer.stop()
+        else:
+            self.hide()
+            self.startHideTimer()
 
     def lockShow(self):
         try:
@@ -1056,17 +1039,12 @@ class Playstream2(
 
     def __init__(self, session, name, url):
         global streaml
-        Screen.__init__(self, session)
         global _session
+        Screen.__init__(self, session)
         self.session = session
-        _session = session
         self.skinName = 'MoviePlayer'
+        _session = session
         streaml = False
-        self.service = None
-        self.url = url
-        self.name = html_conv.html_unescape(name)
-        self.state = self.STATE_PLAYING
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         for x in InfoBarBase, \
                 InfoBarMenu, \
                 InfoBarSeek, \
@@ -1092,13 +1070,22 @@ class Playstream2(
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
                                                              'epg': self.showIMDB,
                                                              'info': self.showIMDB,
-                                                             # 'info': self.cicleStreamType,
-                                                             'exit': self.cancel,
-                                                             'leavePlayer': self.cancel,
                                                              'tv': self.cicleStreamType,
                                                              'stop': self.leavePlayer,
-                                                             'cancel': self.cancel,
-                                                             'back': self.cancel}, -1)
+                                                             'playpauseService': self.playpauseService,
+                                                             'red': self.cicleStreamType,
+                                                             'cancel': self.leavePlayer,
+                                                             'exit': self.leavePlayer,
+                                                             'yellow': self.subtitles,
+                                                             'down': self.av,
+                                                             'back': self.leavePlayer}, -1)
+        self.service = None
+        self.name = html_conv.html_unescape(name)
+        self.icount = 0
+        # url = url.replace(':', '%3a')
+        self.url = url
+        self.state = self.STATE_PLAYING
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
@@ -1169,6 +1156,9 @@ class Playstream2(
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
+    def subtitles(self):
+        self.session.open(MessageBox, _('Please install SubSupport Plugins'), MessageBox.TYPE_ERROR, timeout=10)
+
     def cicleStreamType(self):
         global streaml
         streaml = False
@@ -1223,10 +1213,11 @@ class Playstream2(
             self.doShow()
 
     def cancel(self):
+        srefInit = self.srefInit
         if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(self.srefInit)
+        self.session.nav.playService(srefInit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
