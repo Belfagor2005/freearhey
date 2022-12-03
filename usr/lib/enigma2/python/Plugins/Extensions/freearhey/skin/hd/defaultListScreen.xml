@@ -1,0 +1,26 @@
+<screen name="freearhey" position="0,0" size="1280,720" backgroundColor="#20000000" flags="wfNoBorder">
+	<widget name="title" position="313,8" size="669,52" noWrap="1" zPosition="1" transparent="1" font="Regular;26" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
+	<widget name="name" position="34,74" size="670,50" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular;24" halign="center" foregroundColor="#f4b700" />
+	<widget name="category" position="726,657" size="543,59" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular; 22" halign="center" foregroundColor="#f4b700" />
+	<eLabel backgroundColor="#00ffffff" position="0,64" size="1280,2" zPosition="2" />
+	<eLabel backgroundColor="#00ffffff" position="0,656" size="1280,2" zPosition="2" />
+	<eLabel backgroundColor="#30000000" position="0,0" size="1280,720" transparent="1" zPosition="-9" foregroundColor="#00ffffff" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/main.png" position="0,0" size="1280,720" alphatest="blend" zPosition="-8" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/icon.png" position="1045,136" size="225,225" alphatest="blend" zPosition="3" />
+	<!-- Menu List -->
+	<widget name="menulist" position="36,127" size="670,438" backgroundColor="#30000000" zPosition="1" scrollbarMode="showOnDemand" transparent="1" foregroundColor="#00ffffff" />
+	<!-- Paypal -->
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="1070,374" size="156,75" zPosition="2" alphatest="on" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" position="756,163" scale="1" size="250,250" zPosition="2" alphatest="on" />
+	<widget name="paypal" position="728,456" size="530,197" font="Regular;24" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
+	<eLabel position="721,123" size="552,531" backgroundColor="#80000000" cornerRadius="20" transparent="1" zPosition="1" />
+	<!-- Clock -->
+	<widget source="global.CurrentTime" render="Label" position="1109,6" size="150,60" font="Regular;40" halign="right" backgroundColor="#30000000" transparent="1" valign="center" foregroundColor="#00ffffff">
+		<convert type="ClockToText">Default</convert>
+	</widget>
+	<!-- Button -->
+	<ePixmap name="red" position="35,667" zPosition="2" size="140,40" pixmap="skin_default/buttons/red.png" transparent="1" alphatest="on" />
+	<ePixmap name="green" position="466,669" zPosition="2" size="140,40" pixmap="skin_default/buttons/green.png" transparent="1" alphatest="on" />
+	<widget name="key_red" position="128,669" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<widget name="key_green" position="557,670" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+</screen>
