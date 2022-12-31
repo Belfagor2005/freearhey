@@ -91,11 +91,11 @@ class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
         if Utils.isFHD():
-            self.l.setItemHeight(60)
-            textfont = int(34)
+            self.l.setItemHeight(50)
+            textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(60)
+            self.l.setItemHeight(30)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -198,11 +198,11 @@ def show_(name, link):
     res = [(name, link)]
     png = pngassign(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1900, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -210,11 +210,11 @@ def FreeListEntry(name, png):
     res = [name]
     png = pngassign(name)
     if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1200, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(10, 7), size=(54, 40), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(90, 0), size=(1000, 60), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -296,7 +296,7 @@ class freearhey(Screen):
 
     def paypal2(self):
         conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "can contribute with a coffee\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
 
@@ -440,7 +440,7 @@ class main2(Screen):
 
     def paypal2(self):
         conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "can contribute with a coffee\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
 
@@ -721,7 +721,7 @@ class selectplay(Screen):
 
     def paypal2(self):
         conthelp = "If you like what I do you\n"
-        conthelp += " can contribute with a coffee\n\n"
+        conthelp += "can contribute with a coffee\n"
         conthelp += "scan the qr code and donate € 1.00"
         return conthelp
 
@@ -761,9 +761,7 @@ class selectplay(Screen):
                         if str(result).lower() in name.lower():
                             print('callback: ', name)
                             search = True
-                            url = url.replace(" ", "")
-                            url = url.replace("\\n", "")
-                            url = url.replace('\r', '')
+                            url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                             name = name.replace('\r', '')
                             name = country + ' | ' + name
                             self.menu_list.append(show_(name, url))
@@ -818,9 +816,7 @@ class selectplay(Screen):
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
-                    url = url.replace(" ", "")
-                    url = url.replace("\\n", "")
-                    url = url.replace('\r', '')
+                    url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                     name = name.replace('\r', '')
                     name = country + ' | ' + name
                     print("In showContent name =", name)
@@ -868,9 +864,7 @@ class selectplay(Screen):
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
-                    url = url.replace(" ", "")
-                    url = url.replace("\\n", "")
-                    url = url.replace('\r', '')
+                    url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                     name = name.replace('\r', '')
                     name = country + ' | ' + name
                     print("In showContent name =", name)
@@ -1058,6 +1052,13 @@ class Playstream2(
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
+        self.service = None
+        self.name = html_conv.html_unescape(name)
+        self.icount = 0
+        # url = url.replace(':', '%3a')
+        self.url = url
+        self.state = self.STATE_PLAYING
         self['actions'] = ActionMap(['MoviePlayerActions',
                                      'MovieSelectionActions',
                                      'MediaPlayerActions',
@@ -1065,6 +1066,7 @@ class Playstream2(
                                      'MediaPlayerSeekActions',
                                      'ColorActions',
                                      'ButtonSetupActions',
+                                     'OkCancelActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
@@ -1074,18 +1076,11 @@ class Playstream2(
                                                              'stop': self.leavePlayer,
                                                              'playpauseService': self.playpauseService,
                                                              'red': self.cicleStreamType,
-                                                             'cancel': self.leavePlayer,
+                                                             'cancel': self.cancel,
                                                              'exit': self.leavePlayer,
                                                              'yellow': self.subtitles,
                                                              'down': self.av,
-                                                             'back': self.leavePlayer}, -1)
-        self.service = None
-        self.name = html_conv.html_unescape(name)
-        self.icount = 0
-        # url = url.replace(':', '%3a')
-        self.url = url
-        self.state = self.STATE_PLAYING
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
+                                                             'back': self.cancel}, -1)
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
             self.onFirstExecBegin.append(self.slinkPlay)
@@ -1129,9 +1124,13 @@ class Playstream2(
         self.setAspect(temp)
 
     def showIMDB(self):
-        text_clear = self.name
-        if returnIMDB(text_clear):
-            print('show imdb/tmdb')
+        try:
+            text_clear = self.name
+            if returnIMDB(text_clear):
+                print('show imdb/tmdb')
+        except Exception as ex:
+            print(str(ex))
+            print("Error: can't find Playstream2 in live_to_stream")
 
     def slinkPlay(self, url):
         name = self.name
@@ -1171,13 +1170,13 @@ class Playstream2(
                 self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
-        if Utils.isStreamlinkAvailable():
-            streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
-            streaml = True
-        if os.path.exists("/usr/bin/gstplayer"):
-            streamtypelist.append("5001")
-        if os.path.exists("/usr/bin/exteplayer3"):
-            streamtypelist.append("5002")
+        # if Utils.isStreamlinkAvailable():
+            # streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            # streaml = True
+        # if os.path.exists("/usr/bin/gstplayer"):
+            # streamtypelist.append("5001")
+        # if os.path.exists("/usr/bin/exteplayer3"):
+            # streamtypelist.append("5002")
         if os.path.exists("/usr/bin/apt-get"):
             streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
@@ -1213,11 +1212,10 @@ class Playstream2(
             self.doShow()
 
     def cancel(self):
-        srefInit = self.srefInit
         if os.path.isfile('/tmp/hls.avi'):
             os.remove('/tmp/hls.avi')
         self.session.nav.stopService()
-        self.session.nav.playService(srefInit)
+        self.session.nav.playService(self.srefInit)
         if not self.new_aspect == self.init_aspect:
             try:
                 self.setAspect(self.init_aspect)
