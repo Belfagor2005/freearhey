@@ -87,19 +87,6 @@ except:
         downloadm3u = ('/media/hdd/movie/')
 
 
-class free2list(MenuList):
-    def __init__(self, list):
-        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if Utils.isFHD():
-            self.l.setItemHeight(50)
-            textfont = int(30)
-            self.l.setFont(0, gFont('Regular', textfont))
-        else:
-            self.l.setItemHeight(30)
-            textfont = int(24)
-            self.l.setFont(0, gFont('Regular', textfont))
-
-
 def pngassign(name):
     if 'travel' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
@@ -192,6 +179,19 @@ def pngassign(name):
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
     return png
+
+
+class free2list(MenuList):
+    def __init__(self, list):
+        MenuList.__init__(self, list, True, eListboxPythonMultiContent)
+        if Utils.isFHD():
+            self.l.setItemHeight(50)
+            textfont = int(30)
+            self.l.setFont(0, gFont('Regular', textfont))
+        else:
+            self.l.setItemHeight(30)
+            textfont = int(24)
+            self.l.setFont(0, gFont('Regular', textfont))
 
 
 def show_(name, link):
