@@ -46,9 +46,9 @@ print('Py3: ', PY3)
 
 if PY3:
     from urllib.request import urlopen
-    unicode = str
-    unichr = chr
-    long = int
+    # unicode = str
+    # unichr = chr
+    # long = int
     PY3 = True
 else:
     from urllib2 import urlopen
@@ -87,31 +87,65 @@ except:
         downloadm3u = ('/media/hdd/movie/')
 
 
+
+# filter list assign png
+EXTRAD = "radio", "radyo", "mix", "fm", "kbit", "rap", "metal", "alternative"
+EXTXXX = "adult", "xxx"
+EXTCAM = "webcam", "webcams"
+EXTMUS = "music", "mtv", "deluxe", "djing", "fashion", "kiss", "mpeg", "sluhay", "stingray", "techno", "viva", "country", "vevo"
+EXTSPOR = "sport", "boxing", "racing", "fight", "golf", "knock", "harley", "futbool", "motor", "nba", "nfl", "bull", "poker", "billiar", "fite"
+EXTRLX = "relax", "nature", "escape"
+EXTMOV = "movie", "film"
+EXTWEA = "weather"
+EXTFAM = "family"
+EXTREL = "religious"
+EXTSHP = "shop"
+EXTTRV = "travel"
+
 def pngassign(name):
-    if 'travel' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
-    elif 'webcam' in name.lower():
+    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+    # if any(s in name.lower() for s in EXTTRV):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTCAM):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTMUS):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTSPOR):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTXXX):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTWEA):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTRAD):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTFAM):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTRLX):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTREL):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTSHP):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
+    # elif any(s in name.lower() for s in EXTMOV):
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
+    # elif 'pluto' in name.lower():
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
+    # elif 'tvplus' in name.lower():
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
+    # else: # force
+        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+    # return png
+
+    if 'webcam' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'spor' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif 'adult' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif 'weather' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
-    elif 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
-    elif 'adult' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif 'xxx' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
     elif 'mtv' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'deluxe' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif 'family' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
     elif 'djing' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
     elif 'fashion' in name.lower():
@@ -160,22 +194,32 @@ def pngassign(name):
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
     elif 'fite' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif 'adult' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'xxx' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif 'weather' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
+    elif 'radio' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif 'family' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
     elif 'relax' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
     elif 'nature' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
     elif 'escape' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif 'religious' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+    elif 'shop' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
     elif 'movie' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
     elif 'pluto' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
     elif 'tvplus' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
-    elif 'religious' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
-    elif 'shop' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
     else:
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
     return png
@@ -206,16 +250,16 @@ def show_(name, link):
     return res
 
 
-def FreeListEntry(name, png):
-    res = [name]
-    png = pngassign(name)
-    if Utils.isFHD():
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    return res
+# def FreeListEntry(name, png):
+    # res = [name]
+    # png = pngassign(name)
+    # if Utils.isFHD():
+        # res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
+        # res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # else:
+        # res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
+        # res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+    # return res
 
 
 def returnIMDB(text_clear):
@@ -242,6 +286,13 @@ def returnIMDB(text_clear):
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
     return
+
+
+def paypal():
+    conthelp = "If you like what I do you\n"
+    conthelp += "can contribute with a coffee\n"
+    conthelp += "scan the qr code and donate € 1.00"
+    return conthelp
 
 
 Panel_list = [
@@ -294,15 +345,9 @@ class freearhey(Screen):
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += "can contribute with a coffee\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
 
     def updateMenuList(self):
         self.menu_list = []
@@ -310,9 +355,10 @@ class freearhey(Screen):
             del self.menu_list[0]
         list = []
         idx = 0
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/setting.png".format('freearhey'))
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
         for x in Panel_list:
-            list.append(FreeListEntry(x, png))
+            # list.append(FreeListEntry(x, png))
+            list.append(show_(x, png))
             self.menu_list.append(x)
             idx += 1
         self['menulist'].setList(list)
@@ -438,15 +484,9 @@ class main2(Screen):
         self.timer.start(100, True)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += "can contribute with a coffee\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
     def updateMenuList(self):
@@ -719,15 +759,9 @@ class selectplay(Screen):
             self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
 
-    def paypal2(self):
-        conthelp = "If you like what I do you\n"
-        conthelp += "can contribute with a coffee\n"
-        conthelp += "scan the qr code and donate € 1.00"
-        return conthelp
-
     def layoutFinished(self):
-        paypal = self.paypal2()
-        self["paypal"].setText(paypal)
+        payp = paypal()
+        self["paypal"].setText(payp)
 
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
