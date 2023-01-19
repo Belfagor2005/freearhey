@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 02/12/2022
+# 15/01/2023 update
 # ######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
 #   This is free software; you can redistribute it and/or modify it.   #
@@ -46,9 +46,6 @@ print('Py3: ', PY3)
 
 if PY3:
     from urllib.request import urlopen
-    # unicode = str
-    # unichr = chr
-    # long = int
     PY3 = True
 else:
     from urllib2 import urlopen
@@ -250,18 +247,6 @@ def show_(name, link):
     return res
 
 
-# def FreeListEntry(name, png):
-    # res = [name]
-    # png = pngassign(name)
-    # if Utils.isFHD():
-        # res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
-        # res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    # else:
-        # res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
-        # res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
-    # return res
-
-
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
@@ -362,7 +347,7 @@ class freearhey(Screen):
             self.menu_list.append(x)
             idx += 1
         self['menulist'].setList(list)
-        auswahl = self['menulist'].getCurrent()[0]  # [0]
+        auswahl = self['menulist'].getCurrent()[0][0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
@@ -411,26 +396,26 @@ class freearhey(Screen):
 
     def up(self):
         self[self.currentList].up()
-        auswahl = self['menulist'].getCurrent()[0]  # [0]
-        print('auswahl: ', auswahl)
+        auswahl = self['menulist'].getCurrent()[0][0]
+        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def down(self):
         self[self.currentList].down()
-        auswahl = self['menulist'].getCurrent()[0]  # [0]
-        print('auswahl: ', auswahl)
+        auswahl = self['menulist'].getCurrent()[0][0]
+        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def left(self):
         self[self.currentList].pageUp()
-        auswahl = self['menulist'].getCurrent()[0]  # [0]
+        auswahl = self['menulist'].getCurrent()[0][0]
         print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def right(self):
         self[self.currentList].pageDown()
-        auswahl = self['menulist'].getCurrent()[0]  # [0]
-        print('auswahl: ', auswahl)
+        auswahl = self['menulist'].getCurrent()[0][0]
+        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def exit(self):
@@ -540,7 +525,7 @@ class main2(Screen):
                         a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
                         if any(s in str(name).lower() for s in a):
                             continue
-                        name = name.replace('%20', ' ')  # .replace('<g-emoji class="g-emoji" alias="','').replace('      ', '').replace('%20', ' ')
+                        name = name.replace('%20', ' ')
                         item = name + "###" + url
                         if item not in items:
                             items.append(item)
@@ -599,8 +584,6 @@ class main2(Screen):
                     name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                     self['menulist'].l.setList(self.menu_list)
-                    # self['menulist'].l.setItemHeight(50)
-                    # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 print('auswahl: ', auswahl)
                 self['name'].setText(str(auswahl))
@@ -864,8 +847,6 @@ class selectplay(Screen):
                     name = name.capitalize()
                     self.menu_list.append(show_(name, url))
                 self['menulist'].l.setList(self.menu_list)
-                # self['menulist'].l.setItemHeight(40)
-                # self['menulist'].moveToIndex(0)
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
             except Exception as e:
@@ -1090,7 +1071,6 @@ class Playstream2(
         self.service = None
         self.name = html_conv.html_unescape(name)
         self.icount = 0
-        # url = url.replace(':', '%3a')
         self.url = url
         self.state = self.STATE_PLAYING
         self['actions'] = ActionMap(['MoviePlayerActions',
