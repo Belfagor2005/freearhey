@@ -1,5 +1,7 @@
 freearhey 
 
+![](https://komarev.com/ghpvc/?username=Belfagor2005)
+
 <img src="https://github.com/Belfagor2005/freearhey/blob/main/usr/lib/enigma2/python/Plugins/Extensions/freearhey/plugin.png">
 
 Enigma2 project
