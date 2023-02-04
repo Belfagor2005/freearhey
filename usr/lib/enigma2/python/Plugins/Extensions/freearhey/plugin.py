@@ -60,7 +60,7 @@ currversion = '2.8'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
-res_plugin_path = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin".format('freearhey'))
+res_plugin_path = os.path.join(PLUGIN_PATH, 'skin')
 _firstStartfh = True
 search = False
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
@@ -101,38 +101,39 @@ EXTTRV = "travel"
 
 def pngassign(name):
     png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-    # if any(s in name.lower() for s in EXTTRV):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTCAM):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTMUS):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTSPOR):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTXXX):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTWEA):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTRAD):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTFAM):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTRLX):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTREL):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTSHP):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
-    # elif any(s in name.lower() for s in EXTMOV):
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
-    # elif 'pluto' in name.lower():
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
-    # elif 'tvplus' in name.lower():
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
-    # else: # force
-        # png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-    # return png
-
+    '''
+    if any(s in name.lower() for s in EXTTRV):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTCAM):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTMUS):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTSPOR):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTXXX):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTWEA):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTRAD):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTFAM):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTRLX):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTREL):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTSHP):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
+    elif any(s in name.lower() for s in EXTMOV):
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
+    elif 'pluto' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
+    elif 'tvplus' in name.lower():
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
+    else: # force
+        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+    return png
+    '''
     if 'webcam' in name.lower():
         png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
     elif 'music' in name.lower():
@@ -230,7 +231,7 @@ class free2list(MenuList):
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
         else:
-            self.l.setItemHeight(30)
+            self.l.setItemHeight(50)
             textfont = int(24)
             self.l.setFont(0, gFont('Regular', textfont))
 
@@ -242,8 +243,8 @@ def show_(name, link):
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 3), size=(34, 20), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 30), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(3, 10), size=(54, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(50, 0), size=(500, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     return res
 
 
@@ -293,10 +294,9 @@ Panel_list = [
 class freearhey(Screen):
     def __init__(self, session):
         self.session = session
-        skin = skin_path + '/defaultListScreen.xml'
+        skin = os.path.join(skin_path, 'defaultListScreen.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        f.close()
         Screen.__init__(self, session)
         global _session
         _session = session
@@ -397,13 +397,11 @@ class freearhey(Screen):
     def up(self):
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
-        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def down(self):
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
-        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def left(self):
@@ -415,7 +413,6 @@ class freearhey(Screen):
     def right(self):
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
-        # print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def exit(self):
@@ -426,12 +423,10 @@ class main2(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
-
         self.setup_title = ('Freearhey')
-        skin = skin_path + '/defaultListScreen.xml'
+        skin = os.path.join(skin_path, 'defaultListScreen.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        f.close()
         self.menulist = []
         self.picload = ePicLoad()
         self.picfile = ''
@@ -516,7 +511,6 @@ class main2(Screen):
                     items.append(item)
                     content2 = content[n2:n3]
                     print('content2: ', content2)
-                    # <tr><td align="left">Albanian</td><td align="right">38</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/languages/sqi.m3u</code></td></tr>
                     regexcat = 'align="left">(.+?)</td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     for name, url in match:
@@ -564,7 +558,6 @@ class main2(Screen):
                     item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
                     items.append(item)
                     content2 = content[n4:n5]
-                    # <tr><td align="left">Africa</td><td align="right">135</td><td align="left" nowrap=""><code>https://iptv-org.github.io/iptv/regions/afr.m3u</code></td></tr>
                     regexcat = 'align="left">(.+?)<.*?code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     for name, url in match:
@@ -699,10 +692,9 @@ class main2(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
-        skin = skin_path + '/defaultListScreen.xml'
+        skin = os.path.join(skin_path, 'defaultListScreen.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        f.close()
         self.session = session
         Screen.__init__(self, session)
         self.menulist = []
@@ -770,7 +762,6 @@ class selectplay(Screen):
                         except Exception as e:
                             print("Error: %s." % str(e))
                     print("In showContent content =", content)
-                    # #EXTINF:-1 tvg-id="21Plus.al" tvg-country="AL" tvg-language="Albanian" tvg-logo="" group-title="Albanian",21 Plus (576p) [Not 24/7]
                     regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                     match = re.compile(regexcat, re.DOTALL).findall(content)
                     print("In showContent match =", match)
@@ -1107,22 +1098,26 @@ class Playstream2(
         return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
-        return {0: _('4:3 Letterbox'),
-                1: _('4:3 PanScan'),
-                2: _('16:9'),
-                3: _('16:9 always'),
-                4: _('16:10 Letterbox'),
-                5: _('16:10 PanScan'),
-                6: _('16:9 Letterbox')}[aspectnum]
+        return {
+            0: '4:3 Letterbox',
+            1: '4:3 PanScan',
+            2: '16:9',
+            3: '16:9 always',
+            4: '16:10 Letterbox',
+            5: '16:10 PanScan',
+            6: '16:9 Letterbox'
+        }[aspectnum]
 
     def setAspect(self, aspect):
-        map = {0: '4_3_letterbox',
-               1: '4_3_panscan',
-               2: '16_9',
-               3: '16_9_always',
-               4: '16_10_letterbox',
-               5: '16_10_panscan',
-               6: '16_9_letterbox'}
+        map = {
+            0: '4_3_letterbox',
+            1: '4_3_panscan',
+            2: '16_9',
+            3: '16_9_always',
+            4: '16_10_letterbox',
+            5: '16_10_panscan',
+            6: '16_9_letterbox'
+        }
         config.av.aspectratio.setValue(map[aspect])
         try:
             AVSwitch().setAspectRatio(aspect)
@@ -1184,13 +1179,15 @@ class Playstream2(
                 self.servicetype = "4097"
         currentindex = 0
         streamtypelist = ["4097"]
-        # if Utils.isStreamlinkAvailable():
-            # streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
-            # streaml = True
-        # if os.path.exists("/usr/bin/gstplayer"):
-            # streamtypelist.append("5001")
-        # if os.path.exists("/usr/bin/exteplayer3"):
-            # streamtypelist.append("5002")
+        '''
+        if Utils.isStreamlinkAvailable():
+            streamtypelist.append("5002")  # ref = '5002:0:1:0:0:0:0:0:0:0:http%3a//127.0.0.1%3a8088/' + url
+            streaml = True
+        if os.path.exists("/usr/bin/gstplayer"):
+            streamtypelist.append("5001")
+        if os.path.exists("/usr/bin/exteplayer3"):
+            streamtypelist.append("5002")
+        '''
         if os.path.exists("/usr/bin/apt-get"):
             streamtypelist.append("8193")
         for index, item in enumerate(streamtypelist, start=0):
