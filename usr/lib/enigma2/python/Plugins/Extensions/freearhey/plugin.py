@@ -44,11 +44,15 @@ PY3 = sys.version_info.major >= 3
 print('Py3: ', PY3)
 
 
+PY3 = sys.version_info.major >= 3
 if PY3:
-    from urllib.request import urlopen
+    from urllib.request import urlopen, Request
+    unicode = str
+    unichr = chr
+    long = int
     PY3 = True
 else:
-    from urllib2 import urlopen
+    from urllib2 import urlopen, Request
 
 if sys.version_info.major == 3:
     import urllib.request as urllib2
@@ -84,142 +88,94 @@ except:
         downloadm3u = ('/media/hdd/movie/')
 
 
-
-# filter list assign png
-EXTRAD = "radio", "radyo", "mix", "fm", "kbit", "rap", "metal", "alternative"
-EXTXXX = "adult", "xxx"
-EXTCAM = "webcam", "webcams"
-EXTMUS = "music", "mtv", "deluxe", "djing", "fashion", "kiss", "mpeg", "sluhay", "stingray", "techno", "viva", "country", "vevo"
-EXTSPOR = "sport", "boxing", "racing", "fight", "golf", "knock", "harley", "futbool", "motor", "nba", "nfl", "bull", "poker", "billiar", "fite"
-EXTRLX = "relax", "nature", "escape"
-EXTMOV = "movie", "film"
-EXTWEA = "weather"
-EXTFAM = "family"
-EXTREL = "religious"
-EXTSHP = "shop"
-EXTTRV = "travel"
-
 def pngassign(name):
-    png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-    '''
-    if any(s in name.lower() for s in EXTTRV):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/travel.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTCAM):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTMUS):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTSPOR):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTXXX):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTWEA):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTRAD):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTFAM):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTRLX):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTREL):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTSHP):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
-    elif any(s in name.lower() for s in EXTMOV):
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
-    elif 'pluto' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
-    elif 'tvplus' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
-    else: # force
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
-    return png
-    '''
+    png = os.path.join(res_plugin_path, 'pic/tv.png')
     if 'webcam' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/webcam.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/webcam.png')
     elif 'music' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'spor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'mtv' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'deluxe' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'djing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'fashion' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'kiss' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'sluhay' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'stingray' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'techno' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'viva' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'country' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'vevo' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/music.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/music.png')
     elif 'spor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'boxing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'racing' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'fight' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'golf' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'knock' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'harley' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'futbool' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'motor' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'nba' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'nfl' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'bull' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'poker' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'billiar' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'fite' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/sport.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif 'adult' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/xxx.png')
     elif 'xxx' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/xxx.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/xxx.png')
     elif 'weather' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/weather.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/weather.png')
     elif 'radio' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/radio.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/radio.png')
     elif 'family' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/family.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/family.png')
     elif 'relax' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/relax.png')
     elif 'nature' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/relax.png')
     elif 'escape' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/relax.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/relax.png')
     elif 'religious' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/religious.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/religious.png')
     elif 'shop' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/shop.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/shop.png')
     elif 'movie' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/movie.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/movie.png')
     elif 'pluto' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/plutotv.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/plutotv.png')
     elif 'tvplus' in name.lower():
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tvplus.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/tvplus.png')
     else:
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/tv.png')
     return png
 
 
@@ -339,7 +295,7 @@ class freearhey(Screen):
             del self.menu_list[0]
         list = []
         idx = 0
-        png = resolveFilename(SCOPE_PLUGINS, "Extensions/{}/skin/pic/tv.png".format('freearhey'))
+        png = os.path.join(res_plugin_path, 'pic/tv.png')
         for x in Panel_list:
             # list.append(FreeListEntry(x, png))
             list.append(show_(x, png))
@@ -473,7 +429,7 @@ class main2(Screen):
         items = []
         if Utils.check(self.url):
             try:
-                req = urllib2.Request(self.url)
+                req = Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
                 link = r.read()
@@ -581,9 +537,9 @@ class main2(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
-        else:
-            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-            return
+        # else:
+            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
+            # return
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
@@ -625,68 +581,107 @@ class main2(Screen):
             url = str(url)
             self.convert_bouquet(url, name)
 
-    def convert_bouquet(self, url, name):
+    def convert_bouquet(self, url, namex):
         if Utils.check(url):
-            name = name.replace(' ', '_').strip()
-            name = name.lower()
-            req = urllib2.Request(url)
-            req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
-            r = urlopen(req, None, 15)
-            link = r.read()
-            r.close()
-            content = link
-            if str(type(content)).find('bytes') != -1:
-                try:
-                    content = content.decode("utf-8")
-                except Exception as e:
-                    print("Error: %s." % str(e))
-            if os.path.exists(downloadm3u):
-                xxxname = downloadm3u + name + '.m3u'
-            else:
-                xxxname = '/tmp/' + name + '.m3u'
-            print('path m3u: ', xxxname)
-            try:
-                print("content =", content)
-                with open(xxxname, 'w') as f:
-                    f.write(content)
-                f.close()
-                bqtname = 'userbouquet.%s.tv' % name
-                bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + bqtname + '" ORDER BY bouquet\n'
-                bouquet = 'bouquets.tv'
-                desk_tmp = ''
-                in_bouquets = 0
-                with open('/etc/enigma2/%s' % bqtname, 'w') as outfile:
-                    outfile.write('#NAME %s\r\n' % name.capitalize())
-                    for line in open(xxxname):
-                        if line.startswith('http://') or line.startswith('https'):
-                            outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s' % line.replace(':', '%3a'))
-                            outfile.write('#DESCRIPTION %s' % desk_tmp)
-                        elif line.startswith('#EXTINF'):
-                            desk_tmp = '%s' % line.split(',')[-1]
+            type = 'tv'
+            if "radio" in namex.lower():
+                type = "radio"
+            name_file = namex.replace('/', '_').replace(',', '').replace(' ', '-')
+            cleanName = re.sub(r'[\<\>\:\"\/\\\|\?\*]', '_', str(name_file))
+            cleanName = re.sub(r' ', '_', cleanName)
+            cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
+            name_file = re.sub(r'_+', '_', cleanName)
+            name_file = name_file.lower()
 
-                        elif '<stream_url><![CDATA' in line:
-                            outfile.write('#SERVICE 4097:0:1:1:0:0:0:0:0:0:%s\r\n' % line.split('[')[-1].split(']')[0].replace(':', '%3a'))
-                            outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
-                        elif '<title>' in line:
-                            if '<![CDATA[' in line:
-                                desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
-                            else:
-                                desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
-                    outfile.close()
-                if os.path.isfile('/etc/enigma2/bouquets.tv'):
-                    for line in open('/etc/enigma2/bouquets.tv'):
-                        if bqtname in line:
-                            in_bouquets = 1
-                    if in_bouquets == 0:
-                        if os.path.isfile('/etc/enigma2/%s' % bqtname) and os.path.isfile('/etc/enigma2/bouquets.tv'):
-                            Utils.remove_line('/etc/enigma2/bouquets.tv', bqtname)
-                            with open('/etc/enigma2/bouquets.tv', 'a') as outfile:
-                                outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bqtname)
-                            outfile.close()
-                self.mbox = self.session.open(MessageBox, _('Shuffle Favorite List in Progress') + '\n' + _('Wait please ...'), MessageBox.TYPE_INFO, timeout=7)
+            if os.path.exists(downloadm3u):
+                xxxname = downloadm3u + name_file + '.m3u'
+            else:
+                xxxname = '/tmp/' + name_file + '.m3u'
+            print('path m3u: ', xxxname)
+
+            response = urlopen(url, None, 5)
+            
+            with open(xxxname, 'wb') as output:
+                # print('response: ', response)
+                # if PY3:
+                    # output.write(response.read().decode('utf-8'))
+                    # # output.write(response.read().decode('utf-8'))
+                # else:
+                output.write(response.read())
+            response.close()
+
+            bouquetname = 'userbouquet.%s.%s' % (name_file.lower(), type.lower())
+            tmpx = ''
+            namel = ''
+            tmplist = []
+            tmplist.append('#NAME %s (%s)' % (name_file, type))
+            tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
+            tmplist.append('#DESCRIPTION --- %s ---' % name_file)
+            print("Converting Bouquet %s" % name_file)
+            if os.path.exists(xxxname) and os.stat(xxxname).st_size > 0:
+                for line in open(xxxname):
+                    if line.startswith('#EXTM3U'):
+                        continue
+                    if '#EXTM3U $BorpasFileFormat="1"' in line:  # force export bouquet ???
+                        line = line.replace('$BorpasFileFormat="1"', '')
+                        continue
+                    if line == ' ':
+                        continue
+                    if line.startswith("#EXTINF"):
+                        line = '%s' % line.split(',')[-1]
+                        line = Utils.checkStr(line).rstrip('\r').rstrip('\n')
+                        namel = '%s' % line.split(',')[-1]
+                        tmpx = '#DESCRIPTION %s' % namel
+                    else:
+                        if type.upper() == 'TV':
+                            line = line.replace(':', '%3a')
+                            line = line.rstrip()
+                            if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
+                                line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                            if not line.startswith("#SERVICE 4097:0:1:0:0:0:0:0:0:0:rt"):
+                                if line.startswith('http%3a'):
+                                    line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                                if line.startswith('https%3a'):
+                                    line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                        elif type.upper() == 'RADIO':
+                            line = line.replace(':', '%3a')
+                            line = line.rstrip()
+                            if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
+                                line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                            if not line.startswith("#SERVICE 4097:0:2:0:0:0:0:0:0:0:rt"):
+                                if line.startswith('http%3a'):
+                                    line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                                if line.startswith('https%3a'):
+                                    line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
+                        else:
+                            print("UNKNOWN TYPE: %s" % type)
+                    tmplist.append(line)
+                    tmplist.append(tmpx)
+                    print('lineee222: ', line)
+                    print('tmpx222: ', tmpx)
+
+                path1 = '/etc/enigma2/' + str(bouquetname)
+                path2 = '/etc/enigma2/bouquets.' + str(type.lower())
+                # create userbouquet
+                with open(path1, 'w+') as f:
+                    for item in tmplist:
+                        f.write("%s\n" % item)
+                # write bouquet.tv file
+                in_bouquets = 0
+                for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
+                    if bouquetname in line:
+                        in_bouquets = 1
+                        break
+                if in_bouquets == 0:
+                    '''
+                    Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
+                    '''
+                    with open(path2, 'a+') as f:
+                        bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
+                        f.write(str(bouquetTvString))
+                message = (_("Bouquet exported"))
+                Utils.web_info(message)
                 Utils.ReloadBouquets()
-            except:
-                return
 
 
 class selectplay(Screen):
@@ -736,6 +731,7 @@ class selectplay(Screen):
     def layoutFinished(self):
         payp = paypal()
         self["paypal"].setText(payp)
+        return
 
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
@@ -749,7 +745,7 @@ class selectplay(Screen):
                 self.menu_list = []
                 print('callback: ', result)
                 if result is not None and len(result):
-                    req = urllib2.Request(self.url)
+                    req = Request(self.url)
                     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                     r = urlopen(req, None, 15)
                     link = r.read()
@@ -777,10 +773,10 @@ class selectplay(Screen):
                     self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
-            else:
-                self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-                search = False
-                return
+            # else:
+                # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
+                # search = False
+                # return
         else:
             self.resetSearch()
 
@@ -806,7 +802,7 @@ class selectplay(Screen):
         items = []
         if Utils.check(self.url):
             try:
-                req = urllib2.Request(self.url)
+                req = Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
                 link = r.read()
@@ -841,16 +837,17 @@ class selectplay(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('exception error II ', str(e))
-        else:
-            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-            return
+                # return
+        # else:
+            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
+        # return
 
     def updateMenuListx(self):
         self.menu_list = []
         items = []
         if Utils.check(self.url):
             try:
-                req = urllib2.Request(self.url)
+                req = Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
                 link = r.read()
@@ -887,8 +884,8 @@ class selectplay(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('exception error ', str(e))
-        else:
-            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
+        # else:
+            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
