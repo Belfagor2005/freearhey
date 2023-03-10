@@ -447,7 +447,8 @@ class main2(Screen):
                 n5 = content.find("</tbody>", n4)
                 if "Category" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.category.m3u'
-                    items.append(item)
+                    if item not in items:
+                        items.append(item)
                     content2 = content[n1:n2]
                     regexcat = '<tr><td>(.+?)<.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
@@ -463,7 +464,8 @@ class main2(Screen):
                             items.append(item)
                 elif "Language" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.language.m3u'
-                    items.append(item)
+                    if item not in items:
+                        items.append(item)
                     content2 = content[n2:n3]
                     print('content2: ', content2)
                     regexcat = 'align="left">(.+?)</td.*?<code>(.+?)</code'
@@ -481,7 +483,8 @@ class main2(Screen):
 
                 elif "Country" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.country.m3u'
-                    items.append(item)
+                    if item not in items:
+                        items.append(item)
                     content2 = content[n3:n4]
                     print('content2: ', content2)
                     regexcat = '<tr><td>      (.+?)</td><td.*?<code>(.+?)</code'
@@ -511,7 +514,8 @@ class main2(Screen):
                             items.append(item)
                 elif "Region" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
-                    items.append(item)
+                    if item not in items:
+                        items.append(item)
                     content2 = content[n4:n5]
                     regexcat = 'align="left">(.+?)<.*?code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
@@ -530,6 +534,7 @@ class main2(Screen):
                     name = item.split("###")[0]
                     url = item.split("###")[1]
                     name = name.capitalize()
+
                     self.menu_list.append(show_(name, url))
                     self['menulist'].l.setList(self.menu_list)
                 auswahl = self['menulist'].getCurrent()[0][0]
@@ -611,67 +616,50 @@ class main2(Screen):
             response.close()
 
             bouquetname = 'userbouquet.%s.%s' % (name_file.lower(), type.lower())
-            tmpx = ''
-            namel = ''
-            tmplist = []
-            tmplist.append('#NAME %s (%s)' % (name_file, type))
-            tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
-            tmplist.append('#DESCRIPTION --- %s ---' % name_file)
             print("Converting Bouquet %s" % name_file)
-            if os.path.exists(xxxname) and os.stat(xxxname).st_size > 0:
-                for line in open(xxxname):
-                    if line.startswith('#EXTM3U'):
-                        continue
-                    if '#EXTM3U $BorpasFileFormat="1"' in line:  # force export bouquet ???
-                        line = line.replace('$BorpasFileFormat="1"', '')
-                        continue
-                    if line == ' ':
-                        continue
-                    if line.startswith("#EXTINF"):
-                        line = '%s' % line.split(',')[-1]
-                        line = Utils.checkStr(line).rstrip('\r').rstrip('\n')
-                        namel = '%s' % line.split(',')[-1]
-                        tmpx = '#DESCRIPTION %s' % namel
-                    else:
-                        if type.upper() == 'TV':
-                            line = line.replace(':', '%3a')
-                            line = line.rstrip()
-                            if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
-                                line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                            if not line.startswith("#SERVICE 4097:0:1:0:0:0:0:0:0:0:rt"):
-                                if line.startswith('http%3a'):
-                                    line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                                if line.startswith('https%3a'):
-                                    line = '#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                        elif type.upper() == 'RADIO':
-                            line = line.replace(':', '%3a')
-                            line = line.rstrip()
-                            if line.startswith('rtmp') or line.startswith('rtsp') or line.startswith('mms'):
-                                line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                            if not line.startswith("#SERVICE 4097:0:2:0:0:0:0:0:0:0:rt"):
-                                if line.startswith('http%3a'):
-                                    line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                                if line.startswith('https%3a'):
-                                    line = '#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s:%s' % (line, namel)
-                        else:
-                            print("UNKNOWN TYPE: %s" % type)
-                    tmplist.append(line)
-                    tmplist.append(tmpx)
-                    print('lineee222: ', line)
-                    print('tmpx222: ', tmpx)
 
-                path1 = '/etc/enigma2/' + str(bouquetname)
-                path2 = '/etc/enigma2/bouquets.' + str(type.lower())
-                # create userbouquet
+            path1 = '/etc/enigma2/' + str(bouquetname)
+            path2 = '/etc/enigma2/bouquets.' + str(type.lower())
+
+            if os.path.exists(xxxname) and os.stat(xxxname).st_size > 0:
+                tmplist = []
+                tmplist.append('#NAME %s (%s)' % (name_file.upper(), type.upper()))
+                tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
+                tmplist.append('#DESCRIPTION --- %s ---' % name_file)
+                namel = ' '
+                servicez = ' '
+                descriptionz = ' '
+                for line in open(xxxname):
+
+                    if line.startswith("#EXTINF"):
+                        namel = '%s' % line.split(',')[-1]
+                        descriptiona = '#DESCRIPTION %s' % namel
+                        descriptionz = descriptiona.rstrip('\r').rstrip('\n')
+
+                    elif line.startswith('http'):
+
+                        if type.upper() == 'TV':
+                            servicea = ('#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
+                            servicez = servicea + ':' +  namel
+
+                        elif type.upper() == 'RADIO':
+                            servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n') 
+                            servicez = servicea + ':' +  namel
+
+                    if servicez not in tmplist:
+                        tmplist.append(servicez)
+                        tmplist.append(descriptionz)
+
                 with open(path1, 'w+') as f:
                     for item in tmplist:
-                        f.write("%s\n" % item)
-                # write bouquet.tv file
+                        if item not in f.read():
+                            f.write("%s\n" % item)
+                            print('item  -------- ', item)
+
                 in_bouquets = 0
                 for line in open('/etc/enigma2/bouquets.%s' % type.lower()):
                     if bouquetname in line:
                         in_bouquets = 1
-                        break
                 if in_bouquets == 0:
                     '''
                     Rename unlinked bouquet file /etc/enigma2/userbouquet.webcam.tv to /etc/enigma2/userbouquet.webcam.tv.del
@@ -679,10 +667,13 @@ class main2(Screen):
                     with open(path2, 'a+') as f:
                         bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
                         f.write(str(bouquetTvString))
+
+                from enigma import eDVBDB
+                eDVBDB.getInstance().reloadServicelist()
+                eDVBDB.getInstance().reloadBouquets()
                 message = (_("Bouquet exported"))
                 Utils.web_info(message)
-                Utils.ReloadBouquets()
-
+            
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
