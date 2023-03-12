@@ -41,7 +41,7 @@ import sys
 from . import Utils
 from . import html_conv
 PY3 = sys.version_info.major >= 3
-print('Py3: ', PY3)
+# print('Py3: ', PY3)
 
 
 PY3 = sys.version_info.major >= 3
