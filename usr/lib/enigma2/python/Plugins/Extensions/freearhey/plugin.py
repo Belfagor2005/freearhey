@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 15/01/2023 update
+# 12/03/2023 update
 # ######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
 #   This is free software; you can redistribute it and/or modify it.   #
@@ -573,14 +573,10 @@ class main2(Screen):
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
 
-    def message2(self):
-        name = self['menulist'].l.getCurrentSelection()[0][0]
-        self.session.openWithCallback(self.convert, MessageBox, _("Do you want to Convert %s to favorite .tv ?") % name, MessageBox.TYPE_YESNO, timeout=15, default=True)
-
-    def convert(self, result):
-        if not result:
-            return
-        else:
+    def message2(self, answer=None):
+        if answer is None:
+            self.session.openWithCallback(self.message2, MessageBox, _('Do you want to Convert to favorite .tv ?\n\nAttention!! It may take some time depending\non the number of streams contained !!!'))
+        elif answer:
             name = self['menulist'].l.getCurrentSelection()[0][0]
             url = self['menulist'].getCurrent()[0][1]
             url = str(url)
@@ -597,15 +593,12 @@ class main2(Screen):
             cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
             name_file = re.sub(r'_+', '_', cleanName)
             name_file = name_file.lower()
-
             if os.path.exists(downloadm3u):
                 xxxname = downloadm3u + name_file + '.m3u'
             else:
                 xxxname = '/tmp/' + name_file + '.m3u'
             print('path m3u: ', xxxname)
-
             response = urlopen(url, None, 5)
-            
             with open(xxxname, 'wb') as output:
                 # print('response: ', response)
                 # if PY3:
@@ -614,10 +607,8 @@ class main2(Screen):
                 # else:
                 output.write(response.read())
             response.close()
-
             bouquetname = 'userbouquet.%s.%s' % (name_file.lower(), type.lower())
             print("Converting Bouquet %s" % name_file)
-
             path1 = '/etc/enigma2/' + str(bouquetname)
             path2 = '/etc/enigma2/bouquets.' + str(type.lower())
 
@@ -626,25 +617,29 @@ class main2(Screen):
                 tmplist.append('#NAME %s (%s)' % (name_file.upper(), type.upper()))
                 tmplist.append('#SERVICE 1:64:0:0:0:0:0:0:0:0::%s CHANNELS' % name_file)
                 tmplist.append('#DESCRIPTION --- %s ---' % name_file)
-                namel = ' '
-                servicez = ' '
-                descriptionz = ' '
+                namel = ''
+                servicez = ''
+                descriptionz = ''
                 for line in open(xxxname):
 
                     if line.startswith("#EXTINF"):
                         namel = '%s' % line.split(',')[-1]
-                        descriptiona = '#DESCRIPTION %s' % namel
-                        descriptionz = descriptiona.rstrip('\r').rstrip('\n')
+                        descriptiona = ('#DESCRIPTION %s' % namel).splitlines()
+                        descriptionz = ''.join(descriptiona)
 
                     elif line.startswith('http'):
+                        tag = '1'
+                        if type.upper() == 'RADIO':
+                            tag = '2'
 
-                        if type.upper() == 'TV':
-                            servicea = ('#SERVICE 4097:0:1:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
-                            servicez = servicea + ':' +  namel
+                        servicea = ('#SERVICE 4097:0:%s:0:0:0:0:0:0:0:%s' % (tag, line.replace(':', '%3a')))  # .rstrip('\r').rstrip('\n')
+                        servicez = (servicea + ':' + namel).splitlines()
+                        servicez = ''.join(servicez)
 
-                        elif type.upper() == 'RADIO':
-                            servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n') 
-                            servicez = servicea + ':' +  namel
+                        # elif type.upper() == 'RADIO':
+                            # servicea = ('#SERVICE 4097:0:2:0:0:0:0:0:0:0:%s' % line.replace(':', '%3a')).rstrip('\r').rstrip('\n')
+                            # servicez = (servicea + ':' +  namel).splitlines()
+                            # servicez = ''.join(servicez)
 
                     if servicez not in tmplist:
                         tmplist.append(servicez)
@@ -667,13 +662,21 @@ class main2(Screen):
                     with open(path2, 'a+') as f:
                         bouquetTvString = '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "' + str(bouquetname) + '" ORDER BY bouquet\n'
                         f.write(str(bouquetTvString))
+                try:
+                    from enigma import eDVBDB
+                    eDVBDB.getInstance().reloadServicelist()
+                    eDVBDB.getInstance().reloadBouquets()
+                    print('all bouquets reloaded...')
+                except:
+                    eDVBDB = None
+                    os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
+                    print('bouquets reloaded...')
 
-                from enigma import eDVBDB
-                eDVBDB.getInstance().reloadServicelist()
-                eDVBDB.getInstance().reloadBouquets()
-                message = (_("Bouquet exported"))
-                Utils.web_info(message)
-            
+                # import subprocess
+                # myCmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
+                # subprocess.Popen(myCmd, shell=True, executable='/bin/bash')
+                mbox = _session.open(MessageBox, _('bouquets reloaded..'), MessageBox.TYPE_INFO, timeout=5)
+
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
