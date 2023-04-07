@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 12/03/2023 update
+# 07/04/2023 update
 # ######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
 #   This is free software; you can redistribute it and/or modify it.   #
@@ -459,7 +459,7 @@ class main2(Screen):
                         if any(s in str(name).lower() for s in a):
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        item = name + "###" + url
+                        item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
                 elif "Language" in self.name:
@@ -477,7 +477,7 @@ class main2(Screen):
                         if any(s in str(name).lower() for s in a):
                             continue
                         name = name.replace('%20', ' ')
-                        item = name + "###" + url
+                        item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
 
@@ -496,7 +496,7 @@ class main2(Screen):
                         if any(s in str(name).lower() for s in a):
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        item = name + "###" + url
+                        item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
                     regexcat = 'emoji> (.+?)</td>.*?<code>(.+?)</code'
@@ -509,7 +509,7 @@ class main2(Screen):
                         if any(s in str(name).lower() for s in a):
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        item = name + "###" + url
+                        item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
                 elif "Region" in self.name:
@@ -526,7 +526,7 @@ class main2(Screen):
                         if any(s in str(name).lower() for s in a):
                             continue
                         name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        item = name + "###" + url
+                        item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
                 items.sort()
@@ -818,7 +818,7 @@ class selectplay(Screen):
                     name = country + ' | ' + name
                     print("In showContent name =", name)
                     print("In showContent url =", url)
-                    item = name + "###" + url
+                    item = name + "###" + url + '\n'
                     items.append(item)
                 items.sort()
                 for item in items:
@@ -865,7 +865,7 @@ class selectplay(Screen):
                     name = country + ' | ' + name
                     print("In showContent name =", name)
                     print("In showContent url =", url)
-                    item = name + "###" + url
+                    item = name + "###" + url + '\n'
                     items.append(item)
                 items.sort()
                 for item in items:
@@ -1142,7 +1142,7 @@ class Playstream2(
 
     def openTest(self, servicetype, url):
         name = self.name
-        ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
+        ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
         print('reference:   ', ref)
         if streaml is True:
             url = 'http://127.0.0.1:8088/' + str(url)
