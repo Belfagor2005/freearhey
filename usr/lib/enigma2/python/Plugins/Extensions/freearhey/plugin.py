@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 07/04/2023 update
+# 03/06/2023 update
 # ######################################################################
 #   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
 #   This is free software; you can redistribute it and/or modify it.   #
 #   But no delete this message & support on forum linuxsat-support     #
 # ######################################################################
 from __future__ import print_function
-from . import _
+from . import _, isDreamOS, paypal
+from . import Utils
+from . import html_conv
 from Components.AVSwitch import AVSwitch
 from Components.ActionMap import ActionMap
 from Components.config import config
@@ -19,7 +21,6 @@ from Components.MultiContent import MultiContentEntryPixmapAlphaTest
 from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBar import MoviePlayer
 from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
 from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
 from Screens.InfoBarGenerics import InfoBarNotifications
@@ -38,13 +39,9 @@ from enigma import iPlayableService
 import os
 import re
 import sys
-from . import Utils
-from . import html_conv
-PY3 = sys.version_info.major >= 3
-# print('Py3: ', PY3)
-
 
 PY3 = sys.version_info.major >= 3
+
 if PY3:
     from urllib.request import urlopen, Request
     unicode = str
@@ -54,10 +51,6 @@ if PY3:
 else:
     from urllib2 import urlopen, Request
 
-if sys.version_info.major == 3:
-    import urllib.request as urllib2
-elif sys.version_info.major == 2:
-    import urllib2
 
 global skin_path, search, downloadm3u
 currversion = '2.8'
@@ -77,7 +70,7 @@ skin_path = res_plugin_path + '/hd'
 if Utils.isFHD():
     skin_path = res_plugin_path + '/fhd'
 
-if Utils.DreamOS():
+if isDreamOS:
     skin_path = skin_path + '/dreamOs'
 
 try:
@@ -229,13 +222,6 @@ def returnIMDB(text_clear):
         return True
 
 
-def paypal():
-    conthelp = "If you like what I do you\n"
-    conthelp += "can contribute with a coffee\n"
-    conthelp += "scan the qr code and donate € 1.00"
-    return conthelp
-
-
 Panel_list = [
  ('PLAYLISTS DIRECT'),
  ('PLAYLISTS NSFW'),
@@ -297,13 +283,11 @@ class freearhey(Screen):
         idx = 0
         png = os.path.join(res_plugin_path, 'pic/tv.png')
         for x in Panel_list:
-            # list.append(FreeListEntry(x, png))
             list.append(show_(x, png))
             self.menu_list.append(x)
             idx += 1
         self['menulist'].setList(list)
         auswahl = self['menulist'].getCurrent()[0][0]
-        print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def ok(self):
@@ -362,7 +346,6 @@ class freearhey(Screen):
     def left(self):
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
-        print('auswahl: ', auswahl)
         self['name'].setText(str(auswahl))
 
     def right(self):
@@ -412,7 +395,7 @@ class main2(Screen):
                                                            'cancel': self.close,
                                                            'red': self.close}, -1)
         self.timer = eTimer()
-        if Utils.DreamOS():
+        if isDreamOS:
             self.timer_conn = self.timer.timeout.connect(self.updateMenuList)
         else:
             self.timer.callback.append(self.updateMenuList)
@@ -549,8 +532,6 @@ class main2(Screen):
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
-        print('name: ', name)
-        print('url: ', url)
         self.session.open(selectplay, name, url)
 
     def up(self):
@@ -680,29 +661,30 @@ class main2(Screen):
 
 class selectplay(Screen):
     def __init__(self, session, namex, lnk):
+        self.session = session
+        Screen.__init__(self, session)
         skin = os.path.join(skin_path, 'defaultListScreen.xml')
         with open(skin, 'r') as f:
             self.skin = f.read()
-        self.session = session
-        Screen.__init__(self, session)
         self.menulist = []
+        self.picload = ePicLoad()
+        self.picfile = ''
+        self.currentList = 'menulist'
         self.loading_ok = False
         self.count = 0
         self.loading = 0
         self.name = namex
         self.url = lnk
         self.search = ''
-        self.picload = ePicLoad()
-        self.picfile = ''
-        self.currentList = 'menulist'
+
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
         self['key_red'] = Label(_('Exit'))
         self['key_green'] = Label(_('Search'))
-        self['title'] = Label("Thank's Freearhey")
         self['category'] = Label('')
         self['category'].setText(namex)
+        self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
@@ -725,11 +707,9 @@ class selectplay(Screen):
     def layoutFinished(self):
         payp = paypal()
         self["paypal"].setText(payp)
-        return
 
     def search_text(self):
         from Screens.VirtualKeyBoard import VirtualKeyBoard
-        print('Search go movie: ', search)
         self.session.openWithCallback(self.filterChannels, VirtualKeyBoard, title=_("Search"), text='')
 
     def filterChannels(self, result):
@@ -737,7 +717,6 @@ class selectplay(Screen):
         if result:
             try:
                 self.menu_list = []
-                print('callback: ', result)
                 if result is not None and len(result):
                     req = Request(self.url)
                     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
@@ -750,10 +729,10 @@ class selectplay(Screen):
                             content = content.decode("utf-8")
                         except Exception as e:
                             print("Error: %s." % str(e))
-                    print("In showContent content =", content)
+                    # print("In showContent content =", content)
                     regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                     match = re.compile(regexcat, re.DOTALL).findall(content)
-                    print("In showContent match =", match)
+                    # print("In showContent match =", match)
                     for country, name, url in match:
                         if str(result).lower() in name.lower():
                             print('callback: ', name)
@@ -767,10 +746,6 @@ class selectplay(Screen):
                     self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
-            # else:
-                # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-                # search = False
-                # return
         else:
             self.resetSearch()
 
@@ -799,9 +774,8 @@ class selectplay(Screen):
                 req = Request(self.url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                 r = urlopen(req, None, 15)
-                link = r.read()
+                content = r.read()
                 r.close()
-                content = link
                 if str(type(content)).find('bytes') != -1:
                     try:
                         content = content.decode("utf-8")
@@ -809,15 +783,15 @@ class selectplay(Screen):
                         print("Error: %s." % str(e))
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
-                print("In showContent match =", match)
+                # print("In showContent match =", match)
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
                     url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                     name = name.replace('\r', '')
                     name = country + ' | ' + name
-                    print("In showContent name =", name)
-                    print("In showContent url =", url)
+                    # print("In showContent name =", name)
+                    # print("In showContent url =", url)
                     item = name + "###" + url + '\n'
                     items.append(item)
                 items.sort()
@@ -831,10 +805,6 @@ class selectplay(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('exception error II ', str(e))
-                # return
-        # else:
-            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-        # return
 
     def updateMenuListx(self):
         self.menu_list = []
@@ -856,7 +826,6 @@ class selectplay(Screen):
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
                 print("In showContent match =", match)
-                # n1 = 0
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
@@ -878,23 +847,13 @@ class selectplay(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('exception error ', str(e))
-        # else:
-            # self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
-        print('name: ', name)
-        print('url: ', url)
-        if Utils.check(url):
-            self.play_that_shit(name, url)
-        else:
-            self.session.open(MessageBox, _("Sorry no found!"), MessageBox.TYPE_INFO, timeout=5)
-            return
+        self.play_that_shit(name, url)
 
     def play_that_shit(self, name, url):
-        url = url
-        name = name
         self.session.open(Playstream2, name, url)
 
     def up(self):
@@ -1029,11 +988,9 @@ class Playstream2(
 
     def __init__(self, session, name, url):
         global streaml
-        global _session
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
-        _session = session
         streaml = False
         for x in InfoBarBase, \
                 InfoBarMenu, \

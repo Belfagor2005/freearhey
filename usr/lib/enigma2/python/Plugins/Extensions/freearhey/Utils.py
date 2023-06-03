@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# 15.02.2023
+# 30.03.2023
 # a common tips used from Lululla
 #
 import sys
@@ -26,27 +26,36 @@ PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
 
-
 # PY3 = sys.version_info.major >= 3
 if PY3:
-    # Python 3
-    PY3 = True
-    unicode = str
-    unichr = chr
-    long = int
-    xrange = range
+    bytes = bytes
+    str = unicode = basestring = str
+    range = range
+    zip = zip
+
+    def iteritems(d, **kw):
+        return iter(d.items(**kw))
+
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
     from urllib.error import HTTPError, URLError
 
-else:
-    # # Python 2
-    # _str = str
-    # str = unicode
-    # range = xrange
-    # unicode = unicode
-    # basestring = basestring
+if PY2:
+    _str = str
+    str = unicode
+    range = xrange
+    from itertools import izip
+    zip = izip
+    unicode = unicode
+    basestring = basestring
+
+    def bytes(b, encoding="ascii"):
+        return _str(b)
+
+    def iteritems(d, **kw):
+        return d.iteritems(**kw)
+
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -285,11 +294,11 @@ def getLanguage():
         from Components.config import config
         language = config.osd.language.value
         language = language[:-3]
-        return language
+        # return language
     except:
         language = 'en'
-        return language
-        pass
+    return language
+    pass
 
 
 def downloadFile(url, target):
@@ -451,7 +460,7 @@ def checkRedirect(url):
     # print("*** check redirect ***")
     import requests
     from requests.adapters import HTTPAdapter
-    hdr = {"User-Agent": "Enigma2 - XCForever Plugin"}
+    hdr = {"User-Agent": "Enigma2 - Enigma2 Plugin"}
     x = ""
     adapter = HTTPAdapter()
     http = requests.Session()
@@ -463,6 +472,62 @@ def checkRedirect(url):
     except Exception as e:
         print(e)
         return str(url)
+
+
+
+
+
+def checkRedirect2(url):
+    # print("*** check redirect ***")
+    import requests
+    from requests.adapters import HTTPAdapter
+    # hdr = {"User-Agent": "Enigma2 - Enigma2 Plugin"}
+    # x = ""
+    # adapter = HTTPAdapter()
+    # http = requests.Session()
+    # http.mount("http://", adapter)
+    # http.mount("https://", adapter)
+    # try:
+        # x = http.get(url, headers=hdr, timeout=15, verify=False, stream=True)
+        # return str(x.url)
+    # except Exception as e:
+        # print(e)
+        # return str(url)
+    import ssl
+    from urllib3 import poolmanager
+    # class TLSAdapter(requests.adapters.HTTPAdapter):
+    
+
+        # def init_poolmanager(self, connections, maxsize, block=False):
+            # """Create and initialize the urllib3 PoolManager."""
+            # ctx = ssl.create_default_context()
+            # ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+            # self.poolmanager = poolmanager.PoolManager(
+                    # num_pools=connections,
+                    # maxsize=maxsize,
+                    # block=block,
+                    # ssl_version=ssl.PROTOCOL_TLS,
+                    # ssl_context=ctx)
+
+    # session = requests.session()
+    # session.mount('https://', TLSAdapter())
+    # res = session.get(url)
+    # return res
+
+    class TLSAdapter(requests.adapters.HTTPAdapter):
+
+        def init_poolmanager(self, *args, **kwargs):
+            ctx = ssl.create_default_context()
+            ctx.set_ciphers('DEFAULT@SECLEVEL=1')
+            kwargs['ssl_context'] = ctx
+            return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
+
+    session = requests.session()
+    session.mount('https://', TLSAdapter())
+    res = session.get(url)
+    print('TLSAdapter: ', res)
+    return res
+
 
 
 def freespace():
@@ -559,14 +624,32 @@ def uniq(inlist):
 
 def ReloadBouquets():
     print('\n----Reloading bouquets----\n')
+    # try:
+        # eDVBDB = None
+        # os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
+        # print('bouquets reloaded...')
+    # except:
+        # from enigma import eDVBDB
+        # eDVBDB.getInstance().reloadBouquets()
+        # print('bouquets reloaded...')
     try:
         from enigma import eDVBDB
-        eDVBDB.getInstance().reloadBouquets()
-        print('bouquets reloaded...')
-    except:
+    except ImportError:
         eDVBDB = None
-        os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
-        print('bouquets reloaded...')
+    if eDVBDB:
+        # eDVBDB.getInstance().reloadServicelist()
+        # eDVBDB.getInstance().reloadBouquets()
+        db = eDVBDB.getInstance()
+        if db:
+            db.reloadServicelist()
+            db.reloadBouquets()        
+            print("eDVBDB: bouquets reloaded...")
+    else:
+        os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &")
+        os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=4 > /dev/null 2>&1 &")
+        print("wGET: bouquets reloaded...")
+
+
 
 
 def deletetmp():
@@ -980,14 +1063,14 @@ if PY3:
             response = urlopen(req)
             link = response.read().decode(errors='ignore')
             response.close()
-            return link
+            # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
             link = response.read().decode(errors='ignore')
             response.close()
-            return link
+        return link
 
     def getUrl2(url, referer):
         req = urllib2.Request(url)
@@ -997,26 +1080,26 @@ if PY3:
             response = urlopen(req)
             link = response.read().decode()
             response.close()
-            return link
+            # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
             link = response.read().decode()
             response.close()
-            return link
+        return link
 
     def getUrlresp(url):
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
             response = urlopen(req)
-            return response
+            # return response
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
-            return response
+        return response
 else:
     import sys
     if sys.version_info.major == 3:
@@ -1031,14 +1114,14 @@ else:
             response = urlopen(req)
             link = response.read()
             response.close()
-            return link
+            # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
             link = response.read()
             response.close()
-            return link
+        return link
 
     def getUrl2(url, referer):
         req = urllib2.Request(url)
@@ -1048,26 +1131,26 @@ else:
             response = urlopen(req)
             link = response.read()
             response.close()
-            return link
+            # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
             link = response.read()
             response.close()
-            return link
+        return link
 
     def getUrlresp(url):
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
             response = urlopen(req)
-            return response
+            # return response
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, context=gcontext)
-            return response
+        return response
 
 
 def decodeUrl(text):
@@ -1553,6 +1636,7 @@ def addstreamboq(bouquetname=None):
             fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' % bouquetname)
             fp.close()
             add = True
+    return
 
 
 def stream2bouquet(url=None, name=None, bouquetname=None):
