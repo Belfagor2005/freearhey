@@ -36,6 +36,7 @@ from enigma import ePicLoad, loadPNG, gFont
 from enigma import eServiceReference
 from enigma import eTimer
 from enigma import iPlayableService
+from enigma import getDesktop
 import os
 import re
 import sys
@@ -65,11 +66,15 @@ host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
 downloadm3u = '/media/hdd/movie/'
-skin_path = res_plugin_path + '/hd'
 
-if Utils.isFHD():
+
+screenwidth = getDesktop(0).size()
+if screenwidth.width() == 2560:
+    skin_path = res_plugin_path + '/uhd'
+elif screenwidth.width() == 1920:
     skin_path = res_plugin_path + '/fhd'
-
+else:
+    skin_path = res_plugin_path + '/hd'
 if isDreamOS:
     skin_path = skin_path + '/dreamOs'
 
@@ -175,7 +180,11 @@ def pngassign(name):
 class free2list(MenuList):
     def __init__(self, list):
         MenuList.__init__(self, list, True, eListboxPythonMultiContent)
-        if Utils.isFHD():
+        if screenwidth.width() == 2560:
+            self.l.setItemHeight(60)
+            textfont = int(42)
+            self.l.setFont(0, gFont('Regular', textfont))        
+        elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
             textfont = int(30)
             self.l.setFont(0, gFont('Regular', textfont))
@@ -188,7 +197,10 @@ class free2list(MenuList):
 def show_(name, link):
     res = [(name, link)]
     png = pngassign(name)
-    if Utils.isFHD():
+    if screenwidth.width() == 2560:
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(60, 48), png=loadPNG(png)))
+        res.append(MultiContentEntryText(pos=(85, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+    elif screenwidth.width() == 1920:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     else:
