@@ -1,0 +1,88 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: freearhey\n"
+"POT-Creation-Date: 2022-12-03 14:44+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: lululla\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: plugin.py\n"
+
+#: plugin.py:269 plugin.py:709
+msgid "Exit"
+msgstr ""
+
+#: plugin.py:358
+msgid ""
+"These streams may contain Adult content\n"
+"\n"
+"are you sure you want to continue??"
+msgstr ""
+
+#: plugin.py:416
+msgid "Back"
+msgstr ""
+
+#: plugin.py:417
+msgid "Export"
+msgstr ""
+
+#: plugin.py:577 plugin.py:791 plugin.py:863 plugin.py:915 plugin.py:925
+msgid "Sorry no found!"
+msgstr ""
+
+#: plugin.py:609
+#, python-format
+msgid "Do you want to Convert %s to favorite .tv ?"
+msgstr ""
+
+#: plugin.py:682
+msgid "Shuffle Favorite List in Progress"
+msgstr ""
+
+#: plugin.py:682
+msgid "Wait please ..."
+msgstr ""
+
+#: plugin.py:710 plugin.py:746
+msgid "Search"
+msgstr ""
+
+#: plugin.py:1123
+msgid "4:3 Letterbox"
+msgstr ""
+
+#: plugin.py:1124
+msgid "4:3 PanScan"
+msgstr ""
+
+#: plugin.py:1125
+msgid "16:9"
+msgstr ""
+
+#: plugin.py:1126
+msgid "16:9 always"
+msgstr ""
+
+#: plugin.py:1127
+msgid "16:10 Letterbox"
+msgstr ""
+
+#: plugin.py:1128
+msgid "16:10 PanScan"
+msgstr ""
+
+#: plugin.py:1129
+msgid "16:9 Letterbox"
+msgstr ""
+
+#: plugin.py:1182
+msgid "Please install SubSupport Plugins"
+msgstr ""
