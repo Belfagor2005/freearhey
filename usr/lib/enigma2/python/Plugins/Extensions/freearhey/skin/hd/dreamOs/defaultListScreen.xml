@@ -1,4 +1,4 @@
-<screen name="freearhey" position="0,0" size="1280,720" backgroundColor="#20000000" flags="wfNoBorder">
+<screen name="freearhey" position="0,0" size="1280,720" backgroundColor="#ff000000" flags="wfNoBorder">
 	<widget name="title" position="313,8" size="669,52" noWrap="1" zPosition="1" transparent="1" font="Regular;26" valign="center" halign="center" backgroundColor="#30000000" foregroundColor="#00ffffff" />
 	<widget name="name" position="34,74" size="670,50" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular;24" halign="center" foregroundColor="#f4b700" />
 	<widget name="category" position="726,657" size="543,59" zPosition="1" backgroundColor="#30000000" transparent="1" font="Regular; 22" halign="center" foregroundColor="#f4b700" />

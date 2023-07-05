@@ -183,7 +183,7 @@ class free2list(MenuList):
         if screenwidth.width() == 2560:
             self.l.setItemHeight(60)
             textfont = int(42)
-            self.l.setFont(0, gFont('Regular', textfont))        
+            self.l.setFont(0, gFont('Regular', textfont))
         elif screenwidth.width() == 1920:
             self.l.setItemHeight(50)
             textfont = int(30)
@@ -199,7 +199,7 @@ def show_(name, link):
     png = pngassign(name)
     if screenwidth.width() == 2560:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(60, 48), png=loadPNG(png)))
-        res.append(MultiContentEntryText(pos=(85, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))    
+        res.append(MultiContentEntryText(pos=(85, 0), size=(1200, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
     elif screenwidth.width() == 1920:
         res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 5), size=(54, 40), png=loadPNG(png)))
         res.append(MultiContentEntryText(pos=(70, 0), size=(1000, 50), font=0, text=name, color=0xa6d1fe, flags=RT_HALIGN_LEFT | RT_VALIGN_CENTER))
