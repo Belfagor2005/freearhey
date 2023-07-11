@@ -7,7 +7,7 @@ print("Update.py")
 
 
 def upd_done():
-    from os import popen
+    from os import popen, remove
     cmd01 = "wget http://patbuweb.com/freearhey/freearhey.tar -O /tmp/freearhey.tar ; tar -xvf /tmp/freearhey.tar -C /"
     cmd02 = "wget --no-check-certificate -U 'Enigma2 - freearhey Plugin' -c 'http://patbuweb.com/freearhey/freearhey.tar' -O '/tmp/freearhey.tar'; tar -xvf /tmp/freearhey.tar -C /"
     cmd22 = 'find /usr/bin -name "wget"'
@@ -19,6 +19,7 @@ def upd_done():
         popen(cmd02)
     except:
         popen(cmd01)
+    remove('/tmp/freearhey.tar')
     return
 
 
