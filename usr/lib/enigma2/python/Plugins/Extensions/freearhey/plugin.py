@@ -232,6 +232,7 @@ def returnIMDB(text_clear):
         text_clear = html_conv.html_unescape(text_clear)
         _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
         return True
+    return False
 
 
 Panel_list = [
