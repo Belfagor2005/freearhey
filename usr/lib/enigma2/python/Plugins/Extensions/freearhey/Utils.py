@@ -10,10 +10,10 @@ import os
 import re
 import base64
 from random import choice
-#Added for support of wqhd detection
+# Added for support of wqhd detection
 from enigma import getDesktop
 screenwidth = getDesktop(0).size()
-#End of code
+# End of code
 # from sys import version_info
 # pythonFull = float(str(sys.version_info.major) + '.' + str(sys.version_info.minor))
 pythonVer = sys.version_info.major
@@ -35,10 +35,8 @@ if PY3:
     str = unicode = basestring = str
     range = range
     zip = zip
-
     def iteritems(d, **kw):
         return iter(d.items(**kw))
-
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
@@ -52,13 +50,10 @@ if PY2:
     zip = izip
     unicode = unicode
     basestring = basestring
-
     def bytes(b, encoding="ascii"):
         return _str(b)
-
     def iteritems(d, **kw):
         return d.iteritems(**kw)
-
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -131,7 +126,7 @@ def getDesktopSize():
     return (s.width(), s.height())
 
 
-#Chaneg code for support of wqhd detection
+# Chaneg code for support of wqhd detection
 def isUHD():
     UHD = False
     if screenwidth.width() == 2560:
@@ -146,7 +141,7 @@ def isHD():
     if screenwidth.width() == 1280:
         HD = True
         return HD
-#End of code change
+# End of code change
 
 def DreamOS():
     DreamOS = False
@@ -175,7 +170,7 @@ def getImageVersionString():
                 # 0120 2005 11 29 01 16
                 # 0123 4567 89 01 23 45
                 version = splitted[1]
-                image_type = version[0] # 0 = release, 1 = experimental
+                image_type = version[0]  # 0 = release, 1 = experimental
                 major = version[1]
                 minor = version[2]
                 revision = version[3]
@@ -497,13 +492,10 @@ def checkRedirect(url):
         return str(url)
 
 
-
-
-
-def checkRedirect2(url):
+# def checkRedirect2(url):
     # print("*** check redirect ***")
-    import requests
-    from requests.adapters import HTTPAdapter
+    # import requests
+    # from requests.adapters import HTTPAdapter
     # hdr = {"User-Agent": "Enigma2 - Enigma2 Plugin"}
     # x = ""
     # adapter = HTTPAdapter()
@@ -516,10 +508,10 @@ def checkRedirect2(url):
     # except Exception as e:
         # print(e)
         # return str(url)
-    import ssl
-    from urllib3 import poolmanager
+    # import ssl
+    # from urllib3 import poolmanager
     # class TLSAdapter(requests.adapters.HTTPAdapter):
-    
+
 
         # def init_poolmanager(self, connections, maxsize, block=False):
             # """Create and initialize the urllib3 PoolManager."""
@@ -550,7 +542,6 @@ def checkRedirect2(url):
     res = session.get(url)
     print('TLSAdapter: ', res)
     return res
-
 
 
 def freespace():
@@ -665,14 +656,12 @@ def ReloadBouquets():
         db = eDVBDB.getInstance()
         if db:
             db.reloadServicelist()
-            db.reloadBouquets()        
+            db.reloadBouquets()
             print("eDVBDB: bouquets reloaded...")
     else:
         os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &")
         os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=4 > /dev/null 2>&1 &")
         print("wGET: bouquets reloaded...")
-
-
 
 
 def deletetmp():
@@ -954,7 +943,7 @@ def ReadUrl2(url, referer):
     except:
         CONTEXT = None
 
-    TIMEOUT_URL = 15
+    TIMEOUT_URL = 30
     print('ReadUrl1:\n  url = %s' % url)
     try:
 
@@ -1021,7 +1010,7 @@ def ReadUrl(url):
     except:
         CONTEXT = None
 
-    TIMEOUT_URL = 15
+    TIMEOUT_URL = 30
     print('ReadUrl1:\n  url = %s' % url)
     try:
         req = urllib2.Request(url)
@@ -1083,14 +1072,14 @@ if PY3:
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             link = response.read().decode(errors='ignore')
             response.close()
             # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
             link = response.read().decode(errors='ignore')
             response.close()
         return link
@@ -1100,14 +1089,14 @@ if PY3:
         req.add_header('User-Agent', RequestAgent())
         req.add_header('Referer', referer)
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             link = response.read().decode()
             response.close()
             # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
             link = response.read().decode()
             response.close()
         return link
@@ -1116,12 +1105,12 @@ if PY3:
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             # return response
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
         return response
 else:
     import sys
@@ -1134,14 +1123,14 @@ else:
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             link = response.read()
             response.close()
             # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
             link = response.read()
             response.close()
         return link
@@ -1151,14 +1140,14 @@ else:
         req.add_header('User-Agent', RequestAgent())
         req.add_header('Referer', referer)
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             link = response.read()
             response.close()
             # return link
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
             link = response.read()
             response.close()
         return link
@@ -1167,12 +1156,12 @@ else:
         req = urllib2.Request(url)
         req.add_header('User-Agent', RequestAgent())
         try:
-            response = urlopen(req)
+            response = urlopen(req, timeout=20)
             # return response
         except:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, context=gcontext)
+            response = urlopen(req, timeout=20, context=gcontext)
         return response
 
 
@@ -1522,7 +1511,6 @@ def clean_html(html):
     if strType == 'utf-8':
         html = html.encode('utf-8')
     return html.strip()
-#######################################
 
 
 def cachedel(folder):
