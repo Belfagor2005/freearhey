@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: freearhey\n"
-"POT-Creation-Date: 2022-12-03 14:44+0100\n"
+"POT-Creation-Date: 2023-08-31 18:09+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: lululla\n"
@@ -15,74 +15,44 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:269 plugin.py:709
+#: plugin.py:263 plugin.py:606
 msgid "Exit"
 msgstr ""
 
-#: plugin.py:358
+#: plugin.py:345
 msgid ""
 "These streams may contain Adult content\n"
 "\n"
 "are you sure you want to continue??"
 msgstr ""
 
-#: plugin.py:416
+#: plugin.py:397
 msgid "Back"
 msgstr ""
 
-#: plugin.py:417
+#: plugin.py:398
 msgid "Export"
 msgstr ""
 
-#: plugin.py:577 plugin.py:791 plugin.py:863 plugin.py:915 plugin.py:925
-msgid "Sorry no found!"
+#: plugin.py:573
+msgid ""
+"Do you want to Convert to favorite .tv ?\n"
+"\n"
+"Attention!!It may take some time depending\n"
+"on the number of streams contained !!!"
 msgstr ""
 
-#: plugin.py:609
+#: plugin.py:582
 #, python-format
-msgid "Do you want to Convert %s to favorite .tv ?"
+msgid ""
+"bouquets reloaded..\n"
+"With %s channel"
 msgstr ""
 
-#: plugin.py:682
-msgid "Shuffle Favorite List in Progress"
-msgstr ""
-
-#: plugin.py:682
-msgid "Wait please ..."
-msgstr ""
-
-#: plugin.py:710 plugin.py:746
+#: plugin.py:607 plugin.py:636
 msgid "Search"
 msgstr ""
 
-#: plugin.py:1123
-msgid "4:3 Letterbox"
-msgstr ""
-
-#: plugin.py:1124
-msgid "4:3 PanScan"
-msgstr ""
-
-#: plugin.py:1125
-msgid "16:9"
-msgstr ""
-
-#: plugin.py:1126
-msgid "16:9 always"
-msgstr ""
-
-#: plugin.py:1127
-msgid "16:10 Letterbox"
-msgstr ""
-
-#: plugin.py:1128
-msgid "16:10 PanScan"
-msgstr ""
-
-#: plugin.py:1129
-msgid "16:9 Letterbox"
-msgstr ""
-
-#: plugin.py:1182
+#: plugin.py:1038
 msgid "Please install SubSupport Plugins"
 msgstr ""

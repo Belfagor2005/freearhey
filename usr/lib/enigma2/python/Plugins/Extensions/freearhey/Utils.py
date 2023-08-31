@@ -23,12 +23,11 @@ PY2 = False
 PY3 = False
 PY34 = False
 PY39 = False
-print("sys.version_info =", sys.version_info)
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
-
+print("sys.version_info =", sys.version_info)
 PY3 = sys.version_info.major >= 3
 if PY3:
     bytes = bytes
