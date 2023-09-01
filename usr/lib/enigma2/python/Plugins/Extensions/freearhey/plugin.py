@@ -13,9 +13,9 @@ from . import Utils
 from . import html_conv
 from . import cvbq
 try:
-    from Components.AVSwitch import eAVSwitch
+    from Components.AVSwitch import eAVSwitch as AVSwitch
 except Exception:
-    from Components.AVSwitch import iAVSwitch as eAVSwitch
+    from Components.AVSwitch import iAVSwitch as AVSwitch
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
@@ -965,7 +965,7 @@ class Playstream2(
         self.onClose.append(self.cancel)
 
     def getAspect(self):
-        return eAVSwitch().getAspectRatioSetting()
+        return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
         return {
@@ -990,7 +990,7 @@ class Playstream2(
         }
         config.av.aspectratio.setValue(map[aspect])
         try:
-            eAVSwitch().setAspectRatio(aspect)
+            AVSwitch().setAspectRatio(aspect)
         except:
             pass
 
