@@ -23,11 +23,12 @@ PY2 = False
 PY3 = False
 PY34 = False
 PY39 = False
+print("sys.version_info =", sys.version_info)
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
-print("sys.version_info =", sys.version_info)
+
 PY3 = sys.version_info.major >= 3
 if PY3:
     bytes = bytes
@@ -527,20 +528,6 @@ def checkRedirect(url):
     # session.mount('https://', TLSAdapter())
     # res = session.get(url)
     # return res
-
-    class TLSAdapter(requests.adapters.HTTPAdapter):
-
-        def init_poolmanager(self, *args, **kwargs):
-            ctx = ssl.create_default_context()
-            ctx.set_ciphers('DEFAULT@SECLEVEL=1')
-            kwargs['ssl_context'] = ctx
-            return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
-
-    session = requests.session()
-    session.mount('https://', TLSAdapter())
-    res = session.get(url)
-    print('TLSAdapter: ', res)
-    return res
 
 
 def freespace():
