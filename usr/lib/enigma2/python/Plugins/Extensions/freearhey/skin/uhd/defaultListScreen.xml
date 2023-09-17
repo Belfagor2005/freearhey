@@ -1,26 +1,26 @@
 <screen name="freearhey" position="0,0" size="2560,1440" title="::freearhey::.." backgroundColor="#ff000000" flags="wfNoBorder">
-    <widget name="title" position="519,30" size="1059,99" font="Regular;46" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="3" />
-    <widget name="category" position="1650,819" size="608,256" zPosition="3" backgroundColor="#30000000" transparent="1" font="Regular;51" halign="center" foregroundColor="#f4b700" />
+    <widget name="title" position="544,30" size="1059,99" font="Regular;46" halign="left" valign="center" foregroundColor="#ffff00" backgroundColor="black" transparent="1" zPosition="3" />
+    <widget name="category" position="1720,819" size="608,256" zPosition="3" backgroundColor="#30000000" transparent="1" font="Regular;51" halign="center" foregroundColor="#f4b700" />
     <widget name="name" position="294,174" size="1294,67" font="Regular;40" halign="center" valign="center" foregroundColor="yellow" backgroundColor="#202020" transparent="0" zPosition="5" />
     <eLabel position="296,1022" size="1287,200" backgroundColor="#30000000" zPosition="1" />
-    <eLabel position="1656,199" size="600,600" backgroundColor="#30000000" zPosition="1" />
+    <eLabel position="1721,199" size="600,600" backgroundColor="#30000000" zPosition="1" />
 	<ePixmap position="0,0" size="2560,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/main2.png" zPosition="-2" />
-	<ePixmap position="1914,0" size="640,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/pC.png" zPosition="-1" />
-    <ePixmap position="1654,200" size="600,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/icon.png" zPosition="4" scale="1" alphatest="blend" transparent="1" />
+	<ePixmap position="1367,0" size="640,1440" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/pC.png" zPosition="-1" />
+    <ePixmap position="1724,200" size="600,600" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/icon.png" zPosition="4" scale="1" alphatest="blend" transparent="1" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/plugin.png" scale="stretch" alphatest="blend" position="294,35" size="214,94" zPosition="5" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="893,1248" size="208,100" zPosition="5" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="835,1248" size="208,100" zPosition="5" alphatest="on" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" scale="1" position="306,1030" size="187,187" zPosition="2" alphatest="on" />
-    <widget name="paypal" position="504,1035" size="1079,187" font="Regular; 40" foregroundColor="#ffb75b" backgroundColor="#101010" halign="left" transparent="1" zPosition="5" />
+    <widget name="paypal" position="510,1035" size="1050,187" font="Regular; 40" foregroundColor="#ffb75b" backgroundColor="#101010" halign="left" transparent="1" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/sep.png" position="294,147" size="1294,11" alphatest="blend" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/sep.png" position="294,1007" size="1294,11" alphatest="blend" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/sep.png" position="294,1234" size="1294,11" alphatest="blend" zPosition="5" />
     <!-- Menu List -->
     <widget name="menulist" position="294,254" size="1294,734" scrollbarMode="showOnDemand" transparent="1" zPosition="5" foregroundColor="#00a0a0a0" foregroundColorSelected="#ffffff" backgroundColor="#20000000" backgroundColorSelected="#0b2049" />
     <!-- Colors 1220 -->
-    <widget name="key_red" position="420,1252" size="280,80" valign="center" halign="center" zPosition="4" foregroundColor="white" font="Regular;40" transparent="1" backgroundColor="#20000000" />
+    <widget name="key_red" position="295,1252" size="280,80" valign="center" halign="center" zPosition="4" foregroundColor="white" font="Regular;40" transparent="1" backgroundColor="#20000000" />
     <widget name="key_green" position="1307,1254" size="280,80" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;40" transparent="1" backgroundColor="#20000000" />
 	<!-- <widget name="key_blue" position="1308,1352" size="280,80" valign="center" halign="center" zPosition="4" foregroundColor="#ffffff" font="Regular;40" transparent="1" backgroundColor="#20000000" />	 -->
-    <eLabel position="420,1252" size="280,80" backgroundColor="#ff0033" zPosition="1" />       
+    <eLabel position="295,1252" size="280,80" backgroundColor="#ff0033" zPosition="1" />       
     <eLabel position="1307,1254" size="280,80" backgroundColor="#009900" zPosition="1" />    
     <!-- <eLabel position="1308,1352" size="280,80" backgroundColor="#0000ff" zPosition="1" /> -->
 </screen>
