@@ -11,13 +11,17 @@ from __future__ import print_function
 from . import _, isDreamOS, paypal
 from . import Utils
 from . import html_conv
-from . import cvbq
+# from . import cvbq
 import codecs
 from Components.AVSwitch import AVSwitch
 try:
     from Components.AVSwitch import iAVSwitch
 except:
     from enigma import eAVSwitch
+try:
+    from os.path import isdir
+except ImportError:
+    from os import isdir
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
@@ -59,7 +63,7 @@ else:
     from urllib2 import urlopen, Request
 
 
-global skin_path, search, downloadm3u
+global skin_path, search, dowm3u
 currversion = '2.8'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
@@ -71,8 +75,26 @@ host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
-downloadm3u = '/media/hdd/movie/'
+dowm3u = '/media/hdd/movie/'
+dir_enigma2 = '/etc/enigma2/'
 
+
+def defaultMoviePath():
+    result = config.usage.default_path.value
+    if not isdir(result):
+        from Tools import Directories
+        return Directories.defaultRecordingLocation(config.usage.default_path.value)
+    return result
+
+
+if not isdir(config.movielist.last_videodir.value):
+    try:
+        config.movielist.last_videodir.value = defaultMoviePath()
+        config.movielist.last_videodir.save()
+    except:
+        pass
+
+dowm3u = config.movielist.last_videodir.value
 
 screenwidth = getDesktop(0).size()
 if screenwidth.width() == 2560:
@@ -84,12 +106,12 @@ else:
 if isDreamOS:
     skin_path = skin_path + '/dreamOs'
 
-try:
-    from Components.UsageConfig import defaultMoviePath
-    downloadm3u = defaultMoviePath()
-except:
-    if os.path.exists("/usr/bin/apt-get"):
-        downloadm3u = ('/media/hdd/movie/')
+# try:
+    # from Components.UsageConfig import defaultMoviePath
+    # dowm3u = defaultMoviePath()
+# except:
+    # if os.path.exists("/usr/bin/apt-get"):
+        # dowm3u = ('/media/hdd/movie/')
 
 
 def pngassign(name):
@@ -501,19 +523,19 @@ class main2(Screen):
                         item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
-                    regexcat = 'emoji> (.+?)</td>.*?<code>(.+?)</code'
-                    match = re.compile(regexcat, re.DOTALL).findall(content2)
-                    items.append(item)
-                    for name, url in match:
-                        if 'Channels' in name:
-                            continue
-                        a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
-                        if any(s in str(name).lower() for s in a):
-                            continue
-                        name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        item = name + "###" + url + '\n'
-                        if item not in items:
-                            items.append(item)
+                    # regexcat = 'emoji> (.+?)</td>.*?<code>(.+?)</code'
+                    # match2 = re.compile(regexcat, re.DOTALL).findall(content2)
+                    # items.append(item)
+                    # for name, url in match2:
+                        # if 'Channels' in name:
+                            # continue
+                        # a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
+                        # if any(s in str(name).lower() for s in a):
+                            # continue
+                        # name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
+                        # item = name + "###" + url + '\n'
+                        # if item not in items:
+                            # items.append(item)
                 elif "Region" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
                     if item not in items:
@@ -574,14 +596,90 @@ class main2(Screen):
         if answer is None:
             self.session.openWithCallback(self.message2, MessageBox, _('Do you want to Convert to favorite .tv ?\n\nAttention!!It may take some time depending\non the number of streams contained !!!'))
         elif answer:
-            name = self['menulist'].l.getCurrentSelection()[0][0]
+            # name = self['menulist'].l.getCurrentSelection()[0][0]
             url = self['menulist'].getCurrent()[0][1]
             url = str(url)
             service = '4097'
             ch = 0
-            ch = cvbq.convert_bouquet(url, name, service)
-            if ch:
+            # ch = cvbq.convert_bouquet(url, name, service)
+            # if ch:
+                # _session.open(MessageBox, _('bouquets reloaded..\nWith %s channel' % ch), MessageBox.TYPE_INFO, timeout=5)
+            ch = self.convert_bouquet(service)
+            if ch > 0:
                 _session.open(MessageBox, _('bouquets reloaded..\nWith %s channel' % ch), MessageBox.TYPE_INFO, timeout=5)
+            else:
+                _session.open(MessageBox, _('Download Error'), MessageBox.TYPE_INFO, timeout=5)
+
+    def convert_bouquet(self, service):
+        from time import sleep
+        name = self['menulist'].getCurrent()[0][0]
+        url = self['menulist'].getCurrent()[0][1]
+        type = 'tv'
+        if "radio" in name.lower():
+            type = "radio"
+        name_file = name.replace('/', '_').replace(',', '').replace('hasbahca', 'hbc')
+        cleanName = re.sub(r'[\<\>\:\"\/\\\|\?\*]', '_', str(name_file))
+        cleanName = re.sub(r' ', '_', cleanName)
+        cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
+        name_file = re.sub(r'_+', '_', cleanName)
+        bouquetname = 'userbouquet.free_%s.%s' % (name_file.lower(), type.lower())
+        files = ''
+        if os.path.exists(str(dowm3u)):
+            files = str(dowm3u) + str(name_file) + '.m3u'
+        else:
+            files = '/tmp/' + str(name_file) + '.m3u'
+        if os.path.isfile(files):
+            os.remove(files)
+        urlm3u = url.strip()
+        if PY3:
+            urlm3u.encode()
+        import six
+        content = Utils.getUrl(urlm3u)
+        if six.PY3:
+            content = six.ensure_str(content)
+        with open(files, 'wb') as f1:
+            f1.write(content)
+            f1.close()
+        sleep(5)
+        ch = 0
+        try:
+            if os.path.isfile(files) and os.stat(files).st_size > 0:
+                print('ChannelList is_tmp exist in playlist')
+                desk_tmp = ''
+                in_bouquets = 0
+                with open('%s%s' % (dir_enigma2, bouquetname), 'w') as outfile:
+                    outfile.write('#NAME %s\r\n' % name_file.capitalize())
+                    for line in open(files):
+                        if line.startswith('http://') or line.startswith('https'):
+                            outfile.write('#SERVICE %s:0:1:1:0:0:0:0:0:0:%s' % (service, line.replace(':', '%3a')))
+                            outfile.write('#DESCRIPTION %s' % desk_tmp)
+                        elif line.startswith('#EXTINF'):
+                            desk_tmp = '%s' % line.split(',')[-1]
+                        elif '<stream_url><![CDATA' in line:
+                            outfile.write('#SERVICE %s:0:1:1:0:0:0:0:0:0:%s\r\n' % (service, line.split('[')[-1].split(']')[0].replace(':', '%3a')))
+                            outfile.write('#DESCRIPTION %s\r\n' % desk_tmp)
+                        elif '<title>' in line:
+                            if '<![CDATA[' in line:
+                                desk_tmp = '%s\r\n' % line.split('[')[-1].split(']')[0]
+                            else:
+                                desk_tmp = '%s\r\n' % line.split('<')[1].split('>')[1]
+                        ch += 1
+                    outfile.close()
+                if os.path.isfile('/etc/enigma2/bouquets.tv'):
+                    for line in open('/etc/enigma2/bouquets.tv'):
+                        if bouquetname in line:
+                            in_bouquets = 1
+                    if in_bouquets == 0:
+                        if os.path.isfile('%s%s' % (dir_enigma2, bouquetname)) and os.path.isfile('/etc/enigma2/bouquets.tv'):
+                            Utils.remove_line('/etc/enigma2/bouquets.tv', bouquetname)
+                            with open('/etc/enigma2/bouquets.tv', 'a+') as outfile:
+                                outfile.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "%s" ORDER BY bouquet\r\n' % bouquetname)
+                                outfile.close()
+                                in_bouquets = 1
+                    Utils.ReloadBouquets()
+            return ch
+        except Exception as e:
+            print('error convert iptv ', e)
 
 
 class selectplay(Screen):
@@ -646,9 +744,9 @@ class selectplay(Screen):
                     req = Request(self.url)
                     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
                     r = urlopen(req, None, 15)
-                    link = r.read()
+                    content = r.read()
                     r.close()
-                    content = link
+                    # content = link
                     if str(type(content)).find('bytes') != -1:
                         try:
                             content = content.decode("utf-8")
