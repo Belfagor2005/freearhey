@@ -511,7 +511,7 @@ class main2(Screen):
                         items.append(item)
                     content2 = content[n3:n4]
                     print('content2: ', content2)
-                    regexcat = '<tr><td>      (.+?)</td><td.*?<code>(.+?)</code'
+                    regexcat = '<tr><td>(.+?)</td><td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     for name, url in match:
                         if 'Channels' in name:
@@ -617,7 +617,7 @@ class main2(Screen):
         type = 'tv'
         if "radio" in name.lower():
             type = "radio"
-        name_file = name.replace('/', '_').replace(',', '').replace('hasbahca', 'hbc')
+        name_file = name.replace('/', '_').replace(',', '')
         cleanName = re.sub(r'[\<\>\:\"\/\\\|\?\*]', '_', str(name_file))
         cleanName = re.sub(r' ', '_', cleanName)
         cleanName = re.sub(r'\d+:\d+:[\d.]+', '_', cleanName)
@@ -1065,11 +1065,7 @@ class Playstream2(
         self.onClose.append(self.cancel)
 
     def getAspect(self):
-        try:
-            aspect = iAVSwitch().getAspectRatioSetting()
-        except:
-            aspect = eAVSwitch().getAspectRatioSetting()
-        return aspect
+        return AVSwitch().getAspectRatioSetting()
 
     def getAspectString(self, aspectnum):
         return {0: '4:3 Letterbox',
@@ -1090,9 +1086,9 @@ class Playstream2(
                6: '16_9_letterbox'}
         config.av.aspectratio.setValue(map[aspect])
         try:
-            iAVSwitch.setAspectRatio(aspect)
+            AVSwitch().setAspectRatio(aspect)
         except:
-            eAVSwitch.setAspectRatio(aspect)
+            pass
 
     def av(self):
         temp = int(self.getAspect())
