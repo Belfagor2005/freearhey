@@ -16,8 +16,13 @@ import codecs
 from Components.AVSwitch import AVSwitch
 try:
     from Components.AVSwitch import iAVSwitch
-except:
+except Exception as e:
+    print(e)
+
+try:
     from enigma import eAVSwitch
+except Exception as e:
+    print(e)
 try:
     from os.path import isdir
 except ImportError:
