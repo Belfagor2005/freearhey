@@ -1,6 +1,12 @@
 import re
-from six import ensure_str, unichr, iteritems
+from six import unichr, iteritems  # ensure_str
 from six.moves import html_entities
+import sys
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+
+
+
 _UNICODE_MAP = {k: unichr(v) for k, v in iteritems(html_entities.name2codepoint)}
 _ESCAPE_RE = re.compile("[&<>\"']")
 _UNESCAPE_RE = re.compile(r"&\s*(#?)(\w+?)\s*;")  # Whitespace handling added due to "hand-assed" parsers of html pages
@@ -11,6 +17,30 @@ _ESCAPE_DICT = {
                 '"': "&quot;",
                 "'": "&apos;",
                 }
+
+
+
+def ensure_str(s, encoding='utf-8', errors='strict'):
+    """Coerce *s* to `str`.
+
+    For Python 2:
+      - `unicode` -> encoded to `str`
+      - `str` -> `str`
+
+    For Python 3:
+      - `str` -> `str`
+      - `bytes` -> decoded to `str`
+    """
+    # Optimization: Fast return for the common case.
+    if type(s) is str:
+        return s
+    if PY2 and isinstance(s, text_type):
+        return s.encode(encoding, errors)
+    elif PY3 and isinstance(s, binary_type):
+        return s.decode(encoding, errors)
+    elif not isinstance(s, (text_type, binary_type)):
+        raise TypeError("not expecting type '%s'" % type(s))
+    return s
 
 
 def html_escape(value):
