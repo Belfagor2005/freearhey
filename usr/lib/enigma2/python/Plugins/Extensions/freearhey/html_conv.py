@@ -5,7 +5,12 @@ import sys
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
-
+if PY3:
+    text_type = str
+    binary_type = bytes
+else:
+    text_type = unicode
+    binary_type = str
 
 _UNICODE_MAP = {k: unichr(v) for k, v in iteritems(html_entities.name2codepoint)}
 _ESCAPE_RE = re.compile("[&<>\"']")
