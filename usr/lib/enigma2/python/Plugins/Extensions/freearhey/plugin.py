@@ -50,8 +50,8 @@ from enigma import eListboxPythonMultiContent
 from enigma import ePicLoad, loadPNG, gFont
 from enigma import eServiceReference
 from enigma import eTimer
-from enigma import iPlayableService
 from enigma import getDesktop
+from enigma import iPlayableService
 import os
 import re
 import sys
@@ -438,6 +438,7 @@ class main2(Screen):
                                                            'right': self.right,
                                                            'ok': self.ok,
                                                            'green': self.message2,
+                                                                                     
                                                            'cancel': self.close,
                                                            'red': self.close}, -1)
         self.timer = eTimer()
@@ -453,7 +454,17 @@ class main2(Screen):
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
+                          
+                     
+                          
+                          
+                                                                                                                                 
+
+                              
     def updateMenuList(self):
+                  
+                                   
+                                   
         self.menu_list = []
         items = []
         if Utils.check(self.url):
@@ -571,31 +582,71 @@ class main2(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
+                                                    
+                                         
+                                          
+                 
+                                                        
+                                                                        
+                                       
+                                              
+                                                
+                             
+
+                                                    
+                                         
+                                          
+                        
+                              
+                                           
+                                          
+                                        
+                                                       
+                                                          
+                                                         
+                                              
+                              
+                                   
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
+                                      
+
+                                        
         self.session.open(selectplay, name, url)
 
     def up(self):
+            
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
+                              
+                    
 
     def down(self):
+            
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
+                              
+                    
 
     def left(self):
+            
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
+                              
+                    
 
     def right(self):
+            
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
+                              
+                    
 
     def message2(self, answer=None):
         if answer is None:
@@ -643,7 +694,7 @@ class main2(Screen):
         if six.PY3:
             content = six.ensure_str(content)
         with open(files, 'wb') as f1:
-            f1.write(content)
+            f1.write(content.encode())
             f1.close()
         sleep(5)
         ch = 0
