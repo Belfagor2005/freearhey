@@ -10,6 +10,7 @@ import os
 import re
 import base64
 from random import choice
+import unicodedata
 from Components.config import config
 try:
     from os.path import isdir
@@ -37,31 +38,16 @@ PY39 = sys.version_info[0:2] >= (3, 9)
 PY3 = sys.version_info.major >= 3
 if PY3:
     bytes = bytes
-    str = unicode = basestring = str
+    unicode = str
     range = range
-    zip = zip
-    def iteritems(d, **kw):
-        return iter(d.items(**kw))
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
     from urllib.error import HTTPError, URLError
 
 if PY2:
-    _str = str
-    str = unicode
+    str = str
     range = xrange
-    from itertools import izip
-    zip = izip
-    unicode = unicode
-    basestring = basestring
-    
-    def bytes(b, encoding="ascii"):
-        return _str(b)
-
-    def iteritems(d, **kw):
-        return d.iteritems(**kw)
-
     from urllib import quote
     from urllib2 import urlopen
     from urllib2 import Request
@@ -952,6 +938,23 @@ def RequestAgent():
     return RandomAgent
 
 
+def make_request(url):
+    try:
+        import requests
+        response = requests.get(url, verify=False)
+        if response.status_code == 200:
+            link = requests.get(url, headers={'User-Agent': RequestAgent()}, timeout=15, verify=False, stream=True ).text
+        return link
+    except ImportError:
+        req = Request(url)
+        req.add_header('User-Agent', 'E2 Plugin Lululla')
+        response = urlopen(req, None, 10)
+        link = response.read().decode('utf-8')
+        response.close()
+        return link
+    return
+
+
 def ReadUrl2(url, referer):
     if sys.version_info.major == 3:
         import urllib.request as urllib2
@@ -1232,6 +1235,17 @@ def decodeUrl(text):
         # except ValueError:
             # return "&#%s;" % m.group(2)
     # return _UNICODE_MAP.get(m.group(2), "&%s;" % m.group(2))
+
+def normalize(title):
+    try:
+        try:
+            return title.decode('ascii').encode("utf-8")
+        except:
+            pass
+
+        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
+    except:
+        return unicode(title)
 
 
 def decodeHtml(text):
