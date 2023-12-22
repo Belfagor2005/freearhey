@@ -11,18 +11,17 @@ from __future__ import print_function
 from . import _, isDreamOS, paypal
 from . import Utils
 from . import html_conv
-# from . import cvbq
 import codecs
 from Components.AVSwitch import AVSwitch
 try:
     from Components.AVSwitch import iAVSwitch
 except Exception as e:
     print(e)
-
+    
 try:
     from enigma import eAVSwitch
-except Exception as e:
-    print(e)
+except Exception:
+    from enigma import eAVControl as eAVSwitch
 try:
     from os.path import isdir
 except ImportError:
@@ -43,7 +42,6 @@ from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 from Tools.Directories import SCOPE_PLUGINS
 from Tools.Directories import resolveFilename
-from Screens.VirtualKeyBoard import VirtualKeyBoard
 from enigma import RT_VALIGN_CENTER
 from enigma import RT_HALIGN_LEFT
 from enigma import eListboxPythonMultiContent
@@ -99,8 +97,8 @@ if not isdir(config.movielist.last_videodir.value):
     except:
         pass
 
-dowm3u = config.movielist.last_videodir.value
 
+dowm3u = config.movielist.last_videodir.value
 screenwidth = getDesktop(0).size()
 if screenwidth.width() == 2560:
     skin_path = res_plugin_path + '/uhd'
@@ -110,13 +108,6 @@ else:
     skin_path = res_plugin_path + '/hd'
 if isDreamOS:
     skin_path = skin_path + '/dreamOs'
-
-# try:
-    # from Components.UsageConfig import defaultMoviePath
-    # dowm3u = defaultMoviePath()
-# except:
-    # if os.path.exists("/usr/bin/apt-get"):
-        # dowm3u = ('/media/hdd/movie/')
 
 
 def pngassign(name):
@@ -438,7 +429,6 @@ class main2(Screen):
                                                            'right': self.right,
                                                            'ok': self.ok,
                                                            'green': self.message2,
-                                                                                     
                                                            'cancel': self.close,
                                                            'red': self.close}, -1)
         self.timer = eTimer()
@@ -454,17 +444,7 @@ class main2(Screen):
         self["paypal"].setText(payp)
         self.setTitle(self.setup_title)
 
-                          
-                     
-                          
-                          
-                                                                                                                                 
-
-                              
     def updateMenuList(self):
-                  
-                                   
-                                   
         self.menu_list = []
         items = []
         if Utils.check(self.url):
@@ -539,19 +519,6 @@ class main2(Screen):
                         item = name + "###" + url + '\n'
                         if item not in items:
                             items.append(item)
-                    # regexcat = 'emoji> (.+?)</td>.*?<code>(.+?)</code'
-                    # match2 = re.compile(regexcat, re.DOTALL).findall(content2)
-                    # items.append(item)
-                    # for name, url in match2:
-                        # if 'Channels' in name:
-                            # continue
-                        # a = '+18', 'adult', 'Adult', 'Xxx', 'XXX', 'hot', 'porn', 'sex', 'xxx', 'Sex', 'Porn'
-                        # if any(s in str(name).lower() for s in a):
-                            # continue
-                        # name = name.replace('<g-emoji class="g-emoji" alias="', '').replace('      ', '').replace('%20', ' ')
-                        # item = name + "###" + url + '\n'
-                        # if item not in items:
-                            # items.append(item)
                 elif "Region" in self.name:
                     item = ' All###https://iptv-org.github.io/iptv/index.region.m3u'
                     if item not in items:
@@ -582,71 +549,32 @@ class main2(Screen):
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
-                                                    
-                                         
-                                          
-                 
-                                                        
-                                                                        
-                                       
-                                              
-                                                
-                             
-
-                                                    
-                                         
-                                          
-                        
-                              
-                                           
-                                          
-                                        
-                                                       
-                                                          
-                                                         
-                                              
-                              
-                                   
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
-                                      
-
-                                        
         self.session.open(selectplay, name, url)
 
     def up(self):
-            
+
         self[self.currentList].up()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-                              
-                    
 
     def down(self):
-            
         self[self.currentList].down()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-                              
-                    
 
     def left(self):
-            
         self[self.currentList].pageUp()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-                              
-                    
 
     def right(self):
-            
         self[self.currentList].pageDown()
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
-                              
-                    
 
     def message2(self, answer=None):
         if answer is None:
@@ -657,9 +585,6 @@ class main2(Screen):
             url = str(url)
             service = '4097'
             ch = 0
-            # ch = cvbq.convert_bouquet(url, name, service)
-            # if ch:
-                # _session.open(MessageBox, _('bouquets reloaded..\nWith %s channel' % ch), MessageBox.TYPE_INFO, timeout=5)
             ch = self.convert_bouquet(service)
             if ch > 0:
                 _session.open(MessageBox, _('bouquets reloaded..\nWith %s channel' % ch), MessageBox.TYPE_INFO, timeout=5)
@@ -1254,7 +1179,7 @@ class Playstream2(
                 self.setAspect(self.init_aspect)
             except:
                 pass
-        streaml = False
+        # streaml = False
         self.close()
 
     def leavePlayer(self):
