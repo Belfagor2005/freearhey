@@ -8,8 +8,8 @@ print("Update.py")
 
 def upd_done():
     from os import popen, system
-    cmd01 = "wget http://patbuweb.com/freearhey/freearhey.tar -O /tmp/freearhey.tar ; tar -xvf /tmp/freearhey.tar -C /"
-    cmd02 = "wget --no-check-certificate -U 'Enigma2 - freearhey Plugin' -c 'http://patbuweb.com/freearhey/freearhey.tar' -O '/tmp/freearhey.tar'; tar -xvf /tmp/freearhey.tar -C /"
+    cmd01 = "wget --no-cache --no-dns-cache http://patbuweb.com/freearhey/freearhey.tar -O /tmp/freearhey.tar --post-data='action=purge'; tar -xvf /tmp/freearhey.tar -C /"
+    cmd02 = "wget --no-check-certificate --no-cache --no-dns-cache -U 'Enigma2 - freearhey Plugin' -c 'http://patbuweb.com/freearhey/freearhey.tar' -O '/tmp/freearhey.tar' --post-data='action=purge'; tar -xvf /tmp/freearhey.tar -C /"
     cmd22 = 'find /usr/bin -name "wget"'
     res = popen(cmd22).read()
     if 'wget' not in res.lower():
