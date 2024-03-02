@@ -6,10 +6,10 @@
     <eLabel position="1242,149" size="450,450" backgroundColor="#30000000" zPosition="1" />
 	<ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/main2.png" zPosition="-2" />
     <ePixmap position="1030,0" size="480,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/pC.png" zPosition="-1" />
-    <ePixmap position="1240,150" size="450,450" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/icon.png" zPosition="4" scale="1" alphatest="blend" />
+    <ePixmap position="1240,150" size="450,450" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/icon.png" zPosition="4" scale="stretch" alphatest="blend" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/plugin.png" scale="stretch" alphatest="blend" position="220,26" size="160,70" zPosition="5" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="613,951" size="156,75" zPosition="5" alphatest="on" />
-    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" scale="1" position="229,772" size="140,140" zPosition="2" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" scale="stretch" position="613,951" size="156,75" zPosition="5" alphatest="on" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" scale="stretch" position="229,772" size="140,140" zPosition="2" alphatest="on" />
     <widget name="paypal" position="380,775" size="800,140" font="Regular; 30" foregroundColor="#ffb75b" backgroundColor="#101010" halign="left" transparent="1" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/sep.png" position="220,110" size="970,8" alphatest="blend" zPosition="5" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/sep.png" position="220,755" size="970,8" alphatest="blend" zPosition="5" />

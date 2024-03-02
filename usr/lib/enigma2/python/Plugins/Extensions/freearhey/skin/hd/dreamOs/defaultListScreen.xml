@@ -10,8 +10,8 @@
 	<!-- Menu List -->
 	<widget name="menulist" position="36,127" size="670,438" backgroundColor="#30000000" zPosition="1" scrollbarMode="showOnDemand" transparent="1" foregroundColor="#00ffffff" />
 	<!-- Paypal -->
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="1070,374" size="156,75" zPosition="2" alphatest="on" />
-	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" position="756,163" scale="1" size="250,250" zPosition="2" alphatest="on" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/PayPal.png" position="1070,374" scale="stretch" size="156,75" zPosition="2" alphatest="on" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/freearhey/skin/pic/qr-code.png" position="756,163" scale="stretch" size="250,250" zPosition="2" alphatest="on" />
 	<widget name="paypal" position="728,456" size="530,197" font="Regular;24" halign="center" foregroundColor="#ffffff" backgroundColor="#101010" transparent="1" zPosition="2" />
 	<eLabel position="721,123" size="552,531" backgroundColor="#80000000" cornerRadius="20" transparent="1" zPosition="1" />
 	<!-- Clock -->

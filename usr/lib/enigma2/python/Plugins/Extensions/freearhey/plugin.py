@@ -338,23 +338,23 @@ class freearhey(Screen):
         if sel == ("PLAYLISTS DIRECT"):
             namex = "Directy"
             lnk = Utils.b64decoder(host22)
-            self.session.open(selectplay, namex, lnk)
+            self.session.open(selectplay3, namex, lnk)
         elif sel == ("PLAYLISTS NSFW"):
             namex = "Nsfw"
             lnk = Utils.b64decoder(host33)
-            self.session.open(selectplay, namex, lnk)
+            self.session.open(selectplay3, namex, lnk)
         elif sel == ("PLAYLISTS BY CATEGORY"):
             namex = "Category"
-            self.session.open(main2, namex, lnk)
+            self.session.open(main23, namex, lnk)
         elif sel == ("PLAYLISTS BY LANGUAGE"):
             namex = "Language"
-            self.session.open(main2, namex, lnk)
+            self.session.open(main23, namex, lnk)
         elif sel == ("PLAYLISTS BY COUNTRY"):
             namex = "Country"
-            self.session.open(main2, namex, lnk)
+            self.session.open(main23, namex, lnk)
         elif sel == ("PLAYLISTS BY REGION"):
             namex = "Region"
-            self.session.open(main2, namex, lnk)
+            self.session.open(main23, namex, lnk)
         else:
             if sel == ("MOVIE XXX"):
                 namex = "moviexxx"
@@ -368,7 +368,7 @@ class freearhey(Screen):
         if not result:
             return
         else:
-            self.session.open(selectplay, namex, lnk)
+            self.session.open(selectplay3, namex, lnk)
 
     def up(self):
         self[self.currentList].up()
@@ -394,7 +394,7 @@ class freearhey(Screen):
         self.close()
 
 
-class main2(Screen):
+class main23(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
@@ -553,7 +553,7 @@ class main2(Screen):
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
         url = self['menulist'].getCurrent()[0][1]
-        self.session.open(selectplay, name, url)
+        self.session.open(selectplay3, name, url)
 
     def up(self):
 
@@ -663,7 +663,7 @@ class main2(Screen):
             print('error convert iptv ', e)
 
 
-class selectplay(Screen):
+class selectplay3(Screen):
     def __init__(self, session, namex, lnk):
         self.session = session
         Screen.__init__(self, session)
