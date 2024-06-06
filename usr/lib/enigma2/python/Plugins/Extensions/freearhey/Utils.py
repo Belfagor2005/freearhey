@@ -3,7 +3,7 @@
 
 # 30.03.2023
 # a common tips used from Lululla
-#
+
 import sys
 import datetime
 import os
@@ -24,7 +24,6 @@ screenwidth = getDesktop(0).size()
 # pythonFull = float(str(sys.version_info.major) + '.' + str(sys.version_info.minor))
 pythonVer = sys.version_info.major
 # PY3 = version_info[0] == 3
-
 PY2 = False
 PY3 = False
 PY34 = False
@@ -34,7 +33,6 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
-
 PY3 = sys.version_info.major >= 3
 if PY3:
     bytes = bytes
@@ -163,6 +161,84 @@ def DreamOS():
         return DreamOS
 
 
+def mountipkpth():
+    from Tools.Directories import fileExists
+    myusb = myusb1 = myhdd = myhdd2 = mysdcard = mysd = myuniverse = myba = mydata = ''
+    mdevices = []
+    myusb = None
+    myusb1 = None
+    myhdd = None
+    myhdd2 = None
+    mysdcard = None
+    mysd = None
+    myuniverse = None
+    myba = None
+    mydata = None
+    if fileExists('/proc/mounts'):
+        f = open('/proc/mounts', 'r')
+        for line in f.readlines():
+            if line.find('/media/usb') != -1:
+                myusb = '/media/usb/picon'
+                if not os.path.exists('/media/usb/picon'):
+                    os.system('mkdir -p /media/usb/picon')
+            elif line.find('/media/usb1') != -1:
+                myusb1 = '/media/usb1/picon'
+                if not os.path.exists('/media/usb1/picon'):
+                    os.system('mkdir -p /media/usb1/picon')
+            elif line.find('/media/hdd') != -1:
+                myhdd = '/media/hdd/picon'
+                if not os.path.exists('/media/hdd/picon'):
+                    os.system('mkdir -p /media/hdd/picon')
+            elif line.find('/media/hdd2') != -1:
+                myhdd2 = '/media/hdd2/picon'
+                if not os.path.exists('/media/hdd2/picon'):
+                    os.system('mkdir -p /media/hdd2/picon')
+            elif line.find('/media/sdcard') != -1:
+                mysdcard = '/media/sdcard/picon'
+                if not os.path.exists('/media/sdcard/picon'):
+                    os.system('mkdir -p /media/sdcard/picon')
+            elif line.find('/media/sd') != -1:
+                mysd = '/media/sd/picon'
+                if not os.path.exists('/media/sd/picon'):
+                    os.system('mkdir -p /media/sd/picon')
+            elif line.find('/universe') != -1:
+                myuniverse = '/universe/picon'
+                if not os.path.exists('/universe/picon'):
+                    os.system('mkdir -p /universe/picon')
+            elif line.find('/media/ba') != -1:
+                myba = '/media/ba/picon'
+                if not os.path.exists('/media/ba/picon'):
+                    os.system('mkdir -p /media/ba/picon')
+            elif line.find('/data') != -1:
+                mydata = '/data/picon'
+                if not os.path.exists('/data/picon'):
+                    os.system('mkdir -p /data/picon')
+        f.close()
+    if myusb:
+        mdevices.append(myusb)
+    if myusb1:
+        mdevices.append(myusb1)
+    if myhdd:
+        mdevices.append(myhdd)
+    if myhdd2:
+        mdevices.append(myhdd2)
+    if mysdcard:
+        mdevices.append(mysdcard)
+    if mysd:
+        mdevices.append(mysd)
+    if myuniverse:
+        mdevices.append(myuniverse)
+    if myba:
+        mdevices.append(myba)
+    if mydata:
+        mdevices.append(mydata)
+    mdevices.append('/picon')
+    mdevices.append('/usr/share/enigma2/picon')
+    return mdevices
+# piconpathss = mountipkpth()
+# print('MDEVICES AS:\n', piconpathss)
+
+
 def getEnigmaVersionString():
     try:
         from enigma import getEnigmaVersionString
@@ -243,7 +319,7 @@ def sizeToString(nbytes):
     size = "0 B"
     if nbytes > 0:
         i = 0
-        while nbytes >= 1024 and i < len(suffixes)-1:
+        while nbytes >= 1024 and i < len(suffixes) - 1:
             nbytes /= 1024.
             i += 1
         f = ('%.2f' % nbytes).rstrip('0').rstrip('.').replace(".", ",")
@@ -298,7 +374,7 @@ def getFreeSpace(path):
         print(moin_point + "|" + device)
         stat = os.statvfs(device)  # @UndefinedVariable
         print(stat)
-        return sizeToString(stat.f_bfree*stat.f_bsize)
+        return sizeToString(stat.f_bfree * stat.f_bsize)
     except:
         return "N/A"
 
@@ -388,6 +464,7 @@ def defaultMoviePath():
         return Directories.defaultRecordingLocation(config.usage.default_path.value)
     return result
 
+
 if not isdir(config.movielist.last_videodir.value):
     try:
         config.movielist.last_videodir.value = defaultMoviePath()
@@ -438,12 +515,10 @@ def zCheckInternet(opt=1, server=None, port=None):
         socket.setdefaulttimeout(0.5)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(srv)
         sock = True
-        # print('[iSettingE2] - Internet OK')
         CountConnOk = 0
         print('Status Internet: %s:%s -> OK' % (srv[0], srv[1]))
     except:
         sock = False
-        # print('[iSettingE2] - Internet KO')
         print('Status Internet: %s:%s -> KO' % (srv[0], srv[1]))
         if CountConnOk == 0 and opt != 2 and opt != 3:
             CountConnOk = 1
@@ -491,7 +566,7 @@ def testWebConnection(host='www.google.com', port=80, timeout=3):
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
         return True
     except Exception as e:
-        print('error: ', str(e))
+        print('error: ', e)
         return False
 
 
@@ -504,6 +579,7 @@ def checkStr(text, encoding='utf8'):
             text = text.encode(encoding)
     return text
 
+
 def str_encode(text, encoding="utf8"):
     if not PY3:
         if isinstance(text, unicode):
@@ -512,6 +588,7 @@ def str_encode(text, encoding="utf8"):
             return text
     else:
         return text
+
 
 def checkRedirect(url):
     # print("*** check redirect ***")
@@ -590,32 +667,29 @@ def b64encoder(source):
 
 
 def b64decoder(s):
-    '''Add missing padding to string and return the decoded base64 string.'''
-    import base64
     s = str(s).strip()
     try:
-        outp = base64.b64decode(s)
-        # print('outp1 ', outp)
-        if PY3:
-            outp = outp.decode('utf-8')
-            # print('outp2 ', outp)
-        return outp
+        output = base64.b64decode(s)
+        if pythonVer == 3:
+            output = output.decode('utf-8')
+        return output
 
-    except TypeError:
+    except Exception:
         padding = len(s) % 4
         if padding == 1:
             print('Invalid base64 string: {}'.format(s))
-            return ''
+            return ""
         elif padding == 2:
             s += b'=='
         elif padding == 3:
             s += b'='
-        outp = base64.b64decode(s)
-        # print('outp1 ', outp)
-        if PY3:
-            outp = outp.decode('utf-8')
-            # print('outp2 ', outp)
-        return outp
+        else:
+            return ""
+
+        output = base64.b64decode(s)
+        if pythonVer == 3:
+            output = output.decode('utf-8')
+        return output
 
 
 def __createdir(list):
@@ -634,7 +708,7 @@ try:
     from Plugins.Extensions.tmdb import tmdb
     is_tmdb = True
 except Exception as e:
-    print('error: ', str(e))
+    print('error: ', e)
     is_tmdb = False
 
 
@@ -642,7 +716,7 @@ try:
     from Plugins.Extensions.IMDb.plugin import main as imdb
     is_imdb = True
 except Exception as e:
-    print('error: ', str(e))
+    print('error: ', e)
     is_imdb = False
 
 
@@ -661,31 +735,9 @@ def uniq(inlist):
 
 
 def ReloadBouquets():
-    print('\n----Reloading bouquets----\n')
-    # try:
-        # eDVBDB = None
-        # os.system('wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &')
-        # print('bouquets reloaded...')
-    # except:
-        # from enigma import eDVBDB
-        # eDVBDB.getInstance().reloadBouquets()
-        # print('bouquets reloaded...')
-    try:
-        from enigma import eDVBDB
-    except ImportError:
-        eDVBDB = None
-    if eDVBDB:
-        # eDVBDB.getInstance().reloadServicelist()
-        # eDVBDB.getInstance().reloadBouquets()
-        db = eDVBDB.getInstance()
-        if db:
-            db.reloadServicelist()
-            db.reloadBouquets()
-            print("eDVBDB: bouquets reloaded...")
-    else:
-        os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=2 > /dev/null 2>&1 &")
-        os.system("wget -qO - http://127.0.0.1/web/servicelistreload?mode=4 > /dev/null 2>&1 &")
-        print("wGET: bouquets reloaded...")
+    from enigma import eDVBDB
+    eDVBDB.getInstance().reloadServicelist()
+    eDVBDB.getInstance().reloadBouquets()
 
 
 def deletetmp():
@@ -764,7 +816,7 @@ def web_info(message):
         # debug(cmd, 'CMD -> Console -> WEBIF')
         os.popen(cmd)
     except Exception as e:
-        print('error: ', str(e))
+        print('error: ', e)
         print('web_info ERROR')
 
 
@@ -774,13 +826,13 @@ def trace_error():
         traceback.print_exc(file=sys.stdout)
         traceback.print_exc(file=open('/tmp/Error.log', 'a'))
     except Exception as e:
-        print('error: ', str(e))
+        print('error: ', e)
         pass
 
 
 def log(label, data):
     data = str(data)
-    open('/tmp/my__debug.log', 'a').write('\n' + label+':>' + data)
+    open('/tmp/my__debug.log', 'a').write('\n' + label + ':>' + data)
 
 
 def ConverDate(data):
@@ -874,7 +926,7 @@ def AdultUrl(url):
         try:
             tlink = tlink.decode("utf-8")
         except Exception as e:
-            print('error: ', str(e))
+            print('error: ', e)
     return tlink
 
 
@@ -955,7 +1007,7 @@ def make_request(url):
         import requests
         response = requests.get(url, verify=False)
         if response.status_code == 200:
-            link = requests.get(url, headers={'User-Agent': RequestAgent()}, timeout=15, verify=False, stream=True ).text
+            link = requests.get(url, headers={'User-Agent': RequestAgent()}, timeout=15, verify=False, stream=True).text
         return link
     except ImportError:
         req = Request(url)
@@ -987,7 +1039,7 @@ def ReadUrl2(url, referer):
             r = urlopen(req, None, TIMEOUT_URL, context=CONTEXT)
         except Exception as e:
             r = urlopen(req, None, TIMEOUT_URL)
-            print('CreateLog Codifica ReadUrl: %s.' % str(e))
+            print('CreateLog Codifica ReadUrl: %s.' % e)
         link = r.read()
         r.close()
 
@@ -1000,7 +1052,7 @@ def ReadUrl2(url, referer):
                 dec = 'utf-8'
             except Exception as e:
                 dcod = 1
-                print('ReadUrl2 - Error: ', str(e))
+                print('ReadUrl2 - Error: ', e)
             if dcod == 1:
                 dcod = 0
                 try:
@@ -1008,7 +1060,7 @@ def ReadUrl2(url, referer):
                     dec = 'cp437'
                 except Exception as e:
                     dcod = 1
-                    print('ReadUrl3 - Error:', str(e))
+                    print('ReadUrl3 - Error:', e)
             if dcod == 1:
                 dcod = 0
                 try:
@@ -1016,7 +1068,7 @@ def ReadUrl2(url, referer):
                     dec = 'iso-8859-1'
                 except Exception as e:
                     dcod = 1
-                    print('CreateLog Codific ReadUrl: ', str(e))
+                    print('CreateLog Codific ReadUrl: ', e)
             link = tlink
 
         elif str(type(link)).find('str') != -1:
@@ -1024,7 +1076,7 @@ def ReadUrl2(url, referer):
 
         print('CreateLog Codifica ReadUrl: %s.' % dec)
     except Exception as e:
-        print('ReadUrl5 - Error: ', str(e))
+        print('ReadUrl5 - Error: ', e)
         link = None
     return link
 
@@ -1045,7 +1097,7 @@ def ReadUrl(url):
             r = urlopen(req, None, TIMEOUT_URL, context=CONTEXT)
         except Exception as e:
             r = urlopen(req, None, TIMEOUT_URL)
-            print('CreateLog Codifica ReadUrl: %s.' % str(e))
+            print('CreateLog Codifica ReadUrl: %s.' % e)
         link = r.read()
         r.close()
 
@@ -1058,7 +1110,7 @@ def ReadUrl(url):
                 dec = 'utf-8'
             except Exception as e:
                 dcod = 1
-                print('ReadUrl2 - Error: ', str(e))
+                print('ReadUrl2 - Error: ', e)
             if dcod == 1:
                 dcod = 0
                 try:
@@ -1066,7 +1118,7 @@ def ReadUrl(url):
                     dec = 'cp437'
                 except Exception as e:
                     dcod = 1
-                    print('ReadUrl3 - Error:', str(e))
+                    print('ReadUrl3 - Error:', e)
             if dcod == 1:
                 dcod = 0
                 try:
@@ -1074,7 +1126,7 @@ def ReadUrl(url):
                     dec = 'iso-8859-1'
                 except Exception as e:
                     dcod = 1
-                    print('CreateLog Codific ReadUrl: ', str(e))
+                    print('CreateLog Codific ReadUrl: ', e)
             link = tlink
 
         elif str(type(link)).find('str') != -1:
@@ -1082,102 +1134,69 @@ def ReadUrl(url):
 
         print('CreateLog Codifica ReadUrl: %s.' % dec)
     except Exception as e:
-        print('ReadUrl5 - Error: ', str(e))
+        print('ReadUrl5 - Error: ', e)
         link = None
     return link
 
 
-if PY3:
-    def getUrl(url):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        try:
-            response = urlopen(req, timeout=20)
+def getUrl(url):
+    req = Request(url)
+    req.add_header('User-Agent', RequestAgent())
+
+    try:
+        response = urlopen(req, timeout=20)
+        if pythonVer == 3:
             link = response.read().decode(errors='ignore')
-            response.close()
-            # return link
-        except:
-            import ssl
-            gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
-            link = response.read().decode(errors='ignore')
-            response.close()
+        else:
+            link = response.read()
+        response.close()
         return link
 
-    def getUrl2(url, referer):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        req.add_header('Referer', referer)
+    except Exception as e:
+        print(e)
         try:
-            response = urlopen(req, timeout=20)
-            link = response.read().decode()
-            response.close()
-            # return link
-        except:
             import ssl
             gcontext = ssl._create_unverified_context()
             response = urlopen(req, timeout=20, context=gcontext)
-            link = response.read().decode()
+            if pythonVer == 3:
+                link = response.read().decode(errors='ignore')
+            else:
+                link = response.read()
             response.close()
-        return link
+            return link
 
-    def getUrlresp(url):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        try:
-            response = urlopen(req, timeout=20)
-            # return response
-        except:
-            import ssl
-            gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
-        return response
-else:
+        except Exception as e:
+            print(e)
+            return ""
 
-    def getUrl(url):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        try:
-            response = urlopen(req, timeout=20)
-            link = response.read()
-            response.close()
-            # return link
-        except:
-            import ssl
-            gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
-            link = response.read()
-            response.close()
-        return link
 
-    def getUrl2(url, referer):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        req.add_header('Referer', referer)
-        try:
-            response = urlopen(req, timeout=20)
-            link = response.read()
-            response.close()
-            # return link
-        except:
-            import ssl
-            gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
-            link = response.read()
-            response.close()
-        return link
+def getUrl2(url, referer):
+    req = Request(url)
+    req.add_header('User-Agent', RequestAgent())
+    req.add_header('Referer', referer)
+    try:
+        response = urlopen(req, timeout=20)
+        link = response.read().decode()
+        response.close()
+    except:
+        import ssl
+        gcontext = ssl._create_unverified_context()
+        response = urlopen(req, timeout=20, context=gcontext)
+        link = response.read().decode()
+        response.close()
+    return link
 
-    def getUrlresp(url):
-        req = Request(url)
-        req.add_header('User-Agent', RequestAgent())
-        try:
-            response = urlopen(req, timeout=20)
-            # return response
-        except:
-            import ssl
-            gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
-        return response
+
+def getUrlresp(url):
+    req = Request(url)
+    req.add_header('User-Agent', RequestAgent())
+    try:
+        response = urlopen(req, timeout=20)
+    except:
+        import ssl
+        gcontext = ssl._create_unverified_context()
+        response = urlopen(req, timeout=20, context=gcontext)
+    return response
 
 
 def decodeUrl(text):
@@ -1240,100 +1259,172 @@ def normalize(title):
 
 
 def decodeHtml(text):
-    text = text.replace('&auml;', 'ä')
-    text = text.replace('\u00e4', 'ä')
-    text = text.replace('&#228;', 'ä')
-    text = text.replace('&Auml;', 'Ä')
-    text = text.replace('\u00c4', 'Ä')
-    text = text.replace('&#196;', 'Ä')
-    text = text.replace('&ouml;', 'ö')
-    text = text.replace('\u00f6', 'ö')
-    text = text.replace('&#246;', 'ö')
-    text = text.replace('&ouml;', 'Ö')
-    text = text.replace('&Ouml;', 'Ö')
-    text = text.replace('\u00d6', 'Ö')
-    text = text.replace('&#214;', 'Ö')
-    text = text.replace('&uuml;', 'ü')
-    text = text.replace('\u00fc', 'ü')
-    text = text.replace('&#252;', 'ü')
-    text = text.replace('&Uuml;', 'Ü')
-    text = text.replace('\u00dc', 'Ü')
-    text = text.replace('&#220;', 'Ü')
-    text = text.replace('&szlig;', 'ß')
-    text = text.replace('\u00df', 'ß')
-    text = text.replace('&#223;', 'ß')
-    text = text.replace('&amp;', '&')
-    text = text.replace('&quot;', '\"')
-    text = text.replace('&gt;', '>')
-    text = text.replace('&apos;', "'")
-    text = text.replace('&acute;', '\'')
-    text = text.replace('&ndash;', '-')
-    text = text.replace('&bdquo;', '"')
-    text = text.replace('&rdquo;', '"')
-    text = text.replace('&ldquo;', '"')
-    text = text.replace('&lsquo;', '\'')
-    text = text.replace('&rsquo;', '\'')
-    text = text.replace('&#034;', '"')
-    text = text.replace('&#34;', '"')
-    text = text.replace('&#038;', '&')
-    text = text.replace('&#039;', '\'')
-    text = text.replace('&#39;', '\'')
-    text = text.replace('&#160;', ' ')
-    text = text.replace('\u00a0', ' ')
-    text = text.replace('\u00b4', '\'')
-    text = text.replace('\u003d', '=')
-    text = text.replace('\u0026', '&')
-    text = text.replace('&#174;', '')
-    text = text.replace('&#225;', 'a')
-    text = text.replace('&#233;', 'e')
-    text = text.replace('&#243;', 'o')
-    text = text.replace('&#8211;', '-')
-    text = text.replace('&#8212;', '—')
-    text = text.replace('&mdash;', '—')
-    text = text.replace('\u2013', '–')
-    text = text.replace('&#8216;', "'")
-    text = text.replace('&#8217;', "'")
-    text = text.replace('&#8220;', "'")
-    text = text.replace('&#8221;', '"')
-    text = text.replace('&#8222;', ', ')
-    text = text.replace('\u014d', 'ō')
-    text = text.replace('\u016b', 'ū')
-    text = text.replace('\u201a', '\"')
-    text = text.replace('\u2018', '\"')
-    text = text.replace('\u201e', '\"')
-    text = text.replace('\u201c', '\"')
-    text = text.replace('\u201d', '\'')
-    text = text.replace('\u2019s', '’')
-    text = text.replace('\u00e0', 'à')
-    text = text.replace('\u00e7', 'ç')
-    text = text.replace('\u00e8', 'é')
-    text = text.replace('\u00e9', 'é')
-    text = text.replace('\u00c1', 'Á')
-    text = text.replace('\u00c6', 'Æ')
-    text = text.replace('\u00e1', 'á')
-
-    text = text.replace('&#xC4;', 'Ä')
-    text = text.replace('&#xD6;', 'Ö')
-    text = text.replace('&#xDC;', 'Ü')
-    text = text.replace('&#xE4;', 'ä')
-    text = text.replace('&#xF6;', 'ö')
-    text = text.replace('&#xFC;', 'ü')
-    text = text.replace('&#xDF;', 'ß')
-    text = text.replace('&#xE9;', 'é')
-    text = text.replace('&#xB7;', '·')
-    text = text.replace('&#x27;', "'")
-    text = text.replace('&#x26;', '&')
-    text = text.replace('&#xFB;', 'û')
-    text = text.replace('&#xF8;', 'ø')
-    text = text.replace('&#x21;', '!')
-    text = text.replace('&#x3f;', '?')
-
-    text = text.replace('&#8230;', '...')
-    text = text.replace('\u2026', '...')
-    text = text.replace('&hellip;', '...')
-
-    text = text.replace('&#8234;', '')
-    return text
+    charlist = []
+    charlist.append(('&#034;', '"'))
+    charlist.append(('&#038;', '&'))
+    charlist.append(('&#039;', "'"))
+    charlist.append(('&#060;', ' '))
+    charlist.append(('&#062;', ' '))
+    charlist.append(('&#160;', ' '))
+    charlist.append(('&#174;', ''))
+    charlist.append(('&#192;', '\xc3\x80'))
+    charlist.append(('&#193;', '\xc3\x81'))
+    charlist.append(('&#194;', '\xc3\x82'))
+    charlist.append(('&#196;', '\xc3\x84'))
+    charlist.append(('&#204;', '\xc3\x8c'))
+    charlist.append(('&#205;', '\xc3\x8d'))
+    charlist.append(('&#206;', '\xc3\x8e'))
+    charlist.append(('&#207;', '\xc3\x8f'))
+    charlist.append(('&#210;', '\xc3\x92'))
+    charlist.append(('&#211;', '\xc3\x93'))
+    charlist.append(('&#212;', '\xc3\x94'))
+    charlist.append(('&#214;', '\xc3\x96'))
+    charlist.append(('&#217;', '\xc3\x99'))
+    charlist.append(('&#218;', '\xc3\x9a'))
+    charlist.append(('&#219;', '\xc3\x9b'))
+    charlist.append(('&#220;', '\xc3\x9c'))
+    charlist.append(('&#223;', '\xc3\x9f'))
+    charlist.append(('&#224;', '\xc3\xa0'))
+    charlist.append(('&#225;', '\xc3\xa1'))
+    charlist.append(('&#226;', '\xc3\xa2'))
+    charlist.append(('&#228;', '\xc3\xa4'))
+    charlist.append(('&#232;', '\xc3\xa8'))
+    charlist.append(('&#233;', '\xc3\xa9'))
+    charlist.append(('&#234;', '\xc3\xaa'))
+    charlist.append(('&#235;', '\xc3\xab'))
+    charlist.append(('&#236;', '\xc3\xac'))
+    charlist.append(('&#237;', '\xc3\xad'))
+    charlist.append(('&#238;', '\xc3\xae'))
+    charlist.append(('&#239;', '\xc3\xaf'))
+    charlist.append(('&#242;', '\xc3\xb2'))
+    charlist.append(('&#243;', '\xc3\xb3'))
+    charlist.append(('&#244;', '\xc3\xb4'))
+    charlist.append(('&#246;', '\xc3\xb6'))
+    charlist.append(('&#249;', '\xc3\xb9'))
+    charlist.append(('&#250;', '\xc3\xba'))
+    charlist.append(('&#251;', '\xc3\xbb'))
+    charlist.append(('&#252;', '\xc3\xbc'))
+    charlist.append(('&#8203;', ''))
+    charlist.append(('&#8211;', '-'))
+    charlist.append(('&#8211;', '-'))
+    charlist.append(('&#8212;', ''))
+    charlist.append(('&#8212;', '—'))
+    charlist.append(('&#8216;', "'"))
+    charlist.append(('&#8216;', "'"))
+    charlist.append(('&#8217;', "'"))
+    charlist.append(('&#8217;', "'"))
+    charlist.append(('&#8220;', "'"))
+    charlist.append(('&#8220;', ''))
+    charlist.append(('&#8221;', '"'))
+    charlist.append(('&#8222;', ''))
+    charlist.append(('&#8222;', ', '))
+    charlist.append(('&#8230;', '...'))
+    charlist.append(('&#8230;', '...'))
+    charlist.append(('&#8234;', ''))
+    charlist.append(('&#x21;', '!'))
+    charlist.append(('&#x26;', '&'))
+    charlist.append(('&#x27;', "'"))
+    charlist.append(('&#x3f;', '?'))
+    charlist.append(('&#xB7;', '·'))
+    charlist.append(('&#xC4;', 'Ä'))
+    charlist.append(('&#xD6;', 'Ö'))
+    charlist.append(('&#xDC;', 'Ü'))
+    charlist.append(('&#xDF;', 'ß'))
+    charlist.append(('&#xE4;', 'ä'))
+    charlist.append(('&#xE9;', 'é'))
+    charlist.append(('&#xF6;', 'ö'))
+    charlist.append(('&#xF8;', 'ø'))
+    charlist.append(('&#xFB;', 'û'))
+    charlist.append(('&#xFC;', 'ü'))
+    charlist.append(('&8221;', '\xe2\x80\x9d'))
+    charlist.append(('&8482;', '\xe2\x84\xa2'))
+    charlist.append(('&Aacute;', '\xc3\x81'))
+    charlist.append(('&Acirc;', '\xc3\x82'))
+    charlist.append(('&Agrave;', '\xc3\x80'))
+    charlist.append(('&Auml;', '\xc3\x84'))
+    charlist.append(('&Iacute;', '\xc3\x8d'))
+    charlist.append(('&Icirc;', '\xc3\x8e'))
+    charlist.append(('&Igrave;', '\xc3\x8c'))
+    charlist.append(('&Iuml;', '\xc3\x8f'))
+    charlist.append(('&Oacute;', '\xc3\x93'))
+    charlist.append(('&Ocirc;', '\xc3\x94'))
+    charlist.append(('&Ograve;', '\xc3\x92'))
+    charlist.append(('&Ouml;', '\xc3\x96'))
+    charlist.append(('&Uacute;', '\xc3\x9a'))
+    charlist.append(('&Ucirc;', '\xc3\x9b'))
+    charlist.append(('&Ugrave;', '\xc3\x99'))
+    charlist.append(('&Uuml;', '\xc3\x9c'))
+    charlist.append(('&aacute;', '\xc3\xa1'))
+    charlist.append(('&acirc;', '\xc3\xa2'))
+    charlist.append(('&acute;', '\''))
+    charlist.append(('&agrave;', '\xc3\xa0'))
+    charlist.append(('&amp;', '&'))
+    charlist.append(('&apos;', "'"))
+    charlist.append(('&auml;', '\xc3\xa4'))
+    charlist.append(('&bdquo;', '"'))
+    charlist.append(('&bdquo;', '"'))
+    charlist.append(('&eacute;', '\xc3\xa9'))
+    charlist.append(('&ecirc;', '\xc3\xaa'))
+    charlist.append(('&egrave;', '\xc3\xa8'))
+    charlist.append(('&euml;', '\xc3\xab'))
+    charlist.append(('&gt;', '>'))
+    charlist.append(('&hellip;', '...'))
+    charlist.append(('&iacute;', '\xc3\xad'))
+    charlist.append(('&icirc;', '\xc3\xae'))
+    charlist.append(('&igrave;', '\xc3\xac'))
+    charlist.append(('&iuml;', '\xc3\xaf'))
+    charlist.append(('&laquo;', '"'))
+    charlist.append(('&ldquo;', '"'))
+    charlist.append(('&lsquo;', '\''))
+    charlist.append(('&lt;', '<'))
+    charlist.append(('&mdash;', '—'))
+    charlist.append(('&nbsp;', ' '))
+    charlist.append(('&ndash;', '-'))
+    charlist.append(('&oacute;', '\xc3\xb3'))
+    charlist.append(('&ocirc;', '\xc3\xb4'))
+    charlist.append(('&ograve;', '\xc3\xb2'))
+    charlist.append(('&ouml;', '\xc3\xb6'))
+    charlist.append(('&quot;', '"'))
+    charlist.append(('&raquo;', '"'))
+    charlist.append(('&rsquo;', '\''))
+    charlist.append(('&szlig;', '\xc3\x9f'))
+    charlist.append(('&uacute;', '\xc3\xba'))
+    charlist.append(('&ucirc;', '\xc3\xbb'))
+    charlist.append(('&ugrave;', '\xc3\xb9'))
+    charlist.append(('&uuml;', '\xc3\xbc'))
+    charlist.append(('\u0026', '&'))
+    charlist.append(('\u003d', '='))
+    charlist.append(('\u00a0', ' '))
+    charlist.append(('\u00b4', '\''))
+    charlist.append(('\u00c1', 'Á'))
+    charlist.append(('\u00c4', 'Ä'))
+    charlist.append(('\u00c6', 'Æ'))
+    charlist.append(('\u00d6', 'Ö'))
+    charlist.append(('\u00dc', 'Ü'))
+    charlist.append(('\u00df', 'ß'))
+    charlist.append(('\u00e0', 'à'))
+    charlist.append(('\u00e1', 'á'))
+    charlist.append(('\u00e4', 'ä'))
+    charlist.append(('\u00e7', 'ç'))
+    charlist.append(('\u00e8', 'é'))
+    charlist.append(('\u00e9', 'é'))
+    charlist.append(('\u00f6', 'ö'))
+    charlist.append(('\u00fc', 'ü'))
+    charlist.append(('\u014d', 'ō'))
+    charlist.append(('\u016b', 'ū'))
+    charlist.append(('\u2013', '–'))
+    charlist.append(('\u2018', '\"'))
+    charlist.append(('\u2019s', '’'))
+    charlist.append(('\u201a', '\"'))
+    charlist.append(('\u201c', '\"'))
+    charlist.append(('\u201d', '\''))
+    charlist.append(('\u201e', '\"'))
+    charlist.append(('\u2026', '...'))
+    for repl in charlist:
+        text = text.replace(repl[0], repl[1])
+    from re import sub as re_sub
+    text = re_sub('<[^>]+>', '', text)
+    return str(text)  # str needed for PLi
 
 
 conversion = {
