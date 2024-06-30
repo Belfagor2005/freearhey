@@ -1424,7 +1424,9 @@ def decodeHtml(text):
         text = text.replace(repl[0], repl[1])
     from re import sub as re_sub
     text = re_sub('<[^>]+>', '', text)
-    return str(text).encode('utf-8').decode('unicode_escape')  # str needed for PLi
+    if PY3:
+        text = text.encode('utf-8').decode('unicode_escape')  
+    return str(text) # str needed for PLi
 
 
 conversion = {
