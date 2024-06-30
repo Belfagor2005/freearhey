@@ -14,11 +14,6 @@ from . import html_conv
 import codecs
 from Components.AVSwitch import AVSwitch
 try:
-    from Components.AVSwitch import iAVSwitch as AVSwitch
-except Exception as e:
-    print(e)
-    
-try:
     from enigma import eAVSwitch as AVSwitch
 except Exception:
     from enigma import eAVControl as AVSwitch
