@@ -707,8 +707,7 @@ def __createdir(list):
 try:
     from Plugins.Extensions.tmdb import tmdb
     is_tmdb = True
-except Exception as e:
-    print('error: ', e)
+except ImportError:
     is_tmdb = False
 
 
