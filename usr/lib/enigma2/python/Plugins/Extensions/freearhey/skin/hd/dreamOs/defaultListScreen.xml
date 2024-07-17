@@ -19,10 +19,10 @@
 		<convert type="ClockToText">Default</convert>
 	</widget>
 	<!-- Button -->
-	<widget name="key_red" position="53,669" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	<widget name="key_green" position="227,670" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	<!-- <widget name="key_blue" position="397,670" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" /> -->
-    <eLabel position="53,669" size="140,40" backgroundColor="#ff0033" zPosition="1" />    
-    <eLabel position="227,670" size="140,40" backgroundColor="#009900" zPosition="1" />    
-    <!-- <eLabel position="397,670" size="140,40" backgroundColor="#0000ff" zPosition="1" /> -->
+	<widget name="key_red" position="53,665" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<widget name="key_green" position="294,665" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<widget name="key_yellow" position="536,665" size="140,40" valign="center" halign="left" zPosition="4" foregroundColor="#ffffff" font="Regular;20" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+    <eLabel position="53,665" size="140,40" backgroundColor="#ff0033" zPosition="1" />    
+    <eLabel position="294,665" size="140,40" backgroundColor="#009900" zPosition="1" />    
+    <eLabel position="535,665" size="140,40" backgroundColor="#ffff00" zPosition="1" />
 </screen>

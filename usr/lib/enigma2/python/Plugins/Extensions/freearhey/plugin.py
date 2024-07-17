@@ -11,12 +11,9 @@ from __future__ import print_function
 from . import _, isDreamOS, paypal
 from . import Utils
 from . import html_conv
-import codecs
+from .Console import Console as xConsole
+
 from Components.AVSwitch import AVSwitch
-try:
-    from enigma import eAVSwitch as AVSwitch
-except Exception:
-    from enigma import eAVControl as AVSwitch
 try:
     from os.path import isdir
 except ImportError:
@@ -25,32 +22,41 @@ from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText
-from Components.MultiContent import MultiContentEntryPixmapAlphaTest
+from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
 from Components.Pixmap import Pixmap
-from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Plugins.Plugin import PluginDescriptor
-from Screens.InfoBarGenerics import InfoBarSubtitleSupport, InfoBarMenu
-from Screens.InfoBarGenerics import InfoBarSeek, InfoBarAudioSelection
-from Screens.InfoBarGenerics import InfoBarNotifications
+from Screens.InfoBarGenerics import (
+    InfoBarSubtitleSupport,
+    InfoBarSeek,
+    InfoBarAudioSelection,
+    InfoBarMenu,
+    InfoBarNotifications,
+)
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import SCOPE_PLUGINS
-from Tools.Directories import resolveFilename
-from enigma import RT_VALIGN_CENTER
-from enigma import RT_HALIGN_LEFT
-from enigma import eListboxPythonMultiContent
-from enigma import ePicLoad, loadPNG, gFont
-from enigma import eServiceReference
-from enigma import eTimer
-from enigma import getDesktop
-from enigma import iPlayableService
+from Tools.Directories import (SCOPE_PLUGINS, resolveFilename)
+from enigma import (
+    RT_VALIGN_CENTER,
+    RT_HALIGN_LEFT,
+    eTimer,
+    eListboxPythonMultiContent,
+    eServiceReference,
+    iPlayableService,
+    gFont,
+    ePicLoad,
+    loadPic,
+    loadPNG,
+    getDesktop,
+)
+from datetime import datetime
+import codecs
+import json
 import os
 import re
 import sys
 
 PY3 = sys.version_info.major >= 3
-
 if PY3:
     from urllib.request import urlopen, Request
     unicode = str
@@ -62,19 +68,21 @@ else:
 
 
 global skin_path, search, dowm3u
+
 currversion = '2.8'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
 res_plugin_path = os.path.join(PLUGIN_PATH, 'skin')
-_firstStartfh = True
-search = False
+installer_url = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0JlbGZhZ29yMjAwNS9mcmVlYXJoZXkvbWFpbi9pbnN0YWxsZXIuc2g='
+developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvZnJlZWFyaGV5'
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
 dowm3u = '/media/hdd/movie/'
 dir_enigma2 = '/etc/enigma2/'
+search = False
 
 
 def defaultMoviePath():
@@ -277,6 +285,7 @@ class freearhey(Screen):
         self['menulist'] = free2list([])
         self['key_red'] = Label(_('Exit'))
         self['key_green'] = Label('Select')
+        self['key_yellow'] = Label('Update')
         self['category'] = Label("Plugins Channels Free by Lululla")
         self['title'] = Label("Thank's Freearhey")
         self['name'] = Label('')
@@ -289,19 +298,101 @@ class freearhey(Screen):
         self.count = 0
         self.loading = 0
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
+        # self['actions'] = ActionMap(['OkCancelActions',
+                                     # 'ColorActions',
+                                     # 'ButtonSetupActions',
+                                     # 'DirectionActions'], {'up': self.up,
+                                                           # 'down': self.down,
+                                                           # 'left': self.left,
+                                                           # 'right': self.right,
+                                                           # 'ok': self.ok,
+                                                           # 'green': self.ok,
+                                                           # 'cancel': self.exitx,
+                                                           # 'red': self.exitx}, -1)
+        self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
-                                     'ButtonSetupActions',
+                                     'HotkeyActions',
+                                     'InfobarEPGActions',
+                                     'ChannelSelectBaseActions',
                                      'DirectionActions'], {'up': self.up,
                                                            'down': self.down,
                                                            'left': self.left,
                                                            'right': self.right,
+                                                           'yellow': self.update_me,  # update_me,
+                                                           'yellow_long': self.update_dev,
+                                                           'info_long': self.update_dev,
+                                                           'infolong': self.update_dev,
+                                                           'showEventInfoPlugin': self.update_dev,
                                                            'ok': self.ok,
                                                            'green': self.ok,
-                                                           'cancel': self.exit,
-                                                           'red': self.exit}, -1)
+                                                           'cancel': self.exitx,
+                                                           'red': self.exitx}, -1)
+        self.timer = eTimer()
+        if os.path.exists('/var/lib/dpkg/status'):
+            self.timer_conn = self.timer.timeout.connect(self.check_vers)
+        else:
+            self.timer.callback.append(self.check_vers)
+        self.timer.start(500, 1)
         self.onLayoutFinish.append(self.updateMenuList)
         self.onLayoutFinish.append(self.layoutFinished)
+
+    def check_vers(self):
+        remote_version = '0.0'
+        remote_changelog = ''
+        req = Utils.Request(Utils.b64decoder(installer_url), headers={'User-Agent': 'Mozilla/5.0'})
+        page = Utils.urlopen(req).read()
+        if PY3:
+            data = page.decode("utf-8")
+        else:
+            data = page.encode("utf-8")
+        if data:
+            lines = data.split("\n")
+            for line in lines:
+                if line.startswith("version"):
+                    remote_version = line.split("=")
+                    remote_version = line.split("'")[1]
+                if line.startswith("changelog"):
+                    remote_changelog = line.split("=")
+                    remote_changelog = line.split("'")[1]
+                    break
+        self.new_version = remote_version
+        self.new_changelog = remote_changelog
+        if currversion < remote_version:
+            self.Update = True
+            # self['key_yellow'].show()
+            # self['key_green'].show()
+            self.session.open(MessageBox, _('New version %s is available\n\nChangelog: %s\n\nPress info_long or yellow_long button to start force updating.') % (self.new_version, self.new_changelog), MessageBox.TYPE_INFO, timeout=5)
+        # self.update_me()
+
+    def update_me(self):
+        if self.Update is True:
+            self.session.openWithCallback(self.install_update, MessageBox, _("New version %s is available.\n\nChangelog: %s \n\nDo you want to install it now?") % (self.new_version, self.new_changelog), MessageBox.TYPE_YESNO)
+        else:
+            self.session.open(MessageBox, _("Congrats! You already have the latest version..."),  MessageBox.TYPE_INFO, timeout=4)
+
+    def update_dev(self):
+        try:
+            req = Utils.Request(Utils.b64decoder(developer_url), headers={'User-Agent': 'Mozilla/5.0'})
+            page = Utils.urlopen(req).read()
+            data = json.loads(page)
+            remote_date = data['pushed_at']
+            strp_remote_date = datetime.strptime(remote_date, '%Y-%m-%dT%H:%M:%SZ')
+            remote_date = strp_remote_date.strftime('%Y-%m-%d')
+            self.session.openWithCallback(self.install_update, MessageBox, _("Do you want to install update ( %s ) now?") % (remote_date), MessageBox.TYPE_YESNO)
+        except Exception as e:
+            print('error xcons:', e)
+
+    def install_update(self, answer=False):
+        if answer:
+            cmd1 = 'wget -q "--no-check-certificate" ' + Utils.b64decoder(installer_url) + ' -O - | /bin/sh'
+            self.session.open(xConsole, 'Upgrading...', cmdlist=[cmd1], finishedCallback=self.myCallback, closeOnSuccess=False)
+        else:
+            self.session.open(MessageBox, _("Update Aborted!"),  MessageBox.TYPE_INFO, timeout=3)
+
+    def myCallback(self, result=None):
+        print('result:', result)
+        return
 
     def layoutFinished(self):
         payp = paypal()
@@ -385,7 +476,7 @@ class freearhey(Screen):
         auswahl = self['menulist'].getCurrent()[0][0]
         self['name'].setText(str(auswahl))
 
-    def exit(self):
+    def exitx(self):
         self.close()
 
 
@@ -482,7 +573,6 @@ class main23(Screen):
                     if item not in items:
                         items.append(item)
                     content2 = content[n2:n3]
-                    print('content2: ', content2)
                     regexcat = 'align="left">(.+?)</td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     for name, url in match:
@@ -501,7 +591,6 @@ class main23(Screen):
                     if item not in items:
                         items.append(item)
                     content2 = content[n3:n4]
-                    print('content2: ', content2)
                     regexcat = '<tr><td>(.+?)</td><td.*?<code>(.+?)</code'
                     match = re.compile(regexcat, re.DOTALL).findall(content2)
                     for name, url in match:
@@ -540,7 +629,6 @@ class main23(Screen):
                     self.menu_list.append(show_(name, url))
                     self['menulist'].l.setList(self.menu_list)
                 auswahl = self['menulist'].getCurrent()[0][0]
-                print('auswahl: ', auswahl)
                 self['name'].setText(str(auswahl))
             except Exception as e:
                 print('error ', str(e))
@@ -575,7 +663,6 @@ class main23(Screen):
         if answer is None:
             self.session.openWithCallback(self.message2, MessageBox, _('Do you want to Convert to favorite .tv ?\n\nAttention!!It may take some time depending\non the number of streams contained !!!'))
         elif answer:
-            # name = self['menulist'].l.getCurrentSelection()[0][0]
             url = self['menulist'].getCurrent()[0][1]
             url = str(url)
             service = '4097'
@@ -620,7 +707,6 @@ class main23(Screen):
         ch = 0
         try:
             if os.path.isfile(files) and os.stat(files).st_size > 0:
-                print('ChannelList is_tmp exist in playlist')
                 desk_tmp = ''
                 in_bouquets = 0
                 with open('%s%s' % (dir_enigma2, bouquetname), 'w') as outfile:
@@ -675,7 +761,6 @@ class selectplay3(Screen):
         self.name = namex
         self.url = lnk
         self.search = ''
-
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['menulist'] = free2list([])
         self["paypal"] = Label()
@@ -722,19 +807,15 @@ class selectplay3(Screen):
                     r = urlopen(req, None, 15)
                     content = r.read()
                     r.close()
-                    # content = link
                     if str(type(content)).find('bytes') != -1:
                         try:
                             content = content.decode("utf-8")
                         except Exception as e:
                             print("Error: %s." % str(e))
-                    # print("In showContent content =", content)
                     regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                     match = re.compile(regexcat, re.DOTALL).findall(content)
-                    # print("In showContent match =", match)
                     for country, name, url in match:
                         if str(result).lower() in name.lower():
-                            print('callback: ', name)
                             search = True
                             url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                             name = name.replace('\r', '')
@@ -821,18 +902,14 @@ class selectplay3(Screen):
                         content = content.decode("utf-8")
                     except Exception as e:
                         print("Error: %s." % str(e))
-                print("content A =", content)
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
-                print("In showContent match =", match)
                 for country, name, url in match:
                     if ".m3u8" not in url:
                         continue
                     url = url.replace(" ", "").replace("\\n", "").replace('\r', '')
                     name = name.replace('\r', '')
                     name = country + ' | ' + name
-                    print("In showContent name =", name)
-                    print("In showContent url =", url)
                     item = name + "###" + url + '\n'
                     items.append(item)
                 items.sort()
@@ -968,16 +1045,14 @@ class TvInfoBarShowHide():
         print(text + " %s\n" % obj)
 
 
-class Playstream2(
-                  InfoBarBase,
+class Playstream2(InfoBarBase,
                   InfoBarMenu,
                   InfoBarSeek,
                   InfoBarAudioSelection,
                   InfoBarSubtitleSupport,
                   InfoBarNotifications,
                   TvInfoBarShowHide,
-                  Screen
-                  ):
+                  Screen):
     STATE_IDLE = 0
     STATE_PLAYING = 1
     STATE_PAUSED = 2
@@ -1181,34 +1256,34 @@ class Playstream2(
         self.close()
 
 
-class AutoStartTimerFh:
+# class AutoStartTimerFh:
 
-    def __init__(self, session):
-        self.session = session
-        global _firstStartfh
-        print("*** running AutoStartTimerFh ***")
-        if _firstStartfh:
-            self.runUpdate()
+    # def __init__(self, session):
+        # self.session = session
+        # print("*** running AutoStartTimerFh ***")
+        # if _firstStartfh:
+            # self.runUpdate()
 
-    def runUpdate(self):
-        print("*** running update ***")
-        try:
-            from . import Update
-            Update.upd_done()
-            _firstStartfh = False
-        except Exception as e:
-            print('error Fxy', str(e))
+    # def runUpdate(self):
+        # global _firstStartfh
+        # print("*** running update ***")
+        # try:
+            # from . import Update
+            # Update.upd_done()
+            # _firstStartfh = False
+        # except Exception as e:
+            # print('error Fxy', str(e))
 
 
-def autostart(reason, session=None, **kwargs):
-    print("*** running autostart ***")
-    global autoStartTimerFh
-    global _firstStartfh
-    if reason == 0:
-        if session is not None:
-            _firstStartfh = True
-            autoStartTimerFh = AutoStartTimerFh(session)
-    return
+# def autostart(reason, session=None, **kwargs):
+    # print("*** running autostart ***")
+    # global autoStartTimerFh
+    # global _firstStartfh
+    # if reason == 0:
+        # if session is not None:
+            # _firstStartfh = True
+            # autoStartTimerFh = AutoStartTimerFh(session)
+    # return
 
 
 def main(session, **kwargs):
@@ -1222,7 +1297,8 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
     ico_path = 'plugin.png'
     # extDescriptor = PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_EXTENSIONSMENU], icon=ico_path, fnc=main)
-    result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-              PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
+    result = [PluginDescriptor(name=name_plugin, description=desc_plugin, where=PluginDescriptor.WHERE_PLUGINMENU, icon=ico_path, fnc=main)]
     # result.append(extDescriptor)
     return result
+    # PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
+    

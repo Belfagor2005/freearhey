@@ -7,7 +7,7 @@ import gettext
 import os
 
 PluginLanguageDomain = 'freearhey'
-PluginLanguagePath = 'Extensions/freearhey/res/locale'
+PluginLanguagePath = 'Extensions/freearhey/locale'
 
 isDreamOS = False
 if os.path.exists("/var/lib/dpkg/status"):

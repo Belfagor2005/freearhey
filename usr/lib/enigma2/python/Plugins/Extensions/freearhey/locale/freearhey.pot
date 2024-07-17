@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: freearhey\n"
-"POT-Creation-Date: 2023-08-31 18:09+0200\n"
+"POT-Creation-Date: 2024-07-17 21:08+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: lululla\n"
@@ -10,31 +10,64 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 3.4.4\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:263 plugin.py:606
+#: plugin.py:286 plugin.py:767
 msgid "Exit"
 msgstr ""
 
-#: plugin.py:345
+#: plugin.py:365
+#, python-format
+msgid ""
+"New version %s is available\n"
+"\n"
+"Changelog: %s\n"
+"\n"
+"Press info_long or yellow_long button to start force updating."
+msgstr ""
+
+#: plugin.py:370
+#, python-format
+msgid ""
+"New version %s is available.\n"
+"\n"
+"Changelog: %s \n"
+"\n"
+"Do you want to install it now?"
+msgstr ""
+
+#: plugin.py:372
+msgid "Congrats! You already have the latest version..."
+msgstr ""
+
+#: plugin.py:382
+#, python-format
+msgid "Do you want to install update ( %s ) now?"
+msgstr ""
+
+#: plugin.py:391
+msgid "Update Aborted!"
+msgstr ""
+
+#: plugin.py:451
 msgid ""
 "These streams may contain Adult content\n"
 "\n"
 "are you sure you want to continue??"
 msgstr ""
 
-#: plugin.py:397
+#: plugin.py:503
 msgid "Back"
 msgstr ""
 
-#: plugin.py:398
+#: plugin.py:504
 msgid "Export"
 msgstr ""
 
-#: plugin.py:573
+#: plugin.py:664
 msgid ""
 "Do you want to Convert to favorite .tv ?\n"
 "\n"
@@ -42,17 +75,21 @@ msgid ""
 "on the number of streams contained !!!"
 msgstr ""
 
-#: plugin.py:582
+#: plugin.py:672
 #, python-format
 msgid ""
 "bouquets reloaded..\n"
 "With %s channel"
 msgstr ""
 
-#: plugin.py:607 plugin.py:636
+#: plugin.py:674
+msgid "Download Error"
+msgstr ""
+
+#: plugin.py:768 plugin.py:797
 msgid "Search"
 msgstr ""
 
-#: plugin.py:1038
+#: plugin.py:1185
 msgid "Please install SubSupport Plugins"
 msgstr ""
