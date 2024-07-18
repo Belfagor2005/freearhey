@@ -77,7 +77,7 @@ developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvZnJlZWF
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
-host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
+# host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
 # dowm3u = '/media/hdd/movie/'
 dir_enigma2 = '/etc/enigma2/'
 search = False
@@ -262,7 +262,7 @@ def returnIMDB(text_clear):
 
 Panel_list = [
     ('PLAYLISTS DIRECT'),
-    ('PLAYLISTS NSFW'),
+    # ('PLAYLISTS NSFW'),
     ('PLAYLISTS BY CATEGORY'),
     ('PLAYLISTS BY LANGUAGE'),
     ('PLAYLISTS BY COUNTRY'),
@@ -412,10 +412,10 @@ class freearhey(Screen):
             namex = "Directy"
             lnk = Utils.b64decoder(host22)
             self.session.open(selectplay3, namex, lnk)
-        elif sel == ("PLAYLISTS NSFW"):
-            namex = "Nsfw"
-            lnk = Utils.b64decoder(host33)
-            self.session.open(selectplay3, namex, lnk)
+        # elif sel == ("PLAYLISTS NSFW"):
+            # namex = "Nsfw"
+            # lnk = Utils.b64decoder(host33)
+            # self.session.open(selectplay3, namex, lnk)
         elif sel == ("PLAYLISTS BY CATEGORY"):
             namex = "Category"
             self.session.open(main23, namex, lnk)
