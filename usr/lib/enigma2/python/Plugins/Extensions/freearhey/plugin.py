@@ -23,7 +23,6 @@ from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
 from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
-from Components.Pixmap import Pixmap
 from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
 from Plugins.Plugin import PluginDescriptor
 from Screens.InfoBarGenerics import (
@@ -45,7 +44,6 @@ from enigma import (
     iPlayableService,
     gFont,
     ePicLoad,
-    loadPic,
     loadPNG,
     getDesktop,
 )
@@ -69,7 +67,7 @@ else:
 
 global skin_path, search, dowm3u
 
-currversion = '2.8'
+currversion = '3.0'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
@@ -80,7 +78,7 @@ host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
 host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
-dowm3u = '/media/hdd/movie/'
+# dowm3u = '/media/hdd/movie/'
 dir_enigma2 = '/etc/enigma2/'
 search = False
 
@@ -263,13 +261,13 @@ def returnIMDB(text_clear):
 
 
 Panel_list = [
- ('PLAYLISTS DIRECT'),
- ('PLAYLISTS NSFW'),
- ('PLAYLISTS BY CATEGORY'),
- ('PLAYLISTS BY LANGUAGE'),
- ('PLAYLISTS BY COUNTRY'),
- ('PLAYLISTS BY REGION'),
- ('MOVIE XXX')]
+    ('PLAYLISTS DIRECT'),
+    ('PLAYLISTS NSFW'),
+    ('PLAYLISTS BY CATEGORY'),
+    ('PLAYLISTS BY LANGUAGE'),
+    ('PLAYLISTS BY COUNTRY'),
+    ('PLAYLISTS BY REGION'),
+    ('MOVIE XXX')]
 
 
 class freearhey(Screen):
@@ -298,17 +296,6 @@ class freearhey(Screen):
         self.count = 0
         self.loading = 0
         self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
-        # self['actions'] = ActionMap(['OkCancelActions',
-                                     # 'ColorActions',
-                                     # 'ButtonSetupActions',
-                                     # 'DirectionActions'], {'up': self.up,
-                                                           # 'down': self.down,
-                                                           # 'left': self.left,
-                                                           # 'right': self.right,
-                                                           # 'ok': self.ok,
-                                                           # 'green': self.ok,
-                                                           # 'cancel': self.exitx,
-                                                           # 'red': self.exitx}, -1)
         self.Update = False
         self['actions'] = ActionMap(['OkCancelActions',
                                      'ColorActions',
@@ -1256,36 +1243,6 @@ class Playstream2(InfoBarBase,
         self.close()
 
 
-# class AutoStartTimerFh:
-
-    # def __init__(self, session):
-        # self.session = session
-        # print("*** running AutoStartTimerFh ***")
-        # if _firstStartfh:
-            # self.runUpdate()
-
-    # def runUpdate(self):
-        # global _firstStartfh
-        # print("*** running update ***")
-        # try:
-            # from . import Update
-            # Update.upd_done()
-            # _firstStartfh = False
-        # except Exception as e:
-            # print('error Fxy', str(e))
-
-
-# def autostart(reason, session=None, **kwargs):
-    # print("*** running autostart ***")
-    # global autoStartTimerFh
-    # global _firstStartfh
-    # if reason == 0:
-        # if session is not None:
-            # _firstStartfh = True
-            # autoStartTimerFh = AutoStartTimerFh(session)
-    # return
-
-
 def main(session, **kwargs):
     try:
         session.open(freearhey)
@@ -1301,4 +1258,3 @@ def Plugins(**kwargs):
     # result.append(extDescriptor)
     return result
     # PluginDescriptor(name=name_plugin, description=desc_plugin, where=[PluginDescriptor.WHERE_SESSIONSTART], fnc=autostart),
-    
