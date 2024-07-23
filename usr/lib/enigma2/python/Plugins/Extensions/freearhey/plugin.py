@@ -243,7 +243,7 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as e:
-            print("[XCF] Tmdb: ", str(e))
+            print("[XCF] Tmdb: ", e)
         return True
     elif os.path.exists(IMDb):
         try:
@@ -251,7 +251,7 @@ def returnIMDB(text_clear):
             text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as e:
-            print("[XCF] imdb: ", str(e))
+            print("[XCF] imdb: ", e)
         return True
     else:
         text_clear = html_conv.html_unescape(text_clear)
@@ -532,7 +532,7 @@ class main23(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                        print("Error: %s." % str(e))
+                        print("Error: %s." % e)
                 n1 = content.find('left">Category', 0)
                 n2 = content.find('left">Language', n1)
                 n3 = content.find('left">Country', n2)
@@ -618,7 +618,7 @@ class main23(Screen):
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
             except Exception as e:
-                print('error ', str(e))
+                print('error ', e)
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
@@ -798,7 +798,7 @@ class selectplay3(Screen):
                         try:
                             content = content.decode("utf-8")
                         except Exception as e:
-                            print("Error: %s." % str(e))
+                            print("Error: %s." % e)
                     regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                     match = re.compile(regexcat, re.DOTALL).findall(content)
                     for country, name, url in match:
@@ -812,7 +812,7 @@ class selectplay3(Screen):
                     auswahl = self['menulist'].getCurrent()[0][0]
                     self['name'].setText(str(auswahl))
             except Exception as e:
-                print('error ', str(e))
+                print('error ', e)
         else:
             self.resetSearch()
 
@@ -847,7 +847,7 @@ class selectplay3(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                        print("Error: %s." % str(e))
+                        print("Error: %s." % e)
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
                 # print("In showContent match =", match)
@@ -871,7 +871,7 @@ class selectplay3(Screen):
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
             except Exception as e:
-                print('exception error II ', str(e))
+                print('exception error II ', e)
 
     def updateMenuListx(self):
         self.menu_list = []
@@ -888,7 +888,7 @@ class selectplay3(Screen):
                     try:
                         content = content.decode("utf-8")
                     except Exception as e:
-                        print("Error: %s." % str(e))
+                        print("Error: %s." % e)
                 regexcat = '#EXTINF.*?title="(.+?)".*?,(.+?)\\n(.+?)\\n'
                 match = re.compile(regexcat, re.DOTALL).findall(content)
                 for country, name, url in match:
@@ -909,7 +909,7 @@ class selectplay3(Screen):
                 auswahl = self['menulist'].getCurrent()[0][0]
                 self['name'].setText(str(auswahl))
             except Exception as e:
-                print('exception error ', str(e))
+                print('exception error ', e)
 
     def ok(self):
         name = self['menulist'].getCurrent()[0][0]
