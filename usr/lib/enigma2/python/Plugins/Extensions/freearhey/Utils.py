@@ -8,8 +8,9 @@ import sys
 import datetime
 import os
 import re
+import ssl
 import base64
-import chardet
+# import chardet
 from random import choice
 from Components.config import config
 try:
@@ -35,6 +36,7 @@ PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
 PY3 = sys.version_info.major >= 3
 if PY3:
+    # import chardet
     bytes = bytes
     unicode = str
     range = range
@@ -124,7 +126,7 @@ def checkGZIP(url):
     request = Request(url, headers=hdr)
 
     try:
-        response = urlopen(request, timeout=20)
+        response = urlopen(request, timeout=10)
 
         if response.info().get('Content-Encoding') == 'gzip':
             buffer = StringIO(response.read())
@@ -142,6 +144,25 @@ def checkGZIP(url):
         print(e)
         return None
 
+
+sslverify = False
+try:
+    from twisted.internet import ssl
+    from twisted.internet._sslverify import ClientTLSOptions
+    sslverify = True
+except ImportError:
+    pass
+
+if sslverify:
+    class SNIFactory(ssl.ClientContextFactory):
+        def __init__(self, hostname=None):
+            self.hostname = hostname
+
+        def getContext(self):
+            ctx = self._contextFactory(self.method)
+            if self.hostname:
+                ClientTLSOptions(self.hostname, ctx)
+            return ctx
 
 def ssl_urlopen(url):
     if sslContext:
@@ -1163,7 +1184,7 @@ def getUrl(url):
     req.add_header('User-Agent', RequestAgent())
     link = url
     try:
-        response = urlopen(req, timeout=20)
+        response = urlopen(req, timeout=10)
         if pythonVer == 3:
             link = response.read().decode(errors='ignore')
         else:
@@ -1176,7 +1197,7 @@ def getUrl(url):
         try:
             import ssl
             gcontext = ssl._create_unverified_context()
-            response = urlopen(req, timeout=20, context=gcontext)
+            response = urlopen(req, timeout=10, context=gcontext)
             if pythonVer == 3:
                 link = response.read().decode(errors='ignore')
             else:
@@ -1195,13 +1216,13 @@ def getUrl2(url, referer):
     req.add_header('User-Agent', RequestAgent())
     req.add_header('Referer', referer)
     try:
-        response = urlopen(req, timeout=20)
+        response = urlopen(req, timeout=10)
         link = response.read().decode()
         response.close()
     except:
         import ssl
         gcontext = ssl._create_unverified_context()
-        response = urlopen(req, timeout=20, context=gcontext)
+        response = urlopen(req, timeout=10, context=gcontext)
         link = response.read().decode()
         response.close()
     return link
@@ -1211,11 +1232,11 @@ def getUrlresp(url):
     req = Request(url)
     req.add_header('User-Agent', RequestAgent())
     try:
-        response = urlopen(req, timeout=20)
+        response = urlopen(req, timeout=10)
     except:
         import ssl
         gcontext = ssl._create_unverified_context()
-        response = urlopen(req, timeout=20, context=gcontext)
+        response = urlopen(req, timeout=10, context=gcontext)
     return response
 
 
@@ -1643,37 +1664,37 @@ def charRemove(text):
     return myreplace
 
 
-def decodecs(data):
-    # codecs = [
-        # "ascii", "big5", "big5hkscs", "cp037", "cp273", "cp424", "cp437", "cp500", "cp720",
-        # "cp737", "cp775", "cp850", "cp852", "cp855", "cp856", "cp857", "cp858", "cp860",
-        # "cp861", "cp862", "cp863", "cp864", "cp865", "cp866", "cp869", "cp874", "cp875",
-        # "cp932", "cp949", "cp950", "cp1006", "cp1026", "cp1125", "cp1140", "cp1250",
-        # "cp1251", "cp1252", "cp1253", "cp1254", "cp1255", "cp1256", "cp1257",
-        # "cp1258", "cp65001", "euc_jp", "euc_jis_2004", "euc_jisx0213", "euc_kr", "gb2312",
-        # "gbk", "gb18030", "hz", "iso2022_jp", "iso2022_jp_1", "iso2022_jp_2",
-        # "iso2022_jp_2004", "iso2022_jp_3", "iso2022_jp_ext", "iso2022_kr", "latin_1",
-        # "iso8859_2", "iso8859_3", "iso8859_4", "iso8859_5", "iso8859_6", "iso8859_7",
-        # "iso8859_8", "iso8859_9", "iso8859_10", "iso8859_11", "iso8859_13", "iso8859_14",
-        # "iso8859_15", "iso8859_16", "johab", "koi8_r", "koi8_t", "koi8_u", "kz1048",
-        # "mac_cyrillic", "mac_greek", "mac_iceland", "mac_latin2", "mac_roman",
-        # "mac_turkish", "ptcp154", "shift_jis", "shift_jis_2004", "shift_jisx0213",
-        # "utf_32", "utf_32_be", "utf_32_le", "utf_16", "utf_16_be", "utf_16_le", "utf_7",
-        # "utf_8", "utf_8_sig",
-    # ]
-    # for codec in codecs:
-        # try:
-            # print(f"{codec}, {data.decode(codec)}")
-            # data = data.decode(codec)
-        # except UnicodeDecodeError:
-            # continue
-    try:
-        detected = chardet.detect(data)
-        data = data.decode(detected["encoding"])
-        print('data: dec: ', data)
-    except UnicodeDecodeError:
-        print('error')  # continue
-    return str(data)
+# def decodecs(data):
+    # # codecs = [
+        # # "ascii", "big5", "big5hkscs", "cp037", "cp273", "cp424", "cp437", "cp500", "cp720",
+        # # "cp737", "cp775", "cp850", "cp852", "cp855", "cp856", "cp857", "cp858", "cp860",
+        # # "cp861", "cp862", "cp863", "cp864", "cp865", "cp866", "cp869", "cp874", "cp875",
+        # # "cp932", "cp949", "cp950", "cp1006", "cp1026", "cp1125", "cp1140", "cp1250",
+        # # "cp1251", "cp1252", "cp1253", "cp1254", "cp1255", "cp1256", "cp1257",
+        # # "cp1258", "cp65001", "euc_jp", "euc_jis_2004", "euc_jisx0213", "euc_kr", "gb2312",
+        # # "gbk", "gb18030", "hz", "iso2022_jp", "iso2022_jp_1", "iso2022_jp_2",
+        # # "iso2022_jp_2004", "iso2022_jp_3", "iso2022_jp_ext", "iso2022_kr", "latin_1",
+        # # "iso8859_2", "iso8859_3", "iso8859_4", "iso8859_5", "iso8859_6", "iso8859_7",
+        # # "iso8859_8", "iso8859_9", "iso8859_10", "iso8859_11", "iso8859_13", "iso8859_14",
+        # # "iso8859_15", "iso8859_16", "johab", "koi8_r", "koi8_t", "koi8_u", "kz1048",
+        # # "mac_cyrillic", "mac_greek", "mac_iceland", "mac_latin2", "mac_roman",
+        # # "mac_turkish", "ptcp154", "shift_jis", "shift_jis_2004", "shift_jisx0213",
+        # # "utf_32", "utf_32_be", "utf_32_le", "utf_16", "utf_16_be", "utf_16_le", "utf_7",
+        # # "utf_8", "utf_8_sig",
+    # # ]
+    # # for codec in codecs:
+        # # try:
+            # # print(f"{codec}, {data.decode(codec)}")
+            # # data = data.decode(codec)
+        # # except UnicodeDecodeError:
+            # # continue
+    # try:
+        # detected = chardet.detect(data)
+        # data = data.decode(detected["encoding"])
+        # print('data: dec: ', data)
+    # except UnicodeDecodeError:
+        # print('error')  # continue
+    # return str(data)
 
 
 def clean_html(html):
@@ -1800,6 +1821,59 @@ def get_title(title):
     title = title.replace('&quot;', '\"').replace('&amp;', '&')
     title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
     return title
+
+
+def clean_filename(s):
+    if not s:
+        return ''
+    badchars = '\\/:*?\"<>|\''
+    for c in badchars:
+        s = s.replace(c, '')
+    return s.strip()
+
+
+def cleantext(text):
+    if PY3:
+        import html
+        text = html.unescape(text)
+    else:
+        from six.moves import (html_parser)
+        h = html_parser.HTMLParser()
+        text = h.unescape(text.decode('utf8')).encode('utf8')
+    text = text.replace('&amp;', '&')
+    text = text.replace('&apos;', "'")
+    text = text.replace('&lt;', '<')
+    text = text.replace('&gt;', '>')
+    text = text.replace('&ndash;', '-')
+    text = text.replace('&quot;', '"')
+    text = text.replace('&ntilde;', '~')
+    text = text.replace('&rsquo;', '\'')
+    text = text.replace('&nbsp;', ' ')
+    text = text.replace('&equals;', '=')
+    text = text.replace('&quest;', '?')
+    text = text.replace('&comma;', ',')
+    text = text.replace('&period;', '.')
+    text = text.replace('&colon;', ':')
+    text = text.replace('&lpar;', '(')
+    text = text.replace('&rpar;', ')')
+    text = text.replace('&excl;', '!')
+    text = text.replace('&dollar;', '$')
+    text = text.replace('&num;', '#')
+    text = text.replace('&ast;', '*')
+    text = text.replace('&lowbar;', '_')
+    text = text.replace('&lsqb;', '[')
+    text = text.replace('&rsqb;', ']')
+    text = text.replace('&half;', '1/2')
+    text = text.replace('&DiacriticalTilde;', '~')
+    text = text.replace('&OpenCurlyDoubleQuote;', '"')
+    text = text.replace('&CloseCurlyDoubleQuote;', '"')
+    return text.strip()
+
+
+def cleanhtml(raw_html):
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return cleantext
 
 
 def addstreamboq(bouquetname=None):
