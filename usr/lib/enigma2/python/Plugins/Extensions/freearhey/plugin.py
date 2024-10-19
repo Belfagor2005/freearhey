@@ -112,93 +112,43 @@ if isDreamOS:
 
 
 def pngassign(name):
-    png = os.path.join(res_plugin_path, 'pic/tv.png')
-    if 'webcam' in name.lower():
+    name_lower = name.lower()
+    png = os.path.join(res_plugin_path, 'pic/tv.png')  # default image
+
+    music_keywords = ['music', 'mtv', 'deluxe', 'djing', 'fashion', 'kiss', 'sluhay',
+                      'stingray', 'techno', 'viva', 'country', 'vevo']
+    sport_keywords = ['spor', 'boxing', 'racing', 'fight', 'golf', 'knock', 'harley',
+                      'futbool', 'motor', 'nba', 'nfl', 'bull', 'poker', 'billiar', 'fite']
+    xxx_keywords = ['adult', 'xxx']
+    relax_keywords = ['relax', 'nature', 'escape']
+
+    if 'webcam' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/webcam.png')
-    elif 'music' in name.lower():
+    elif any(keyword in name_lower for keyword in music_keywords):
         png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'spor' in name.lower():
+    elif any(keyword in name_lower for keyword in sport_keywords):
         png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'mtv' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'deluxe' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'djing' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'fashion' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'kiss' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'sluhay' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'stingray' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'techno' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'viva' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'country' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'vevo' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/music.png')
-    elif 'spor' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'boxing' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'racing' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'fight' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'golf' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'knock' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'harley' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'futbool' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'motor' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'nba' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'nfl' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'bull' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'poker' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'billiar' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'fite' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/sport.png')
-    elif 'adult' in name.lower():
+    elif any(keyword in name_lower for keyword in xxx_keywords):
         png = os.path.join(res_plugin_path, 'pic/xxx.png')
-    elif 'xxx' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/xxx.png')
-    elif 'weather' in name.lower():
+    elif 'weather' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/weather.png')
-    elif 'radio' in name.lower():
+    elif 'radio' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/radio.png')
-    elif 'family' in name.lower():
+    elif 'family' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/family.png')
-    elif 'relax' in name.lower():
+    elif any(keyword in name_lower for keyword in relax_keywords):
         png = os.path.join(res_plugin_path, 'pic/relax.png')
-    elif 'nature' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/relax.png')
-    elif 'escape' in name.lower():
-        png = os.path.join(res_plugin_path, 'pic/relax.png')
-    elif 'religious' in name.lower():
+    elif 'religious' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/religious.png')
-    elif 'shop' in name.lower():
+    elif 'shop' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/shop.png')
-    elif 'movie' in name.lower():
+    elif 'movie' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/movie.png')
-    elif 'pluto' in name.lower():
+    elif 'pluto' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/plutotv.png')
-    elif 'tvplus' in name.lower():
+    elif 'tvplus' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/tvplus.png')
-    else:
-        png = os.path.join(res_plugin_path, 'pic/tv.png')
+
     return png
 
 
