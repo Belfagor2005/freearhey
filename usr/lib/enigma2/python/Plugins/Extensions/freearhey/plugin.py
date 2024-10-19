@@ -186,26 +186,34 @@ def show_(name, link):
 
 def returnIMDB(text_clear):
     TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
+    tmdb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('tmdb'))
     IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
+    text = html_conv.html_unescape(text_clear)
     if os.path.exists(TMDB):
         try:
             from Plugins.Extensions.TMBD.plugin import TMBD
-            text = html_conv.html_unescape(text_clear)
             _session.open(TMBD.tmdbScreen, text, 0)
         except Exception as e:
-            print("[XCF] Tmdb: ", e)
+            print("[XCF] Tmdb: ", str(e))
         return True
+
+    elif os.path.exists(tmdb):
+        try:
+            from Plugins.Extensions.tmdb.plugin import tmdb
+            _session.open(tmdb.tmdbScreen, text, 0)
+        except Exception as e:
+            print("[XCF] Tmdb: ", str(e))
+        return True
+
     elif os.path.exists(IMDb):
         try:
             from Plugins.Extensions.IMDb.plugin import main as imdb
-            text = html_conv.html_unescape(text_clear)
             imdb(_session, text)
         except Exception as e:
-            print("[XCF] imdb: ", e)
+            print("[XCF] imdb: ", str(e))
         return True
     else:
-        text_clear = html_conv.html_unescape(text_clear)
-        _session.open(MessageBox, text_clear, MessageBox.TYPE_INFO)
+        _session.open(MessageBox, text, MessageBox.TYPE_INFO)
         return True
     return False
 
