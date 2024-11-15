@@ -1,7 +1,6 @@
 #!/bin/bash
 ## setup command=wget -q "--no-check-certificate" https://raw.githubusercontent.com/Belfagor2005/freearhey/main/installer.sh -O - | /bin/sh
-exec > >(tee -a /tmp/freearhey_debug.txt) 2>&1
-set -x
+
 ## Only This 2 lines to edit with new version ######
 version='3.0'
 changelog='\nAdd Live Upgrade\nFix screen'
