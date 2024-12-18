@@ -60,7 +60,6 @@ requests.packages.urllib3.disable_warnings(
 
 if sys.version_info >= (2, 7, 9):
     try:
-        import ssl
         sslContext = ssl._create_unverified_context()
     except:
         sslContext = None
@@ -1239,42 +1238,61 @@ def get_safe_filename(filename, fallback=''):
 
 
 def decodeHtml(text):
-    if pythonVer == 3:
-        import html
-        text = html.unescape(text)
-    else:
+    # List of HTML and Unicode entities to replace
+    import six
+    if six.PY2:
         from six.moves import (html_parser)
         h = html_parser.HTMLParser()
         text = h.unescape(text.decode('utf8')).encode('utf8')
-    text = text.replace('&amp;', '&')
-    text = text.replace('&apos;', "'")
-    text = text.replace('&lt;', '<')
-    text = text.replace('&gt;', '>')
-    text = text.replace('&ndash;', '-')
-    text = text.replace('&quot;', '"')
-    text = text.replace('&ntilde;', '~')
-    text = text.replace('&rsquo;', '\'')
-    text = text.replace('&nbsp;', ' ')
-    text = text.replace('&equals;', '=')
-    text = text.replace('&quest;', '?')
-    text = text.replace('&comma;', ',')
-    text = text.replace('&period;', '.')
-    text = text.replace('&colon;', ':')
-    text = text.replace('&lpar;', '(')
-    text = text.replace('&rpar;', ')')
-    text = text.replace('&excl;', '!')
-    text = text.replace('&dollar;', '$')
-    text = text.replace('&num;', '#')
-    text = text.replace('&ast;', '*')
-    text = text.replace('&lowbar;', '_')
-    text = text.replace('&lsqb;', '[')
-    text = text.replace('&rsqb;', ']')
-    text = text.replace('&half;', '1/2')
-    text = text.replace('&DiacriticalTilde;', '~')
-    text = text.replace('&OpenCurlyDoubleQuote;', '"')
-    text = text.replace('&CloseCurlyDoubleQuote;', '"')
-    return text.strip()
+    else:
+        import html
+        text = html.unescape(text)
 
+    charlist = [
+        ('&#034;', '"'), ('&#038;', '&'), ('&#039;', "'"), ('&#060;', ' '),
+        ('&#062;', ' '), ('&#160;', ' '), ('&#174;', ''), ('&#192;', 'À'),
+        ('&#193;', 'Á'), ('&#194;', 'Â'), ('&#196;', 'Ä'), ('&#204;', 'Ì'),
+        ('&#205;', 'Í'), ('&#206;', 'Î'), ('&#207;', 'Ï'), ('&#210;', 'Ò'),
+        ('&#211;', 'Ó'), ('&#212;', 'Ô'), ('&#214;', 'Ö'), ('&#217;', 'Ù'),
+        ('&#218;', 'Ú'), ('&#219;', 'Û'), ('&#220;', 'Ü'), ('&#223;', 'ß'),
+        ('&#224;', 'à'), ('&#225;', 'á'), ('&#226;', 'â'), ('&#228;', 'ä'),
+        ('&#232;', 'è'), ('&#233;', 'é'), ('&#234;', 'ê'), ('&#235;', 'ë'),
+        ('&#236;', 'ì'), ('&#237;', 'í'), ('&#238;', 'î'), ('&#239;', 'ï'),
+        ('&#242;', 'ò'), ('&#243;', 'ó'), ('&#244;', 'ô'), ('&#246;', 'ö'),
+        ('&#249;', 'ù'), ('&#250;', 'ú'), ('&#251;', 'û'), ('&#252;', 'ü'),
+        ('&#8203;', ''), ('&#8211;', '-'), ('&#8212;', '—'), ('&#8216;', "'"),
+        ('&#8217;', "'"), ('&#8220;', '"'), ('&#8221;', '"'), ('&#8222;', ','),
+        ('&#8230;', '...'), ('&#x21;', '!'), ('&#x26;', '&'), ('&#x27;', "'"),
+        ('&#x3f;', '?'), ('&#xB7;', '·'), ('&#xC4;', 'Ä'), ('&#xD6;', 'Ö'),
+        ('&#xDC;', 'Ü'), ('&#xDF;', 'ß'), ('&#xE4;', 'ä'), ('&#xE9;', 'é'),
+        ('&#xF6;', 'ö'), ('&#xF8;', 'ø'), ('&#xFB;', 'û'), ('&#xFC;', 'ü'),
+        ('&8221;', '”'), ('&8482;', '™'), ('&Aacute;', 'Á'), ('&Acirc;', 'Â'),
+        ('&Agrave;', 'À'), ('&Auml;', 'Ä'), ('&Iacute;', 'Í'), ('&Icirc;', 'Î'),
+        ('&Igrave;', 'Ì'), ('&Iuml;', 'Ï'), ('&Oacute;', 'Ó'), ('&Ocirc;', 'Ô'),
+        ('&Ograve;', 'Ò'), ('&Ouml;', 'Ö'), ('&Uacute;', 'Ú'), ('&Ucirc;', 'Û'),
+        ('&Ugrave;', 'Ù'), ('&Uuml;', 'Ü'), ('&aacute;', 'á'), ('&acirc;', 'â'),
+        ('&acute;', "'"), ('&agrave;', 'à'), ('&amp;', '&'), ('&apos;', "'"),
+        ('&auml;', 'ä'), ('&bdquo;', '"'), ('&eacute;', 'é'), ('&ecirc;', 'ê'),
+        ('&egrave;', 'è'), ('&euml;', 'ë'), ('&gt;', '>'), ('&hellip;', '...'),
+        ('&iacute;', 'í'), ('&icirc;', 'î'), ('&igrave;', 'ì'), ('&iuml;', 'ï'),
+        ('&laquo;', '"'), ('&ldquo;', '"'), ('&lsquo;', "'"), ('&lt;', '<'),
+        ('&mdash;', '—'), ('&nbsp;', ' '), ('&ndash;', '-'), ('&oacute;', 'ó'),
+        ('&ocirc;', 'ô'), ('&ograve;', 'ò'), ('&ouml;', 'ö'), ('&quot;', '"'),
+        ('&raquo;', '"'), ('&rsquo;', "'"), ('&szlig;', 'ß'), ('&uacute;', 'ú'),
+        ('&ucirc;', 'û'), ('&ugrave;', 'ù'), ('&uuml;', 'ü'), ('&ntilde;', '~'),
+        ('&equals;', '='), ('&quest;', '?'), ('&comma;', ','), ('&period;', '.'),
+        ('&colon;', ':'), ('&lpar;', '('), ('&rpar;', ')'), ('&excl;', '!'),
+        ('&dollar;', '$'), ('&num;', '#'), ('&ast;', '*'), ('&lowbar;', '_'),
+        ('&lsqb;', '['), ('&rsqb;', ']'), ('&half;', '1/2'), ('&DiacriticalTilde;', '~'),
+        ('&OpenCurlyDoubleQuote;', '"'), ('&CloseCurlyDoubleQuote;', '"'),
+    ]
+
+    # Replacing all HTML entities with their respective characters
+    for repl in charlist:
+        text = text.replace(repl[0], repl[1])
+    # Remove any remaining HTML tags
+    text = re.sub('<[^>]+>', '', text)
+    return text.strip()
 
 
 if sys.version_info[0] < 3:
@@ -1585,10 +1603,10 @@ def get_title(title):
         # title = title.encode('utf-8')
     # except:
         # pass
-    title = re.sub('&#(\d+);', '', title)
-    title = re.sub('(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
+    title = re.sub(r'&#(\d+);', '', title)
+    title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
     title = title.replace('&quot;', '\"').replace('&amp;', '&')
-    title = re.sub('\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
+    title = re.sub(r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
     return title
 
 
