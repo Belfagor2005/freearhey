@@ -9,9 +9,9 @@
 # ######################################################################
 from __future__ import print_function
 from . import _, isDreamOS, paypal
-from . import Utils
-from . import html_conv
-from .Console import Console as xConsole
+from .lib import Utils
+from .lib import html_conv
+from .lib.Console import Console as xConsole
 
 from Components.AVSwitch import AVSwitch
 try:
@@ -67,7 +67,7 @@ else:
 
 global skin_path, search, dowm3u
 
-currversion = '3.0'
+currversion = '3.1'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = ('..:: Freearhey International Channel List V. %s ::.. ' % currversion)
 PLUGIN_PATH = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('freearhey'))
@@ -77,8 +77,6 @@ developer_url = 'aHR0cHM6Ly9hcGkuZ2l0aHViLmNvbS9yZXBvcy9CZWxmYWdvcjIwMDUvZnJlZWF
 host00 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9jYXRlZ29yaWVzL3h4eC5tM3U='
 host11 = 'aHR0cHM6Ly9naXRodWIuY29tL2lwdHYtb3JnL2lwdHY='
 host22 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5sYW5ndWFnZS5tM3U='
-# host33 = 'aHR0cHM6Ly9pcHR2LW9yZy5naXRodWIuaW8vaXB0di9pbmRleC5uc2Z3Lm0zdQ=='
-# dowm3u = '/media/hdd/movie/'
 dir_enigma2 = '/etc/enigma2/'
 search = False
 
@@ -122,22 +120,23 @@ def pngassign(name):
     xxx_keywords = ['adult', 'xxx']
     relax_keywords = ['relax', 'nature', 'escape']
 
-    if 'webcam' in name_lower:
-        png = os.path.join(res_plugin_path, 'pic/webcam.png')
-    elif any(keyword in name_lower for keyword in music_keywords):
+    if any(keyword in name_lower for keyword in music_keywords):
         png = os.path.join(res_plugin_path, 'pic/music.png')
     elif any(keyword in name_lower for keyword in sport_keywords):
         png = os.path.join(res_plugin_path, 'pic/sport.png')
     elif any(keyword in name_lower for keyword in xxx_keywords):
         png = os.path.join(res_plugin_path, 'pic/xxx.png')
+    elif any(keyword in name_lower for keyword in relax_keywords):
+        png = os.path.join(res_plugin_path, 'pic/relax.png')
+
+    elif 'webcam' in name_lower:
+        png = os.path.join(res_plugin_path, 'pic/webcam.png')
     elif 'weather' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/weather.png')
     elif 'radio' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/radio.png')
     elif 'family' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/family.png')
-    elif any(keyword in name_lower for keyword in relax_keywords):
-        png = os.path.join(res_plugin_path, 'pic/relax.png')
     elif 'religious' in name_lower:
         png = os.path.join(res_plugin_path, 'pic/religious.png')
     elif 'shop' in name_lower:
@@ -869,12 +868,20 @@ class selectplay3(Screen):
                 print('exception error ', e)
 
     def ok(self):
-        name = self['menulist'].getCurrent()[0][0]
-        url = self['menulist'].getCurrent()[0][1]
-        self.play_that_shit(name, url)
+        try:
+            i = self['menulist'].getSelectedIndex()
+            self.currentindex = i
+            selection = self['menulist'].l.getCurrentSelection()
+            if selection is not None:
+                item = self.menu_list[i][0]
+                name = item[0]
+                url = item[1]
+            self.play_that_shit(url, name, self.currentindex, item, self.menu_list)
+        except Exception as error:
+            print('error as:', error)
 
-    def play_that_shit(self, name, url):
-        self.session.open(Playstream2, name, url)
+    def play_that_shit(self, url, name, index, item, menu_list):
+        self.session.open(Playstream2, name, url, index, item, menu_list)
 
     def up(self):
         self[self.currentList].up()
@@ -934,15 +941,15 @@ class TvInfoBarShowHide():
 
     def serviceStarted(self):
         if self.execing:
-            if config.usage.show_infobar_on_zap.value:
-                self.doShow()
+            self.doShow()
 
     def startHideTimer(self):
         if self.__state == self.STATE_SHOWN and not self.__locked:
             self.hideTimer.stop()
-            idx = config.usage.infobar_timeout.index
-            if idx:
-                self.hideTimer.start(idx * 1500, True)
+            self.hideTimer.start(3000, True)
+        elif hasattr(self, "pvrStateDialog"):
+            self.hideTimer.stop()
+        self.skipToggleShow = False
 
     def doShow(self):
         self.hideTimer.stop()
@@ -985,9 +992,6 @@ class TvInfoBarShowHide():
         if self.execing:
             self.startHideTimer()
 
-    def debug(obj, text=""):
-        print(text + " %s\n" % obj)
-
 
 class Playstream2(InfoBarBase,
                   InfoBarMenu,
@@ -1004,11 +1008,15 @@ class Playstream2(InfoBarBase,
     ALLOW_SUSPEND = True
     screen_timeout = 5000
 
-    def __init__(self, session, name, url):
+    def __init__(self, session, name, url, index, item, menu_list):
         global streaml
         Screen.__init__(self, session)
         self.session = session
         self.skinName = 'MoviePlayer'
+        self.currentindex = index
+        self.item = item
+        self.itemscount = len(menu_list)
+        self.list = menu_list
         streaml = False
         for x in InfoBarBase, \
                 InfoBarMenu, \
@@ -1023,12 +1031,12 @@ class Playstream2(InfoBarBase,
         except:
             self.init_aspect = 0
         self.new_aspect = self.init_aspect
-        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self.service = None
-        self.name = html_conv.html_unescape(name)
-        self.icount = 0
         self.url = url
+        self.name = html_conv.html_unescape(name)
+
         self.state = self.STATE_PLAYING
+        self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
         self['actions'] = ActionMap(['MoviePlayerActions',
                                      'MovieSelectionActions',
                                      'MediaPlayerActions',
@@ -1039,6 +1047,7 @@ class Playstream2(InfoBarBase,
                                      'OkCancelActions',
                                      'InfobarShowHideActions',
                                      'InfobarActions',
+                                     'DirectionActions',
                                      'InfobarSeekActions'], {'leavePlayer': self.cancel,
                                                              'epg': self.showIMDB,
                                                              'info': self.showIMDB,
@@ -1049,7 +1058,11 @@ class Playstream2(InfoBarBase,
                                                              'cancel': self.cancel,
                                                              'exit': self.leavePlayer,
                                                              'yellow': self.subtitles,
-                                                             'down': self.av,
+                                                             'channelDown': self.previousitem,
+                                                             'channelUp': self.nextitem,
+                                                             'down': self.previousitem,
+                                                             'up': self.nextitem,
+                                                             # 'down': self.av,
                                                              'back': self.cancel}, -1)
         if '8088' in str(self.url):
             # self.onLayoutFinish.append(self.slinkPlay)
@@ -1058,6 +1071,28 @@ class Playstream2(InfoBarBase,
             # self.onLayoutFinish.append(self.cicleStreamType)
             self.onFirstExecBegin.append(self.cicleStreamType)
         self.onClose.append(self.cancel)
+
+    def nextitem(self):
+        currentindex = int(self.currentindex) + 1
+        if currentindex == self.itemscount:
+            currentindex = 0
+        self.currentindex = currentindex
+        i = self.currentindex
+        item = self.list[i][0]
+        self.name = item[0]
+        self.url = item[1]
+        self.cicleStreamType()
+
+    def previousitem(self):
+        currentindex = int(self.currentindex) - 1
+        if currentindex < 0:
+            currentindex = self.itemscount - 1
+        self.currentindex = currentindex
+        i = self.currentindex
+        item = self.list[i][0]
+        self.name = item[0]
+        self.url = item[1]
+        self.cicleStreamType()
 
     def getAspect(self):
         return AVSwitch().getAspectRatioSetting()
@@ -1159,12 +1194,6 @@ class Playstream2(InfoBarBase,
         self.servicetype = str(next(nextStreamType))
         print('servicetype2: ', self.servicetype)
         self.openTest(self.servicetype, url)
-
-    def up(self):
-        pass
-
-    def down(self):
-        self.up()
 
     def doEofInternal(self, playing):
         self.close()
