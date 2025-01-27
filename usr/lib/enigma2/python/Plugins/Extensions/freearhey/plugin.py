@@ -1152,11 +1152,11 @@ class Playstream2(InfoBarBase,
         print('reference:   ', ref)
         if streaml is True:
             url = 'http://127.0.0.1:8088/' + str(url)
-            ref = "{0}:0:1:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
+            ref = "{0}:0:0:0:0:0:0:0:0:0:{1}:{2}".format(servicetype, url.replace(":", "%3a"), name.replace(":", "%3a"))
             print('streaml reference:   ', ref)
         print('final reference:   ', ref)
         sref = eServiceReference(ref)
-        sref.setName(str(name))
+        sref.setName(name)
         self.session.nav.stopService()
         self.session.nav.playService(sref)
 
@@ -1222,7 +1222,6 @@ class Playstream2(InfoBarBase,
                 self.setAspect(self.init_aspect)
             except:
                 pass
-        # streaml = False
         self.close()
 
     def leavePlayer(self):
