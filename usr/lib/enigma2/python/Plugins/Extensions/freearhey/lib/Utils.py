@@ -1,46 +1,37 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# 30.03.2023
+# 30.03.2024
 # a common tips used from Lululla
 
-import sys
-import datetime
-import os
-import re
-import ssl
-import base64
-import requests
-# import chardet
-from random import choice
 from Components.config import config
-try:
-    from os.path import isdir
-except ImportError:
-    from os import isdir
-# Added for support of wqhd detection
 from enigma import getDesktop
+from os.path import isdir, exists, realpath, dirname, join, isfile
+from os import system, stat, statvfs, listdir, remove, chmod, popen
+from random import choice
+import base64
+import datetime
+import re
+import requests
+import ssl
+import sys
+requests.packages.urllib3.disable_warnings(
+    requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
 screenwidth = getDesktop(0).size()
-# End of code
-# from sys import version_info
-# pythonFull = float(str(sys.version_info.major) + '.' + str(sys.version_info.minor))
 pythonVer = sys.version_info.major
-# PY3 = version_info[0] == 3
 PY2 = False
 PY3 = False
 PY34 = False
 PY39 = False
-print("sys.version_info =", sys.version_info)
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 PY39 = sys.version_info[0:2] >= (3, 9)
 PY3 = sys.version_info.major >= 3
 if PY3:
-    # import chardet
     bytes = bytes
     unicode = str
-    range = range
     from urllib.parse import quote
     from urllib.request import urlopen
     from urllib.request import Request
@@ -54,9 +45,14 @@ if PY2:
     from urllib2 import HTTPError, URLError
 
 
-requests.packages.urllib3.disable_warnings(
-    requests.packages.urllib3.exceptions.InsecureRequestWarning)
-
+if sys.version_info[0] < 3:
+    # Python 2
+    def u(x):
+        return x.decode('utf-8')
+else:
+    # Python 3
+    def u(x):
+        return x
 
 if sys.version_info >= (2, 7, 9):
     try:
@@ -72,6 +68,13 @@ def unicodify(s, encoding='utf-8', norm=None):
         from unicodedata import normalize
         s = normalize(norm, s)
     return s
+
+
+def installed(plugin_name):
+    """Check if an Enigma2 plugin is installed in the Extensions directory."""
+    from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+    path = resolveFilename(SCOPE_PLUGINS, "Extensions/" + plugin_name)
+    return exists(path)
 
 
 def checktoken(token):
@@ -199,7 +202,7 @@ def isHD():
 
 def DreamOS():
     DreamOS = False
-    if os.path.exists('/var/lib/dpkg/status'):
+    if exists('/var/lib/dpkg/status'):
         DreamOS = True
         return DreamOS
 
@@ -223,40 +226,40 @@ def mountipkpth():
             for line in f.readlines():
                 if line.find('/media/usb') != -1:
                     myusb = '/media/usb/picon'
-                    if not os.path.exists('/media/usb/picon'):
-                        os.system('mkdir -p /media/usb/picon')
+                    if not exists('/media/usb/picon'):
+                        system('mkdir -p /media/usb/picon')
                 elif line.find('/media/usb1') != -1:
                     myusb1 = '/media/usb1/picon'
-                    if not os.path.exists('/media/usb1/picon'):
-                        os.system('mkdir -p /media/usb1/picon')
+                    if not exists('/media/usb1/picon'):
+                        system('mkdir -p /media/usb1/picon')
                 elif line.find('/media/hdd') != -1:
                     myhdd = '/media/hdd/picon'
-                    if not os.path.exists('/media/hdd/picon'):
-                        os.system('mkdir -p /media/hdd/picon')
+                    if not exists('/media/hdd/picon'):
+                        system('mkdir -p /media/hdd/picon')
                 elif line.find('/media/hdd2') != -1:
                     myhdd2 = '/media/hdd2/picon'
-                    if not os.path.exists('/media/hdd2/picon'):
-                        os.system('mkdir -p /media/hdd2/picon')
+                    if not exists('/media/hdd2/picon'):
+                        system('mkdir -p /media/hdd2/picon')
                 elif line.find('/media/sdcard') != -1:
                     mysdcard = '/media/sdcard/picon'
-                    if not os.path.exists('/media/sdcard/picon'):
-                        os.system('mkdir -p /media/sdcard/picon')
+                    if not exists('/media/sdcard/picon'):
+                        system('mkdir -p /media/sdcard/picon')
                 elif line.find('/media/sd') != -1:
                     mysd = '/media/sd/picon'
-                    if not os.path.exists('/media/sd/picon'):
-                        os.system('mkdir -p /media/sd/picon')
+                    if not exists('/media/sd/picon'):
+                        system('mkdir -p /media/sd/picon')
                 elif line.find('/universe') != -1:
                     myuniverse = '/universe/picon'
-                    if not os.path.exists('/universe/picon'):
-                        os.system('mkdir -p /universe/picon')
+                    if not exists('/universe/picon'):
+                        system('mkdir -p /universe/picon')
                 elif line.find('/media/ba') != -1:
                     myba = '/media/ba/picon'
-                    if not os.path.exists('/media/ba/picon'):
-                        os.system('mkdir -p /media/ba/picon')
+                    if not exists('/media/ba/picon'):
+                        system('mkdir -p /media/ba/picon')
                 elif line.find('/data') != -1:
                     mydata = '/data/picon'
-                    if not os.path.exists('/data/picon'):
-                        os.system('mkdir -p /data/picon')
+                    if not exists('/data/picon'):
+                        system('mkdir -p /data/picon')
             f.close()
         if myusb:
             mdevices.append(myusb)
@@ -336,7 +339,7 @@ def mySkin():
     return currentSkin
 
 
-if os.path.exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
+if exists('/usr/lib/enigma2/python/Plugins/Extensions/MediaPlayer'):
     from Plugins.Extensions.MediaPlayer import *
     MediaPlayerInstalled = True
 else:
@@ -386,16 +389,16 @@ def convert_size(size_bytes):
 
 
 def getMountPoint(path):
-    pathname = os.path.realpath(path)
-    parent_device = os.stat(pathname).st_dev
-    path_device = os.stat(pathname).st_dev
+    pathname = realpath(path)
+    parent_device = stat(pathname).st_dev
+    path_device = stat(pathname).st_dev
     mount_point = ""
     while parent_device == path_device:
         mount_point = pathname
-        pathname = os.path.dirname(pathname)
+        pathname = dirname(pathname)
         if pathname == mount_point:
             break
-        parent_device = os.stat(pathname).st_dev
+        parent_device = stat(pathname).st_dev
     return mount_point
 
 
@@ -419,7 +422,7 @@ def getFreeSpace(path):
         moin_point = getMountPoint(path)
         device = getMointedDevice(moin_point)
         print(moin_point + "|" + device)
-        stat = os.statvfs(device)  # @UndefinedVariable
+        stat = statvfs(device)  # @UndefinedVariable
         print(stat)
         return sizeToString(stat.f_bfree * stat.f_bsize)
     except:
@@ -429,18 +432,18 @@ def getFreeSpace(path):
 def listDir(what):
     f = None
     try:
-        f = os.listdir(what)
+        f = listdir(what)
     except:
         pass
     return f
 
 
 def purge(dir, pattern):
-    for f in os.listdir(dir):
-        file_path = os.path.join(dir, f)
-        if os.path.isfile(file_path):
+    for f in listdir(dir):
+        file_path = join(dir, f)
+        if isfile(file_path):
             if re.search(pattern, f):
-                os.remove(file_path)
+                remove(file_path)
 
 
 def getLanguage():
@@ -459,10 +462,8 @@ def downloadFile(url, target):
     import socket
     try:
         from urllib.error import HTTPError, URLError
-        from urllib.request import urlopen
     except:
         from urllib2 import HTTPError, URLError
-        from urllib2 import urlopen
     try:
         response = urlopen(url, None, 15)
         with open(target, 'wb') as output:
@@ -654,7 +655,7 @@ def checkRedirect(url):
 
 def freespace():
     try:
-        diskSpace = os.statvfs('/')
+        diskSpace = statvfs('/')
         capacity = float(diskSpace.f_bsize * diskSpace.f_blocks)
         available = float(diskSpace.f_bsize * diskSpace.f_bavail)
         fspace = round(float(available / 1048576.0), 2)
@@ -703,7 +704,7 @@ def __createdir(list):
     dir = ''
     for line in list[1:].split('/'):
         dir += '/' + line
-        if not os.path.exists(dir):
+        if not exists(dir):
             try:
                 from os import mkdir
                 mkdir(dir)
@@ -749,36 +750,36 @@ def ReloadBouquets():
 
 
 def deletetmp():
-    os.system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz;rm -f /tmp/*.m3u')
+    system('rm -rf /tmp/unzipped;rm -f /tmp/*.ipk;rm -f /tmp/*.tar;rm -f /tmp/*.zip;rm -f /tmp/*.tar.gz;rm -f /tmp/*.tar.bz2;rm -f /tmp/*.tar.tbz2;rm -f /tmp/*.tar.tbz;rm -f /tmp/*.m3u')
     return
 
 
 def del_jpg():
     import glob
-    for i in glob.glob(os.path.join('/tmp', '*.jpg')):
+    for i in glob.glob(join('/tmp', '*.jpg')):
         try:
-            os.chmod(i, 0o777)
-            os.remove(i)
+            chmod(i, 0o777)
+            remove(i)
         except OSError:
             pass
 
 
 def OnclearMem():
     try:
-        os.system('sync')
-        os.system('echo 1 > /proc/sys/vm/drop_caches')
-        os.system('echo 2 > /proc/sys/vm/drop_caches')
-        os.system('echo 3 > /proc/sys/vm/drop_caches')
+        system('sync')
+        system('echo 1 > /proc/sys/vm/drop_caches')
+        system('echo 2 > /proc/sys/vm/drop_caches')
+        system('echo 3 > /proc/sys/vm/drop_caches')
     except:
         pass
 
 
 def MemClean():
     try:
-        os.system('sync')
-        os.system('echo 1 > /proc/sys/vm/drop_caches')
-        os.system('echo 2 > /proc/sys/vm/drop_caches')
-        os.system('echo 3 > /proc/sys/vm/drop_caches')
+        system('sync')
+        system('echo 1 > /proc/sys/vm/drop_caches')
+        system('echo 2 > /proc/sys/vm/drop_caches')
+        system('echo 3 > /proc/sys/vm/drop_caches')
     except:
         pass
 
@@ -822,7 +823,7 @@ def web_info(message):
         message = quote_plus(message)
         cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
         # debug(cmd, 'CMD -> Console -> WEBIF')
-        os.popen(cmd)
+        popen(cmd)
     except Exception as e:
         print('error: ', e)
         print('web_info ERROR')
@@ -858,11 +859,10 @@ def ConverDateBack(data):
 
 
 def isPythonFolder():
-    import os
     path = ('/usr/lib/')
-    for name in os.listdir(path):
+    for name in listdir(path):
         fullname = path + name
-        if not os.path.isfile(fullname) and 'python' in fullname:
+        if not isfile(fullname) and 'python' in fullname:
             print(fullname)
             import sys
             print("sys.version_info =", sys.version_info)
@@ -881,7 +881,7 @@ def isStreamlinkAvailable():
 
 def isExtEplayer3Available():
     from enigma import eEnv
-    return os.path.isfile(eEnv.resolve('$bindir/exteplayer3'))
+    return isfile(eEnv.resolve('$bindir/exteplayer3'))
 
 
 '''
@@ -1295,15 +1295,6 @@ def decodeHtml(text):
     return text.strip()
 
 
-if sys.version_info[0] < 3:
-    # Python 2
-    def u(x):
-        return x.decode('utf-8')
-else:
-    # Python 3
-    def u(x):
-        return x
-
 conversion = {
     u(b'\xd0\xb0'): 'a',
     u(b'\xd0\x90'): 'A',
@@ -1393,88 +1384,90 @@ def cyr2lat(text):
 
 
 def charRemove(text):
-    char = ['1080p',
-            'PF1',
-            'PF2',
-            'PF3',
-            'PF4',
-            'PF5',
-            'PF6',
-            'PF7',
-            'PF8',
-            'PF9',
-            'PF10',
-            'PF11',
-            'PF12',
-            'PF13',
-            'PF14',
-            'PF15',
-            'PF16',
-            'PF17',
-            'PF18',
-            'PF19',
-            'PF20',
-            'PF21',
-            'PF22',
-            'PF23',
-            'PF24',
-            'PF25',
-            'PF26',
-            'PF27',
-            'PF28',
-            'PF29',
-            'PF30'
-            '480p',
-            '4K',
-            '720p',
-            'ANIMAZIONE',
-            # 'APR',
-            # 'AVVENTURA',
-            'BIOGRAFICO',
-            'BDRip',
-            'BluRay',
-            'CINEMA',
-            # 'COMMEDIA',
-            'DOCUMENTARIO',
-            'DRAMMATICO',
-            'FANTASCIENZA',
-            'FANTASY',
-            # 'FEB',
-            # 'GEN',
-            # 'GIU',
-            'HDCAM',
-            'HDTC',
-            'HDTS',
-            'LD',
-            'MAFIA',
-            # 'MAG',
-            'MARVEL',
-            'MD',
-            # 'ORROR',
-            'NEW_AUDIO',
-            'POLIZIE',
-            'R3',
-            'R6',
-            'SD',
-            'SENTIMENTALE',
-            'TC',
-            'TEEN',
-            'TELECINE',
-            'TELESYNC',
-            'THRILLER',
-            'Uncensored',
-            'V2',
-            'WEBDL',
-            'WEBRip',
-            'WEB',
-            'WESTERN',
-            '-',
-            '_',
-            '.',
-            '+',
-            '[',
-            ']',
-            ]
+    char = [
+        '1080p',
+        'PF1',
+        'PF2',
+        'PF3',
+        'PF4',
+        'PF5',
+        'PF6',
+        'PF7',
+        'PF8',
+        'PF9',
+        'PF10',
+        'PF11',
+        'PF12',
+        'PF13',
+        'PF14',
+        'PF15',
+        'PF16',
+        'PF17',
+        'PF18',
+        'PF19',
+        'PF20',
+        'PF21',
+        'PF22',
+        'PF23',
+        'PF24',
+        'PF25',
+        'PF26',
+        'PF27',
+        'PF28',
+        'PF29',
+        'PF30',
+        '480p',
+        '4K',
+        '720p',
+        'ANIMAZIONE',
+        'BIOGRAFICO',
+        'BDRip',
+        'BluRay',
+        'CINEMA',
+        'DOCUMENTARIO',
+        'DRAMMATICO',
+        'FANTASCIENZA',
+        'FANTASY',
+        'HDCAM',
+        'HDTC',
+        'HDTS',
+        'LD',
+        'MAFIA',
+        'MARVEL',
+        'MD',
+        'NEW_AUDIO',
+        'POLIZIE',
+        'R3',
+        'R6',
+        'SD',
+        'SENTIMENTALE',
+        'TC',
+        'TEEN',
+        'TELECINE',
+        'TELESYNC',
+        'THRILLER',
+        'Uncensored',
+        'V2',
+        'WEBDL',
+        'WEBRip',
+        'WEB',
+        'WESTERN',
+        '-',
+        '_',
+        '.',
+        '+',
+        '[',
+        ']',
+        # 'APR',
+        # 'AVVENTURA',
+        # 'COMMEDIA',
+        # 'FEB',
+        # 'GEN',
+        # 'GIU',
+        # 'MAG',
+        # 'ORROR',
+    ]
+
     myreplace = text  # .lower()
     for ch in char:  # .lower():
         # ch= ch #.lower()
@@ -1511,7 +1504,7 @@ def clean_html(html):
 def cachedel(folder):
     fold = str(folder)
     cmd = "rm " + fold + "/*"
-    os.system(cmd)
+    system(cmd)
 
 
 def cleanName(name):
@@ -1557,7 +1550,7 @@ def cleanTitle(x):
 
 
 def remove_line(filename, what):
-    if os.path.isfile(filename):
+    if isfile(filename):
         file_read = open(filename).readlines()
         file_write = open(filename, 'w')
         for line in file_read:
@@ -1665,7 +1658,7 @@ def cleanhtml(raw_html):
 
 def addstreamboq(bouquetname=None):
     boqfile = '/etc/enigma2/bouquets.tv'
-    if not os.path.exists(boqfile):
+    if not exists(boqfile):
         pass
     else:
         fp = open(boqfile, 'r')
@@ -1692,7 +1685,7 @@ def stream2bouquet(url=None, name=None, bouquetname=None):
 
     try:
         addstreamboq(bouquetname)
-        if not os.path.exists(fileName):
+        if not exists(fileName):
             fp = open(fileName, 'w')
             fp.write('#NAME %s\n' % bouquetname)
             fp.close()
