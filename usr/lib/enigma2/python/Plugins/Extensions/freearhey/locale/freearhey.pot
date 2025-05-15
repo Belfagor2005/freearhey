@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: freearhey\n"
-"POT-Creation-Date: 2024-07-17 21:08+0200\n"
+"POT-Creation-Date: 2025-05-15 22:27+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: lululla\n"
@@ -10,16 +10,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: plugin.py\n"
 
-#: plugin.py:286 plugin.py:767
+#: plugin.py:257 plugin.py:742
 msgid "Exit"
 msgstr ""
 
-#: plugin.py:365
+#: plugin.py:332
 #, python-format
 msgid ""
 "New version %s is available\n"
@@ -29,7 +29,7 @@ msgid ""
 "Press info_long or yellow_long button to start force updating."
 msgstr ""
 
-#: plugin.py:370
+#: plugin.py:337
 #, python-format
 msgid ""
 "New version %s is available.\n"
@@ -39,35 +39,35 @@ msgid ""
 "Do you want to install it now?"
 msgstr ""
 
-#: plugin.py:372
+#: plugin.py:339
 msgid "Congrats! You already have the latest version..."
 msgstr ""
 
-#: plugin.py:382
+#: plugin.py:349
 #, python-format
 msgid "Do you want to install update ( %s ) now?"
 msgstr ""
 
-#: plugin.py:391
+#: plugin.py:358
 msgid "Update Aborted!"
 msgstr ""
 
-#: plugin.py:451
+#: plugin.py:418
 msgid ""
 "These streams may contain Adult content\n"
 "\n"
 "are you sure you want to continue??"
 msgstr ""
 
-#: plugin.py:503
+#: plugin.py:470
 msgid "Back"
 msgstr ""
 
-#: plugin.py:504
+#: plugin.py:471
 msgid "Export"
 msgstr ""
 
-#: plugin.py:664
+#: plugin.py:639
 msgid ""
 "Do you want to Convert to favorite .tv ?\n"
 "\n"
@@ -75,21 +75,21 @@ msgid ""
 "on the number of streams contained !!!"
 msgstr ""
 
-#: plugin.py:672
+#: plugin.py:647
 #, python-format
 msgid ""
 "bouquets reloaded..\n"
 "With %s channel"
 msgstr ""
 
-#: plugin.py:674
+#: plugin.py:649
 msgid "Download Error"
 msgstr ""
 
-#: plugin.py:768 plugin.py:797
+#: plugin.py:743 plugin.py:779
 msgid "Search"
 msgstr ""
 
-#: plugin.py:1185
+#: plugin.py:1181
 msgid "Please install SubSupport Plugins"
 msgstr ""

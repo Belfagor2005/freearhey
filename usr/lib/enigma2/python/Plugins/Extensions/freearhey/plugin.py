@@ -8,23 +8,23 @@
 #   But no delete this message & support on forum linuxsat-support     #
 # ######################################################################
 from __future__ import print_function
-from . import _, isDreamOS, paypal
-from .lib import Utils
-from .lib import html_conv
-from .lib.Console import Console as xConsole
+# === Built-in libraries ===
+import codecs
+import json
+import os
+import re
+import sys
+from datetime import datetime
 
-from Components.AVSwitch import AVSwitch
-try:
-	from os.path import isdir
-except ImportError:
-	from os import isdir
+# === Enigma2 Components ===
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
 from Components.MenuList import MenuList
-from Components.MultiContent import (MultiContentEntryPixmapAlphaTest, MultiContentEntryText)
-from Components.ServiceEventTracker import (ServiceEventTracker, InfoBarBase)
-from Plugins.Plugin import PluginDescriptor
+from Components.MultiContent import MultiContentEntryPixmapAlphaTest, MultiContentEntryText
+from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
+
+# === Enigma2 Screens ===
 from Screens.InfoBarGenerics import (
 	InfoBarSubtitleSupport,
 	InfoBarSeek,
@@ -34,7 +34,12 @@ from Screens.InfoBarGenerics import (
 )
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
-from Tools.Directories import (SCOPE_PLUGINS, resolveFilename)
+
+# === Enigma2 Tools ===
+from Tools.Directories import SCOPE_PLUGINS, resolveFilename
+from Plugins.Plugin import PluginDescriptor
+
+# === Enigma2 Core ===
 from enigma import (
 	RT_VALIGN_CENTER,
 	RT_HALIGN_LEFT,
@@ -47,23 +52,27 @@ from enigma import (
 	loadPNG,
 	getDesktop,
 )
-from datetime import datetime
-import codecs
-import json
-import os
-import re
-import sys
 
+# === Local Plugin Imports ===
+from . import _, isDreamOS, paypal
+from .lib import Utils
+from .lib import html_conv
+from .lib.Console import Console as xConsole
+
+# === OS Path ===
+from os.path import isdir
+
+# Python 2/3 compatibility
 PY3 = sys.version_info.major >= 3
 if PY3:
 	from urllib.request import urlopen, Request
 	unicode = str
 	unichr = chr
 	long = int
-	PY3 = True
 else:
 	from urllib2 import urlopen, Request
 
+aspect_manager = Utils.AspectManager()
 
 global skin_path, search, dowm3u
 
@@ -196,37 +205,32 @@ def show_(name, link):
 
 
 def returnIMDB(text_clear):
-	TMDB = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('TMDB'))
-	tmdb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('tmdb'))
-	IMDb = resolveFilename(SCOPE_PLUGINS, "Extensions/{}".format('IMDb'))
 	text = html_conv.html_unescape(text_clear)
-	if os.path.exists(TMDB):
+
+	if Utils.is_TMDB and Utils.TMDB:
 		try:
-			from Plugins.Extensions.TMBD.plugin import TMBD
-			_session.open(TMBD.tmdbScreen, text, 0)
+			_session.open(Utils.TMDB.tmdbScreen, text, 0)
 		except Exception as e:
-			print("[XCF] Tmdb: ", str(e))
+			print("[XCF] TMDB error:", str(e))
 		return True
 
-	elif os.path.exists(tmdb):
+	elif Utils.is_tmdb and Utils.tmdb:
 		try:
-			from Plugins.Extensions.tmdb.plugin import tmdb
-			_session.open(tmdb.tmdbScreen, text, 0)
+			_session.open(Utils.tmdb.tmdbScreen, text, 0)
 		except Exception as e:
-			print("[XCF] Tmdb: ", str(e))
+			print("[XCF] tmdb error:", str(e))
 		return True
 
-	elif os.path.exists(IMDb):
+	elif Utils.is_imdb and Utils.imdb:
 		try:
-			from Plugins.Extensions.IMDb.plugin import main as imdb
-			imdb(_session, text)
+			Utils.imdb(_session, text)
 		except Exception as e:
-			print("[XCF] imdb: ", str(e))
+			print("[XCF] IMDb error:", str(e))
 		return True
-	else:
-		_session.open(MessageBox, text, MessageBox.TYPE_INFO)
-		return True
-	return False
+
+	_session.open(MessageBox, text, MessageBox.TYPE_INFO)
+	return True
+
 
 
 Panel_list = [
@@ -1071,19 +1075,9 @@ class Playstream2(
 		for base_class in base_classes:
 			base_class.__init__(self)
 
-		# Get initial aspect ratio
-		try:
-			self.init_aspect = int(self.getAspect())
-		except ValueError:  # Evita errori di conversione
-			self.init_aspect = 0
-		except Exception:  # Cattura altri errori senza nascondere tutto
-			self.init_aspect = 0
-
-		self.new_aspect = self.init_aspect
 		self.service = None
 		self.url = url
 		self.name = html_conv.html_unescape(name)
-
 		self.state = self.STATE_PLAYING
 		self.srefInit = self.session.nav.getCurrentlyPlayingServiceReference()
 		self["actions"] = ActionMap(
@@ -1116,7 +1110,6 @@ class Playstream2(
 				"channelUp": self.nextitem,
 				"down": self.previousitem,
 				"up": self.nextitem,
-				# "down": self.av,
 				"back": self.cancel,
 			},
 			-1,
@@ -1151,48 +1144,6 @@ class Playstream2(
 		self.name = item[0]
 		self.url = item[1]
 		self.cicleStreamType()
-
-	def getAspect(self):
-		return AVSwitch().getAspectRatioSetting()
-
-	def getAspectString(self, aspectnum):
-		aspect_map = {
-			0: "4:3 Letterbox",
-			1: "4:3 PanScan",
-			2: "16:9",
-			3: "16:9 always",
-			4: "16:10 Letterbox",
-			5: "16:10 PanScan",
-			6: "16:9 Letterbox",
-		}
-		return aspect_map.get(aspectnum, "Unknown")  # Evita KeyError
-
-	def setAspect(self, aspect):
-		aspect_map = {
-			0: "4_3_letterbox",
-			1: "4_3_panscan",
-			2: "16_9",
-			3: "16_9_always",
-			4: "16_10_letterbox",
-			5: "16_10_panscan",
-			6: "16_9_letterbox",
-		}
-
-		aspect_value = aspect_map.get(aspect)
-		if aspect_value:  # Controlla se il valore esiste
-			config.av.aspectratio.setValue(aspect_value)
-			try:
-				AVSwitch().setAspectRatio(aspect)
-			except:
-				pass
-
-	def av(self):
-		temp = int(self.getAspect())
-		temp = temp + 1
-		if temp > 6:
-			temp = 0
-		self.new_aspect = temp
-		self.setAspect(temp)
 
 	def showIMDB(self):
 		try:
@@ -1283,15 +1234,11 @@ class Playstream2(
 			os.remove('/tmp/hls.avi')
 		self.session.nav.stopService()
 		self.session.nav.playService(self.srefInit)
-		if not self.new_aspect == self.init_aspect:
-			try:
-				self.setAspect(self.init_aspect)
-			except:
-				pass
+		aspect_manager.restore_aspect
 		self.close()
 
 	def leavePlayer(self):
-		self.close()
+		self.cancel()
 
 
 def main(session, **kwargs):

@@ -1,49 +1,19 @@
 import re
+import sys
+import six
+import types
 from six import unichr, iteritems
 from six.moves import html_entities
-import sys
-import types
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
 
-if PY3:
-	string_types = (str,)
-	integer_types = (int,)
-	class_types = (type,)
-	text_type = str
-	binary_type = bytes
 
-	MAXSIZE = sys.maxsize
-else:
-	string_types = (basestring,)
-	integer_types = (int, long)
-	class_types = (type, types.ClassType)
-	text_type = unicode
-	binary_type = str
-
-	if sys.platform.startswith("java"):
-		# Jython always uses 32 bits.
-		MAXSIZE = int((1 << 31) - 1)
-	else:
-		# It's possible to have sizeof(long) != sizeof(Py_ssize_t).
-		class X(object):
-
-			def __len__(self):
-				return 1 << 31
-		try:
-			len(X())
-		except OverflowError:
-			# 32-bit
-			MAXSIZE = int((1 << 31) - 1)
-		else:
-			# 64-bit
-			MAXSIZE = int((1 << 63) - 1)
-		del X
+class_types = (type,) if six.PY3 else (type, types.ClassType)
+text_type = six.text_type  # unicode in Py2, str in Py3
+binary_type = six.binary_type  # str in Py2, bytes in Py3
+MAXSIZE = sys.maxsize  # Compatibile con entrambe le versioni
 
 _UNICODE_MAP = {k: unichr(v) for k, v in iteritems(html_entities.name2codepoint)}
 _ESCAPE_RE = re.compile("[&<>\"']")
-_UNESCAPE_RE = re.compile(r"&\s*(#?)(\w+?)\s*;")  # Whitespace handling added due to "hand-assed" parsers of html pages
-# Dictionary for escaping special HTML characters
+_UNESCAPE_RE = re.compile(r"&\s*(#?)(\w+?)\s*;")
 _ESCAPE_DICT = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -53,27 +23,21 @@ _ESCAPE_DICT = {
 }
 
 
-def ensure_str(s, encoding='utf-8', errors='strict'):
+def ensure_str(s, encoding="utf-8", errors="strict"):
 	"""Coerce *s* to `str`.
 
-	For Python 2:
+	- In Python 2:
 	  - `unicode` -> encoded to `str`
 	  - `str` -> `str`
-
-	For Python 3:
+	- In Python 3:
 	  - `str` -> `str`
 	  - `bytes` -> decoded to `str`
 	"""
-	# Optimization: Fast return for the common case.
-	if type(s) is str:
+	if isinstance(s, str):
 		return s
-	if PY2 and isinstance(s, text_type):
-		return s.encode(encoding, errors)
-	elif PY3 and isinstance(s, binary_type):
+	if isinstance(s, binary_type):
 		return s.decode(encoding, errors)
-	elif not isinstance(s, (text_type, binary_type)):
-		raise TypeError("not expecting type '%s'" % type(s))
-	return s
+	raise TypeError("not expecting type '%s'" % type(s))
 
 
 def html_escape(value):
