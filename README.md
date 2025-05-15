@@ -1,5 +1,7 @@
 freearhey 
 
+[![Python package](https://github.com/Belfagor2005/freearhey/actions/workflows/pylint.yml/badge.svg)](https://github.com/Belfagor2005/freearhey/actions/workflows/pylint.yml)
+
 ![](https://komarev.com/ghpvc/?username=Belfagor2005)
 
 <img src="https://github.com/Belfagor2005/freearhey/blob/main/usr/lib/enigma2/python/Plugins/Extensions/freearhey/plugin.png">
