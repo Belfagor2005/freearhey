@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import sys, os
+import sys
+import os
 PY3 = sys.version_info.major >= 3
 print("Update.py")
 
@@ -12,4 +13,3 @@ def upd_done():
     cmd00 = 'wget -q "--no-check-certificate" ' + installUrl + ' -O - | /bin/sh'
     popen(cmd00)
     return
-
