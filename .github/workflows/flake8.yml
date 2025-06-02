@@ -1,0 +1,51 @@
+name: PEP8 Aggressive Check and Fix
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pep8-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install linters
+        run: |
+          python -m pip install --upgrade pip
+          pip install autopep8 pycodestyle
+
+      - name: Fix indentation (replace tabs with spaces)
+        run: |
+          find . -name "*.py" -exec sed -i 's/\t/    /g' {} +
+
+      - name: Run autopep8 (aggressive)
+        run: |
+          autopep8 . --in-place --recursive --aggressive --aggressive
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Pull latest changes
+        run: |
+          git pull origin main --no-rebase || echo "No remote changes to pull"
+
+      - name: Commit and push if changes exist
+        run: |
+          git add .
+          git diff --cached --quiet || git commit -m "Apply auto PEP8 aggressive fixes"
+          git push origin main || echo "Push failed (e.g. due to race condition)"
