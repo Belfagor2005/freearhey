@@ -69,10 +69,7 @@ text_type = six.text_type  # unicode in Py2, str in Py3
 binary_type = six.binary_type  # str in Py2, bytes in Py3
 MAXSIZE = sys.maxsize  # Compatibile con entrambe le versioni
 
-_UNICODE_MAP = {
-    k: unichr(v) for k,
-    v in iteritems(
-        html_entities.name2codepoint)}
+_UNICODE_MAP = {k: unichr(v) for k, v in iteritems(html_entities.name2codepoint)}
 _ESCAPE_RE = re.compile(r"[&<>\"']")
 _UNESCAPE_RE = re.compile(r"&\s*(#?)(\w+?)\s*;")
 _ESCAPE_DICT = {
@@ -96,7 +93,7 @@ else:
 if sys.version_info >= (2, 7, 9):
     try:
         sslContext = ssl._create_unverified_context()
-    except BaseException:
+    except:
         sslContext = None
 
 
@@ -162,8 +159,7 @@ def _convert_entity(m):
     """Helper for HTML entity conversion, compatible with Python 2 and 3"""
     if m.group(1) == "#":
         try:
-            return unichr(int(m.group(2)[1:], 16)) if m.group(
-                2)[:1].lower() == "x" else unichr(int(m.group(2)))
+            return unichr(int(m.group(2)[1:], 16)) if m.group(2)[:1].lower() == "x" else unichr(int(m.group(2)))
         except ValueError:
             return "&#%s;" % m.group(2)
     return _UNICODE_MAP.get(m.group(2), "&%s;" % m.group(2))
@@ -225,7 +221,6 @@ def ssl_urlopen(url):
 
 class AspectManager:
     """Manages aspect ratio settings for the plugin"""
-
     def __init__(self):
         self.init_aspect = self.get_current_aspect()
         print("[INFO] Initial aspect ratio:", self.init_aspect)
@@ -370,7 +365,7 @@ def getEnigmaVersionString():
     try:
         from enigma import getEnigmaVersionString
         return getEnigmaVersionString()
-    except BaseException:
+    except:
         return "N/A"
 
 
@@ -429,7 +424,7 @@ def getFreeMemory():
                     parts = line.strip().split()
                     mem_total = float(parts[1])
             f.close()
-    except BaseException:
+    except:
         pass
     return (mem_free, mem_total)
 
@@ -482,7 +477,7 @@ def getMointedDevice(pathname):
                     md = fields[0]
                     break
             f.close()
-    except BaseException:
+    except:
         pass
     return md
 
@@ -495,7 +490,7 @@ def getFreeSpace(path):
         stat = statvfs(device)  # @UndefinedVariable
         print(stat)
         return sizeToString(stat.f_bfree * stat.f_bsize)
-    except BaseException:
+    except:
         return "N/A"
 
 
@@ -503,7 +498,7 @@ def listDir(what):
     f = None
     try:
         f = listdir(what)
-    except BaseException:
+    except:
         pass
     return f
 
@@ -523,7 +518,7 @@ def getLanguage():
         language = config.osd.language.value
         language = language[:-3]
         # return language
-    except BaseException:
+    except:
         language = 'en'
     return language
     pass
@@ -533,7 +528,7 @@ def downloadFile(url, target):
     import socket
     try:
         from urllib.error import HTTPError, URLError
-    except BaseException:
+    except:
         from urllib2 import HTTPError, URLError
     try:
         response = urlopen(url, None, 15)
@@ -560,9 +555,7 @@ def downloadFile(url, target):
 def downloadFilest(url, target):
     try:
         req = Request(url)
-        req.add_header(
-            'User-Agent',
-            'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+        req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
         # context=ssl._create_unverified_context()
         response = ssl_urlopen(req)
         with open(target, 'wb') as output:
@@ -582,8 +575,7 @@ def defaultMoviePath():
     result = config.usage.default_path.value
     if not isdir(result):
         from Tools import Directories
-        return Directories.defaultRecordingLocation(
-            config.usage.default_path.value)
+        return Directories.defaultRecordingLocation(config.usage.default_path.value)
     return result
 
 
@@ -591,13 +583,12 @@ if not isdir(config.movielist.last_videodir.value):
     try:
         config.movielist.last_videodir.value = defaultMoviePath()
         config.movielist.last_videodir.save()
-    except BaseException:
+    except:
         pass
 downloadm3u = config.movielist.last_videodir.value
 
 
-# this def returns the current playing service name and stream_url from
-# give sref
+# this def returns the current playing service name and stream_url from give sref
 def getserviceinfo(service_ref):
     """Get service name and URL from service reference"""
     try:
@@ -627,8 +618,7 @@ CountConnOk = 0
 def zCheckInternet(opt=1, server=None, port=None):
     global CountConnOk
     sock = False
-    checklist = [("8.8.44.4", 53), ("8.8.88.8", 53), ("www.lululla.altervista.org/",
-                                                      80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
+    checklist = [("8.8.4.4", 53), ("8.8.8.8", 53), ("www.lululla.altervista.org/", 80), ("www.linuxsat-support.com", 443), ("www.google.com", 443)]
     if opt < 5:
         srv = checklist[opt]
     else:
@@ -640,7 +630,7 @@ def zCheckInternet(opt=1, server=None, port=None):
         sock = True
         CountConnOk = 0
         print('Status Internet: %s:%s -> OK' % (srv[0], srv[1]))
-    except BaseException:
+    except:
         sock = False
         print('Status Internet: %s:%s -> KO' % (srv[0], srv[1]))
         if CountConnOk == 0 and opt != 2 and opt != 3:
@@ -658,11 +648,9 @@ def checkInternet():
     try:
         import socket
         socket.setdefaulttimeout(0.5)
-        socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM).connect(
-            ('8.8.8.8', 53))
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(('8.8.8.8', 53))
         return True
-    except BaseException:
+    except:
         return False
 
 
@@ -670,7 +658,7 @@ def check(url):
     import socket
     try:
         from urllib.error import HTTPError, URLError
-    except BaseException:
+    except:
         from urllib2 import HTTPError, URLError
     try:
         response = checkStr(urlopen(url, None, 15))
@@ -737,10 +725,9 @@ def freespace():
         available = float(diskSpace.f_bsize * diskSpace.f_bavail)
         fspace = round(float(available / 1048576.0), 2)
         tspace = round(float(capacity / 1048576.0), 1)
-        spacestr = 'Free space(' + str(fspace) + \
-            'MB) Total space(' + str(tspace) + 'MB)'
+        spacestr = 'Free space(' + str(fspace) + 'MB) Total space(' + str(tspace) + 'MB)'
         return spacestr
-    except BaseException:
+    except:
         return ''
 
 
@@ -776,7 +763,7 @@ def __createdir(list):
             try:
                 from os import mkdir
                 mkdir(dir)
-            except BaseException:
+            except:
                 print('Mkdir Failed', dir)
 
 
@@ -866,7 +853,7 @@ def OnclearMem():
         system('echo 1 > /proc/sys/vm/drop_caches')
         system('echo 2 > /proc/sys/vm/drop_caches')
         system('echo 3 > /proc/sys/vm/drop_caches')
-    except BaseException:
+    except:
         pass
 
 
@@ -902,8 +889,7 @@ def findSoftCamKey():
                 paths.insert(0, line.split(':')[1].strip())
     for path in paths:
         softcamkey = os_path.join(path, 'SoftCam.Key')
-        print('[key] the %s exists %d' %
-              (softcamkey, os_path.exists(softcamkey)))
+        print('[key] the %s exists %d' % (softcamkey, os_path.exists(softcamkey)))
         if os_path.exists(softcamkey):
             return softcamkey
         else:
@@ -915,7 +901,7 @@ def web_info(message):
     try:
         try:
             from urllib import quote_plus
-        except BaseException:
+        except:
             from urllib.parse import quote_plus
         message = quote_plus(message)
         cmd = "wget -qO - 'http://127.0.0.1/web/message?type=2&timeout=10&text=%s' > /dev/null 2>&1 &" % message
@@ -956,29 +942,28 @@ def ConverDateBack(data):
 
 
 def isPythonFolder():
-    path = ('/usr/lib/')
+    path = "/usr/lib/"
     for name in listdir(path):
-        fullname = path + name
-        if not isfile(fullname) and 'python' in fullname:
+        fullname = join(path, name)
+        if not isfile(fullname) and "python" in name:
             print(fullname)
-            import sys
             print("sys.version_info =", sys.version_info)
-            pythonvr = fullname
-            print('pythonvr is ', pythonvr)
-            x = ('%s/site-packages/streamlink' % pythonvr)
+            x = join(fullname, "site-packages", "streamlink")
             print(x)
-            # /usr/lib/python3.9/site-packages/streamlink
-    return x
+            if exists(x):
+                return x
+    return False
 
 
-def isStreamlinkAvailable():
-    pythonvr = isPythonFolder()
-    return pythonvr
+def is_streamlink_available():
+    streamlink_folder = isPythonFolder()
+    return streamlink_folder
 
 
-def isExtEplayer3Available():
+def is_exteplayer3_Available():
     from enigma import eEnv
-    return isfile(eEnv.resolve('$bindir/exteplayer3'))
+    path = eEnv.resolve("$bindir/exteplayer3")
+    return isfile(path)
 
 
 '''
@@ -1004,9 +989,7 @@ WHERE_CHANNEL_CONTEXT_MENU = 15
 
 def AdultUrl(url):
     req = Request(url)
-    req.add_header(
-        'User-Agent',
-        'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
+    req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14')
     r = urlopen(req, None, 15)
     link = r.read()
     r.close()
@@ -1025,7 +1008,6 @@ std_headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'en-us,en;q=0.5',
 }
-
 
 ListAgent = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
@@ -1081,7 +1063,8 @@ ListAgent = [
     'Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/537.13+ (KHTML, like Gecko) Version/5.1.7 Safari/534.57.2',
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/534.55.3 (KHTML, like Gecko) Version/5.1.3 Safari/534.53.10',
-    'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3']
+    'Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko ) Version/5.1 Mobile/9B176 Safari/7534.48.3'
+]
 
 
 def RequestAgent():
@@ -1095,13 +1078,7 @@ def make_request(url):
         import requests
         response = requests.get(url, verify=False)
         if response.status_code == 200:
-            link = requests.get(
-                url,
-                headers={
-                    'User-Agent': RequestAgent()},
-                timeout=15,
-                verify=False,
-                stream=True).text
+            link = requests.get(url, headers={'User-Agent': RequestAgent()}, timeout=15, verify=False, stream=True).text
         return link
     except ImportError:
         req = Request(url)
@@ -1117,7 +1094,7 @@ def ReadUrl2(url, referer):
     try:
         import ssl
         CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-    except BaseException:
+    except:
         CONTEXT = None
 
     TIMEOUT_URL = 30
@@ -1179,7 +1156,7 @@ def ReadUrl(url):
     try:
         import ssl
         CONTEXT = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-    except BaseException:
+    except:
         CONTEXT = None
     link = url
     TIMEOUT_URL = 30
@@ -1273,7 +1250,7 @@ def getUrl2(url, referer):
         response = urlopen(req, timeout=10)
         link = response.read().decode()
         response.close()
-    except BaseException:
+    except:
         import ssl
         gcontext = ssl._create_unverified_context()
         response = urlopen(req, timeout=10, context=gcontext)
@@ -1287,7 +1264,7 @@ def getUrlresp(url):
     req.add_header('User-Agent', RequestAgent())
     try:
         response = urlopen(req, timeout=10)
-    except BaseException:
+    except:
         import ssl
         gcontext = ssl._create_unverified_context()
         response = urlopen(req, timeout=10, context=gcontext)
@@ -1318,16 +1295,11 @@ def normalize(title):
         import unicodedata
         try:
             return title.decode('ascii').encode("utf-8")
-        except BaseException:
+        except:
             pass
 
-        return str(
-            ''.join(
-                c for c in unicodedata.normalize(
-                    'NFKD',
-                    unicode(
-                        title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
-    except BaseException:
+        return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
+    except:
         return unicode(title)
 
 
@@ -1339,10 +1311,7 @@ def get_safe_filename(filename, fallback=''):
     name = filename.replace(' ', '_').replace('/', '_')
     if isinstance(name, six.text_type):
         name = name.encode('utf-8')
-    name = unicodedata.normalize(
-        'NFKD', six.text_type(
-            name, 'utf_8', errors='ignore')).encode(
-        'ASCII', 'ignore')
+    name = unicodedata.normalize('NFKD', six.text_type(name, 'utf_8', errors='ignore')).encode('ASCII', 'ignore')
     name = re.sub(b'[^a-z0-9-_]', b'', name.lower())
     if not name:
         name = fallback
@@ -1454,7 +1423,7 @@ def cyr2lat(text):
         bukva_original = text[i]
         try:
             bukva_translit = conversion[bukva_original]
-        except BaseException:
+        except:
             bukva_translit = bukva_original
         i = i + 1
         retval += bukva_translit
@@ -1550,13 +1519,7 @@ def charRemove(text):
     for ch in char:  # .lower():
         # ch= ch #.lower()
         if text == ch:
-            myreplace = text.replace(
-                ch,
-                '').replace(
-                '  ',
-                ' ').replace(
-                '   ',
-                ' ').strip()
+            myreplace = text.replace(ch, '').replace('  ', ' ').replace('   ', ' ').strip()
     print('myreplace: ', myreplace)
     return myreplace
 
@@ -1593,14 +1556,13 @@ def cachedel(folder):
 
 def cleanName(name):
     non_allowed_characters = "/.\\:*?<>|\""
+    name = unicodedata.normalize("NFKD", name).encode("ASCII", "ignore").decode("ASCII")
     name = name.replace('\xc2\x86', '').replace('\xc2\x87', '')
     name = name.replace(' ', '-').replace("'", '').replace('&', 'e')
     name = name.replace('(', '').replace(')', '')
     name = name.strip()
-    name = ''.join(
-        ['_' if c in non_allowed_characters or ord(c) < 32 else c for c in name])
+    name = ''.join(['_' if c in non_allowed_characters or ord(c) < 32 else c for c in name])
     return name
-
 
 def cleantitle(title):
     import re
@@ -1647,346 +1609,28 @@ def remove_line(filename, pattern):
 def badcar(name):
     name = name
     bad_chars = [
-        "sd",
-        "hd",
-        "fhd",
-        "uhd",
-        "4k",
-        "1080p",
-        "720p",
-        "blueray",
-        "x264",
-        "aac",
-        "ozlem",
-        "hindi",
-        "hdrip",
-        "(cache)",
-        "(kids)",
-        "[3d-en]",
-        "[iran-dubbed]",
-        "imdb",
-        "top250",
-        "multi-audio",
-        "multi-subs",
-        "multi-sub",
-        "[audio-pt]",
-        "[nordic-subbed]",
-        "[nordic-subbeb]",
-        "SD",
-        "HD",
-        "FHD",
-        "UHD",
-        "4K",
-        "1080P",
-        "720P",
-        "BLUERAY",
-        "X264",
-        "AAC",
-        "OZLEM",
-        "HINDI",
-        "HDRIP",
-        "(CACHE)",
-        "(KIDS)",
-        "[3D-EN]",
-        "[IRAN-DUBBED]",
-        "IMDB",
-        "TOP250",
-        "MULTI-AUDIO",
-        "MULTI-SUBS",
-        "MULTI-SUB",
-        "[AUDIO-PT]",
-        "[NORDIC-SUBBED]",
-        "[NORDIC-SUBBEB]",
-        "-ae-",
-        "-al-",
-        "-ar-",
-        "-at-",
-        "-ba-",
-        "-be-",
-        "-bg-",
-        "-br-",
-        "-cg-",
-        "-ch-",
-        "-cz-",
-        "-da-",
-        "-de-",
-        "-dk-",
-        "-ee-",
-        "-en-",
-        "-es-",
-        "-ex-yu-",
-        "-fi-",
-        "-fr-",
-        "-gr-",
-        "-hr-",
-        "-hu-",
-        "-in-",
-        "-ir-",
-        "-it-",
-        "-lt-",
-        "-mk-",
-        "-mx-",
-        "-nl-",
-        "-no-",
-        "-pl-",
-        "-pt-",
-        "-ro-",
-        "-rs-",
-        "-ru-",
-        "-se-",
-        "-si-",
-        "-sk-",
-        "-tr-",
-        "-uk-",
-        "-us-",
-        "-yu-",
-        "-AE-",
-        "-AL-",
-        "-AR-",
-        "-AT-",
-        "-BA-",
-        "-BE-",
-        "-BG-",
-        "-BR-",
-        "-CG-",
-        "-CH-",
-        "-CZ-",
-        "-DA-",
-        "-DE-",
-        "-DK-",
-        "-EE-",
-        "-EN-",
-        "-ES-",
-        "-EX-YU-",
-        "-FI-",
-        "-FR-",
-        "-GR-",
-        "-HR-",
-        "-HU-",
-        "-IN-",
-        "-IR-",
-        "-IT-",
-        "-LT-",
-        "-MK-",
-        "-MX-",
-        "-NL-",
-        "-NO-",
-        "-PL-",
-        "-PT-",
-        "-RO-",
-        "-RS-",
-        "-RU-",
-        "-SE-",
-        "-SI-",
-        "-SK-",
-        "-TR-",
-        "-UK-",
-        "-US-",
-        "-YU-",
-        "|ae|",
-        "|al|",
-        "|ar|",
-        "|at|",
-        "|ba|",
-        "|be|",
-        "|bg|",
-        "|br|",
-        "|cg|",
-        "|ch|",
-        "|cz|",
-        "|da|",
-        "|de|",
-        "|dk|",
-        "|ee|",
-        "|en|",
-        "|es|",
-        "|ex-yu|",
-        "|fi|",
-        "|fr|",
-        "|gr|",
-        "|hr|",
-        "|hu|",
-        "|in|",
-        "|ir|",
-        "|it|",
-        "|lt|",
-        "|mk|",
-        "|mx|",
-        "|nl|",
-        "|no|",
-        "|pl|",
-        "|pt|",
-        "|ro|",
-        "|rs|",
-        "|ru|",
-        "|se|",
-        "|si|",
-        "|sk|",
-        "|tr|",
-        "|uk|",
-        "|us|",
-        "|yu|",
-        "|AE|",
-        "|AL|",
-        "|AR|",
-        "|AT|",
-        "|BA|",
-        "|BE|",
-        "|BG|",
-        "|BR|",
-        "|CG|",
-        "|CH|",
-        "|CZ|",
-        "|DA|",
-        "|DE|",
-        "|DK|",
-        "|EE|",
-        "|EN|",
-        "|ES|",
-        "|EX-YU|",
-        "|FI|",
-        "|FR|",
-        "|GR|",
-        "|HR|",
-        "|HU|",
-        "|IN|",
-        "|IR|",
-        "|IT|",
-        "|LT|",
-        "|MK|",
-        "|MX|",
-        "|NL|",
-        "|NO|",
-        "|PL|",
-        "|PT|",
-        "|RO|",
-        "|RS|",
-        "|RU|",
-        "|SE|",
-        "|SI|",
-        "|SK|",
-        "|TR|",
-        "|UK|",
-        "|US|",
-        "|YU|",
-        "|Ae|",
-        "|Al|",
-        "|Ar|",
-        "|At|",
-        "|Ba|",
-        "|Be|",
-        "|Bg|",
-        "|Br|",
-        "|Cg|",
-        "|Ch|",
-        "|Cz|",
-        "|Da|",
-        "|De|",
-        "|Dk|",
-        "|Ee|",
-        "|En|",
-        "|Es|",
-        "|Ex-Yu|",
-        "|Fi|",
-        "|Fr|",
-        "|Gr|",
-        "|Hr|",
-        "|Hu|",
-        "|In|",
-        "|Ir|",
-        "|It|",
-        "|Lt|",
-        "|Mk|",
-        "|Mx|",
-        "|Nl|",
-        "|No|",
-        "|Pl|",
-        "|Pt|",
-        "|Ro|",
-        "|Rs|",
-        "|Ru|",
-        "|Se|",
-        "|Si|",
-        "|Sk|",
-        "|Tr|",
-        "|Uk|",
-        "|Us|",
-        "|Yu|",
-        "(",
-        ")",
-        "[",
-        "]",
-        "u-",
-        "3d",
-        "'",
-        "#",
-        "/",
-        "-",
-        "_",
-        ".",
-        "+",
-        "PF1",
-        "PF2",
-        "PF3",
-        "PF4",
-        "PF5",
-        "PF6",
-        "PF7",
-        "PF8",
-        "PF9",
-        "PF10",
-        "PF11",
-        "PF12",
-        "PF13",
-        "PF14",
-        "PF15",
-        "PF16",
-        "PF17",
-        "PF18",
-        "PF19",
-        "PF20",
-        "PF21",
-        "PF22",
-        "PF23",
-        "PF24",
-        "PF25",
-        "PF26",
-        "PF27",
-        "PF28",
-        "PF29",
-        "PF30",
-        "480p",
-        "ANIMAZIONE",
-        "AVVENTURA",
-        "BIOGRAFICO",
-        "BDRip",
-        "BluRay",
-        "CINEMA",
-        "COMMEDIA",
-        "DOCUMENTARIO",
-        "DRAMMATICO",
-        "FANTASCIENZA",
-        "FANTASY",
-        "HDCAM",
-        "HDTC",
-        "HDTS",
-        "LD",
-        "MARVEL",
-        "MD",
-        "NEW_AUDIO",
-        "R3",
-        "R6",
-        "SENTIMENTALE",
-        "TC",
-        "TELECINE",
-        "TELESYNC",
-        "THRILLER",
-        "Uncensored",
-        "V2",
-        "WEBDL",
-        "WEBRip",
-        "WEB",
-        "WESTERN"]
+        "sd", "hd", "fhd", "uhd", "4k", "1080p", "720p", "blueray", "x264", "aac", "ozlem", "hindi", "hdrip", "(cache)", "(kids)", "[3d-en]", "[iran-dubbed]", "imdb", "top250", "multi-audio",
+        "multi-subs", "multi-sub", "[audio-pt]", "[nordic-subbed]", "[nordic-subbeb]",
+        "SD", "HD", "FHD", "UHD", "4K", "1080P", "720P", "BLUERAY", "X264", "AAC", "OZLEM", "HINDI", "HDRIP", "(CACHE)", "(KIDS)", "[3D-EN]", "[IRAN-DUBBED]", "IMDB", "TOP250", "MULTI-AUDIO",
+        "MULTI-SUBS", "MULTI-SUB", "[AUDIO-PT]", "[NORDIC-SUBBED]", "[NORDIC-SUBBEB]",
+        "-ae-", "-al-", "-ar-", "-at-", "-ba-", "-be-", "-bg-", "-br-", "-cg-", "-ch-", "-cz-", "-da-", "-de-", "-dk-", "-ee-", "-en-", "-es-", "-ex-yu-", "-fi-", "-fr-", "-gr-", "-hr-", "-hu-",
+        "-in-", "-ir-", "-it-", "-lt-", "-mk-", "-mx-", "-nl-", "-no-", "-pl-", "-pt-", "-ro-", "-rs-", "-ru-", "-se-", "-si-", "-sk-", "-tr-", "-uk-", "-us-", "-yu-",
+        "-AE-", "-AL-", "-AR-", "-AT-", "-BA-", "-BE-", "-BG-", "-BR-", "-CG-", "-CH-", "-CZ-", "-DA-", "-DE-", "-DK-", "-EE-", "-EN-", "-ES-", "-EX-YU-", "-FI-", "-FR-", "-GR-", "-HR-", "-HU-",
+        "-IN-", "-IR-", "-IT-", "-LT-", "-MK-", "-MX-", "-NL-", "-NO-", "-PL-", "-PT-", "-RO-", "-RS-", "-RU-", "-SE-", "-SI-", "-SK-", "-TR-", "-UK-", "-US-", "-YU-",
+        "|ae|", "|al|", "|ar|", "|at|", "|ba|", "|be|", "|bg|", "|br|", "|cg|", "|ch|", "|cz|", "|da|", "|de|", "|dk|", "|ee|", "|en|", "|es|", "|ex-yu|", "|fi|", "|fr|", "|gr|", "|hr|", "|hu|",
+        "|in|", "|ir|", "|it|", "|lt|", "|mk|", "|mx|", "|nl|", "|no|", "|pl|", "|pt|", "|ro|", "|rs|", "|ru|", "|se|", "|si|", "|sk|", "|tr|", "|uk|", "|us|", "|yu|",
+        "|AE|", "|AL|", "|AR|", "|AT|", "|BA|", "|BE|", "|BG|", "|BR|", "|CG|", "|CH|", "|CZ|", "|DA|", "|DE|", "|DK|", "|EE|", "|EN|", "|ES|", "|EX-YU|", "|FI|", "|FR|", "|GR|", "|HR|", "|HU|",
+        "|IN|", "|IR|", "|IT|", "|LT|", "|MK|", "|MX|", "|NL|", "|NO|", "|PL|", "|PT|", "|RO|", "|RS|", "|RU|", "|SE|", "|SI|", "|SK|", "|TR|", "|UK|", "|US|", "|YU|",
+        "|Ae|", "|Al|", "|Ar|", "|At|", "|Ba|", "|Be|", "|Bg|", "|Br|", "|Cg|", "|Ch|", "|Cz|", "|Da|", "|De|", "|Dk|", "|Ee|", "|En|", "|Es|", "|Ex-Yu|", "|Fi|", "|Fr|", "|Gr|", "|Hr|", "|Hu|",
+        "|In|", "|Ir|", "|It|", "|Lt|", "|Mk|", "|Mx|", "|Nl|", "|No|", "|Pl|", "|Pt|", "|Ro|", "|Rs|", "|Ru|", "|Se|", "|Si|", "|Sk|", "|Tr|", "|Uk|", "|Us|", "|Yu|",
+        "(", ")", "[", "]", "u-", "3d", "'", "#", "/", "-", "_", ".", "+",
+        "PF1", "PF2", "PF3", "PF4", "PF5", "PF6", "PF7", "PF8", "PF9", "PF10", "PF11", "PF12", "PF13", "PF14", "PF15", "PF16", "PF17", "PF18", "PF19", "PF20",
+        "PF21", "PF22", "PF23", "PF24", "PF25", "PF26", "PF27", "PF28", "PF29", "PF30",
+        "480p", "ANIMAZIONE", "AVVENTURA", "BIOGRAFICO", "BDRip", "BluRay", "CINEMA", "COMMEDIA",
+        "DOCUMENTARIO", "DRAMMATICO", "FANTASCIENZA", "FANTASY", "HDCAM", "HDTC", "HDTS", "LD",
+        "MARVEL", "MD", "NEW_AUDIO", "R3", "R6", "SENTIMENTALE", "TC", "TELECINE", "TELESYNC",
+        "THRILLER", "Uncensored", "V2", "WEBDL", "WEBRip", "WEB", "WESTERN"
+    ]
 
     for j in range(1900, 2025):
         bad_chars.append(str(j))
@@ -2006,10 +1650,7 @@ def get_title(title):
     title = re.sub(r'&#(\d+);', '', title)
     title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
     title = title.replace('&quot;', '\"').replace('&amp;', '&')
-    title = re.sub(
-        r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s',
-        '',
-        title).lower()
+    title = re.sub(r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\s', '', title).lower()
     return title
 
 
@@ -2081,9 +1722,7 @@ def addstreamboq(bouquetname=None):
                 break
         if add is True:
             fp = open(boqfile, 'a')
-            fp.write(
-                '#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' %
-                bouquetname)
+            fp.write('#SERVICE 1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.%s.tv" ORDER BY bouquet\n' % bouquetname)
             fp.close()
             add = True
     return
@@ -2093,8 +1732,7 @@ def stream2bouquet(url=None, name=None, bouquetname=None):
     error = 'none'
     bouquetname = 'MyFavoriteBouquet'
     fileName = '/etc/enigma2/userbouquet.%s.tv' % bouquetname
-    out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (
-        quote(url), quote(name))
+    out = '#SERVICE 4097:0:0:0:0:0:0:0:0:0:%s:%s\r\n' % (quote(url), quote(name))
 
     try:
         addstreamboq(bouquetname)
@@ -2116,6 +1754,6 @@ def stream2bouquet(url=None, name=None, bouquetname=None):
             fp.write(out)
         fp.write('')
         fp.close()
-    except BaseException:
+    except:
         error = ('Adding to bouquet failed')
     return error
