@@ -19,6 +19,7 @@ import six
 from six import unichr, iteritems
 from six.moves import html_entities
 import types
+import unicodedata
 
 requests.packages.urllib3.disable_warnings(
     requests.packages.urllib3.exceptions.InsecureRequestWarning)
