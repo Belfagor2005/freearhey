@@ -6,7 +6,9 @@ LICENSE = "proprietary"
 
 require conf/license/license-gplv2.inc
 
-inherit gitpkgv
+RDEPENDS:${PN} = "ffmpeg gstplayer exteplayer3 enigma2-plugin-systemplugins-serviceapp"
+
+inherit allarch gitpkgv
 
 SRCREV = "${AUTOREV}"
 PV = "1.0+git${SRCPV}"
@@ -18,8 +20,8 @@ SRC_URI = "git://github.com/Belfagor2005/freearhey.git;protocol=https;branch=mai
 
 S = "${WORKDIR}/git"
 
-FILES_${PN} = "/usr/*"
+FILES:${PN} = "/usr/*"
 
 do_install() {
-    cp -rp ${S}/usr* ${D}/ 
+    cp -af --no-preserve=ownership ${S}/usr* ${D}/
 }
