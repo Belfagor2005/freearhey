@@ -54,7 +54,7 @@ from enigma import (
 )
 
 # === Local Plugin Imports ===
-from . import _, isDreamOS, paypal
+from . import _, isDreamOS, paypal, __version__
 from .lib import Utils
 from .lib import html_conv
 from .lib.Console import Console as xConsole
@@ -76,11 +76,11 @@ aspect_manager = Utils.AspectManager()
 
 global skin_path, search, dowm3u
 
-currversion = '3.1'
+__version__ = '3.1'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = (
     '..:: Freearhey International Channel List V. %s ::.. ' %
-    currversion)
+    __version__)
 PLUGIN_PATH = resolveFilename(
     SCOPE_PLUGINS,
     "Extensions/{}".format('freearhey'))
@@ -377,7 +377,7 @@ class freearhey(Screen):
                     break
         self.new_version = remote_version
         self.new_changelog = remote_changelog
-        if currversion < remote_version:
+        if __version__ < remote_version:
             self.Update = True
             # self['key_yellow'].show()
             # self['key_green'].show()

@@ -5,7 +5,7 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 import gettext
 import os
-
+__version__ =  "3.1"
 PluginLanguageDomain = 'freearhey'
 PluginLanguagePath = 'Extensions/freearhey/locale'
 
