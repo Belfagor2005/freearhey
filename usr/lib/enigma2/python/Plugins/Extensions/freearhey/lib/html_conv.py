@@ -5,9 +5,34 @@ import types
 from six import unichr, iteritems
 from six.moves import html_entities
 
+try:
+    unicode
+except NameError:
+    unicode = str  # Python 3 fallback
+
+try:
+    basestring
+except NameError:
+    basestring = str  # fake definition for linter
+
+try:
+    long
+except NameError:
+    long = int  # fake definition for linter
+
+
+if sys.version_info[0] < 3:
+    string_types = (basestring,)
+    integer_types = (int, long)
+    text_type = unicode
+else:
+    string_types = (str,)
+    integer_types = (int,)
+    text_type = str
+
 
 class_types = (type,) if six.PY3 else (type, types.ClassType)
-text_type = six.text_type  # unicode in Py2, str in Py3
+# text_type = six.text_type  # unicode in Py2, str in Py3
 binary_type = six.binary_type  # str in Py2, bytes in Py3
 MAXSIZE = sys.maxsize  # Compatibile con entrambe le versioni
 
