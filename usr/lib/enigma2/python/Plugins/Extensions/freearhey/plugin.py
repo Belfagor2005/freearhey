@@ -1,14 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 30/08/2023 update
-# ######################################################################
-#   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
-#   This is free software; you can redistribute it and/or modify it.   #
-#   But no delete this message & support on forum linuxsat-support     #
-# ######################################################################
+
 from __future__ import print_function
-# === Built-in libraries ===
 import codecs
 import json
 import os
@@ -16,7 +10,6 @@ import re
 import sys
 from datetime import datetime
 
-# === Enigma2 Components ===
 from Components.ActionMap import ActionMap
 from Components.config import config
 from Components.Label import Label
@@ -24,7 +17,6 @@ from Components.MenuList import MenuList
 from Components.MultiContent import MultiContentEntryPixmapAlphaTest, MultiContentEntryText
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 
-# === Enigma2 Screens ===
 from Screens.InfoBarGenerics import (
     InfoBarSubtitleSupport,
     InfoBarSeek,
@@ -35,11 +27,9 @@ from Screens.InfoBarGenerics import (
 from Screens.MessageBox import MessageBox
 from Screens.Screen import Screen
 
-# === Enigma2 Tools ===
 from Tools.Directories import SCOPE_PLUGINS, resolveFilename
 from Plugins.Plugin import PluginDescriptor
 
-# === Enigma2 Core ===
 from enigma import (
     RT_VALIGN_CENTER,
     RT_HALIGN_LEFT,
@@ -52,17 +42,21 @@ from enigma import (
     loadPNG,
     getDesktop,
 )
+from os.path import isdir
 
-# === Local Plugin Imports ===
 from . import _, isDreamOS, paypal, __version__
 from .lib import Utils
 from .lib import html_conv
 from .lib.Console import Console as xConsole
 
-# === OS Path ===
-from os.path import isdir
+# 30/08/2023 update
+# ######################################################################
+#   Enigma2 plugin Freearhey is coded by Lululla and Pcd               #
+#   This is free software; you can redistribute it and/or modify it.   #
+#   But no delete this message & support on forum linuxsat-support     #
+# ######################################################################
 
-# Python 2/3 compatibility
+
 PY3 = sys.version_info.major >= 3
 if PY3:
     from urllib.request import urlopen, Request
@@ -76,7 +70,6 @@ aspect_manager = Utils.AspectManager()
 
 global skin_path, search, dowm3u
 
-__version__ = '3.1'
 name_plugin = 'Freearhey Plugin'
 desc_plugin = (
     '..:: Freearhey International Channel List V. %s ::.. ' %
